@@ -15,8 +15,6 @@ import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
-/** Phones: the screens carousel advances by itself after this long (ms). */
-const SCREEN_AUTO = 7000;
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
 const SLIDE_MS = 450;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
@@ -178,14 +176,6 @@ export default function BroadcastPanel({
     setScreen((i) => (i + d + screenCount) % screenCount);
   };
 
-  // Phones: the screens carousel moves on by itself every SCREEN_AUTO ms
-  // (the timer restarts after every change, manual or automatic).
-  useEffect(() => {
-    if (!compact || kind !== "screens" || !live || !tabOpen || screenCount < 2) return;
-    const t = setTimeout(() => stepScreen(1), SCREEN_AUTO);
-    return () => clearTimeout(t);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [compact, kind, live, tabOpen, screen, screenCount]);
 
   // Phones: opening a tab scrolls its header to the middle of the screen (the
   // tab above may have just collapsed, which would otherwise leave you far down).
@@ -369,6 +359,7 @@ export default function BroadcastPanel({
               </div>}
               <div
                 className={`${styles.preview} ${styles.screenStage}`}
+                data-assets={screens[screen]?.assets || undefined}
                 onPointerDown={onStageDown}
                 onPointerUp={onStageUp}
                 onPointerCancel={() => (swipe.current = null)}

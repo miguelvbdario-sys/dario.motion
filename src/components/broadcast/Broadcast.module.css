@@ -2216,3 +2216,20 @@
     touch-action: none;
   }
 }
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* Line-up loops side by side again (a lone loop still takes the full width). */
+  .screenLoopsMobile {
+    flex-direction: row;
+  }
+
+  .screenLoopsMobile .loopCell {
+    flex: 1 1 0;
+    width: auto;
+  }
+
+  /* All assets: a much taller field on phones. */
+  .screenStage[data-assets] {
+    aspect-ratio: 3 / 4;
+  }
+}
