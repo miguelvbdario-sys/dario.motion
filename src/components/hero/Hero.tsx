@@ -248,7 +248,8 @@ export default function Hero() {
           }
         }
         const showRight = !!right && view.right > 0;
-        if (showRight) right.draw(Math.round(RIGHT_FRAMES.first + view.right));
+        // Played in reverse: the start of the drag shows the sequence's last file.
+        if (showRight) right.draw(Math.round(RIGHT_FRAMES.last - view.right));
         else head.draw(Math.min(HEAD_FRAMES.last, Math.max(HEAD_FRAMES.first, view.display)));
         if (rightEl) rightEl.style.visibility = showRight ? "visible" : "hidden";
         if (headCanvas.current) headCanvas.current.style.visibility = showRight ? "hidden" : "visible";
