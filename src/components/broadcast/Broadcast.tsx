@@ -32,6 +32,8 @@ const FLIP_TIME = 0.6;
 /** A flip in progress blocks media swaps and other flips for this long. */
 const FLIP_LOCK_MS = 620;
 const OPEN_TIME = 0.85;
+/** Space left above a row when a card opens and the page scrolls to it (px). */
+const SCROLL_GAP = 12;
 /** Floating card offset from the cursor (px). */
 const CARD_OFFSET_X = 200;
 /** Card size (320×180, 16:9): centred vertically on the cursor. */
@@ -317,6 +319,22 @@ export default function Broadcast() {
     });
     // The card never sits over the open row.
     transition(targetFor(hovered.current));
+
+    // Opening a card: scroll to its row. If another open card above it is
+    // collapsing, its height is taken off the target so we land on the row
+    // (before, the collapse shifted the page and you ended up far below).
+    if (openId) {
+      const i = BROADCAST.findIndex((p) => p.id === openId);
+      const row = rows.current[i];
+      if (row) {
+        const prevIdx = prev ? BROADCAST.findIndex((p) => p.id === prev) : -1;
+        let y = row.getBoundingClientRect().top + window.scrollY - SCROLL_GAP;
+        if (prevIdx >= 0 && prevIdx < i) y -= panels.current[prevIdx]?.offsetHeight ?? 0;
+        const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+        if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
+        else window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
   }, [openId, setBars, targetFor, transition]);
 
   // Esc closes the open card.

@@ -165,6 +165,9 @@ export default function BroadcastPanel({
     setClosing(false);
     setTabOpen(false);
   }, []);
+  /** Phones: accordion items, and whether the next open should scroll to it. */
+  const accRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const accJump = useRef(false);
   /** Screens carousel: the screen sliding out, and the slide direction. */
   const [leaving, setLeaving] = useState<{ index: number; dir: 1 | -1 } | null>(null);
   const screenCount = screens?.length ?? 0;
@@ -182,6 +185,22 @@ export default function BroadcastPanel({
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compact, kind, live, tabOpen, screen, screenCount]);
+
+  // Phones: opening a tab scrolls to its header (the tab above may have just
+  // collapsed, which would otherwise leave you far down the page).
+  useEffect(() => {
+    if (!accJump.current) return;
+    accJump.current = false;
+    const el = accRefs.current[sections ? tab : active];
+    if (!el) return;
+    requestAnimationFrame(() => {
+      const y = el.getBoundingClientRect().top + window.scrollY - 12;
+      const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+      if (lenis) lenis.scrollTo(y, { duration: 0.7 });
+      else window.scrollTo({ top: y, behavior: "smooth" });
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab, active]);
 
   // The screen sliding out is dropped once the slide is over.
   useEffect(() => {
@@ -449,12 +468,50 @@ export default function BroadcastPanel({
                   </div>
                 ))}
               </div>
-              {kind === "scoreboard" && index}
+              {kind === "scoreboard" && !compact && index}
             </div>
           )}
-          {!loops && kind === "scoreboard" && index}
+          {!loops && kind === "scoreboard" && !compact && index}
         </div>
   ) : null;
+
+  const mediaPreview = (
+          <div className={styles.preview}>
+            {current ? (
+              live ? (
+                // The chosen video, muted and looping (Vimeo), only while the card is open.
+                <iframe
+                  key={current.vimeo}
+                  className={styles.previewFrame}
+                  src={`https://player.vimeo.com/video/${current.vimeo}?autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&dnt=1`}
+                  title={`${current.title} (preview)`}
+                  allow="autoplay; picture-in-picture"
+                  tabIndex={-1}
+                />
+              ) : (
+                <Placeholder169 />
+              )
+            ) : project.preview && near ? (
+              <Loop src={project.preview} poster={project.img ?? undefined} active={live} />
+            ) : (
+              <Placeholder169 />
+            )}
+            <span className={styles.previewLabel}>
+              Preview · Loop{videos && current ? ` · ${pad(active + 1)} / ${pad(videos.length)}` : ""}
+            </span>
+          </div>
+  );
+
+  /** Phones: every card's choices as a vertical accordion (sections, videos or categories). */
+  const accItems = sections
+    ? sections.map((x) => x.label)
+    : videos
+      ? videos.map((v) => v.title)
+      : project.filters.length > 0
+        ? project.filters.map((f) => f.label)
+        : null;
+  const accActive = sections ? tab : active;
+  const accBody = sections ? stackEl : mediaPreview;
 
   return (
     <div className={styles.panel}>
@@ -477,40 +534,56 @@ export default function BroadcastPanel({
       <p className={styles.desc}>{project.desc}</p>
 
       {/* Tabs (sections), the video selector, or plain filters. */}
-      {sections && compact ? (
-        // Phones: vertical sections, one above the other; tap to open / close.
-        <div className={styles.accordion}>
-          {sections.map((sec, i) => {
-            const isOpen = i === tab && tabOpen;
-            return (
-              <div key={sec.label} className={styles.accItem} data-open={isOpen || undefined}>
-                <button
-                  type="button"
-                  className={styles.accHeader}
-                  aria-expanded={isOpen}
-                  onClick={() => {
-                    if (closing) return;
-                    if (i === tab && tabOpen) setClosing(true);
-                    else {
-                      setTab(i);
-                      setTabOpen(true);
-                    }
-                  }}
-                >
-                  <span className={styles.square} aria-hidden="true" />
-                  <span className={styles.filterLabel}>{sec.label}</span>
-                  <span className={styles.count}>[{pad(i + 1)}]</span>
-                  <span className={styles.accChevron} aria-hidden="true">▾</span>
-                </button>
-                {isOpen && (
-                  <AccBody key={sec.label} closing={closing} onClosed={finishClose}>
-                    {stackEl}
-                  </AccBody>
-                )}
-              </div>
-            );
-          })}
-        </div>
+      {compact ? (
+        // Phones: the Index first, then the choices as vertical tabs; tap to open / close.
+        <>
+          {index}
+          {accItems ? (
+            <div className={styles.accordion}>
+              {accItems.map((label, i) => {
+                const isOpen = i === accActive && tabOpen;
+                return (
+                  <div
+                    key={label + i}
+                    ref={(n) => {
+                      accRefs.current[i] = n;
+                    }}
+                    className={styles.accItem}
+                    data-open={isOpen || undefined}
+                  >
+                    <button
+                      type="button"
+                      className={styles.accHeader}
+                      aria-expanded={isOpen}
+                      onClick={() => {
+                        if (closing) return;
+                        if (i === accActive && tabOpen) setClosing(true);
+                        else {
+                          accJump.current = true;
+                          if (sections) setTab(i);
+                          else setActive(i);
+                          setTabOpen(true);
+                        }
+                      }}
+                    >
+                      <span className={styles.square} aria-hidden="true" />
+                      <span className={styles.filterLabel}>{label}</span>
+                      <span className={styles.count}>[{pad(i + 1)}]</span>
+                      <span className={styles.accChevron} aria-hidden="true">▾</span>
+                    </button>
+                    {isOpen && (
+                      <AccBody key={label + i} closing={closing} onClosed={finishClose}>
+                        {accBody}
+                      </AccBody>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            !sections && mediaPreview
+          )}
+        </>
       ) : sections ? (
         <PillBar
           tabs
@@ -537,34 +610,11 @@ export default function BroadcastPanel({
         )
       )}
 
-      {sections ? (
-        compact ? null : stackEl
+      {compact ? null : sections ? (
+        stackEl
       ) : (
         <div className={styles.mediaGrid}>
-          <div className={styles.preview}>
-            {current ? (
-              live ? (
-                // The chosen video, muted and looping (Vimeo), only while the card is open.
-                <iframe
-                  key={current.vimeo}
-                  className={styles.previewFrame}
-                  src={`https://player.vimeo.com/video/${current.vimeo}?autoplay=1&muted=1&loop=1&controls=0&title=0&byline=0&portrait=0&dnt=1`}
-                  title={`${current.title} (preview)`}
-                  allow="autoplay; picture-in-picture"
-                  tabIndex={-1}
-                />
-              ) : (
-                <Placeholder169 />
-              )
-            ) : project.preview && near ? (
-              <Loop src={project.preview} poster={project.img ?? undefined} active={live} />
-            ) : (
-              <Placeholder169 />
-            )}
-            <span className={styles.previewLabel}>
-              Preview · Loop{videos && current ? ` · ${pad(active + 1)} / ${pad(videos.length)}` : ""}
-            </span>
-          </div>
+          {mediaPreview}
           {index}
         </div>
       )}

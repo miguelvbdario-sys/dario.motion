@@ -13,6 +13,9 @@
   --ink: #140000;
   position: relative;
   z-index: 1;
+  /* We scroll to the opened card ourselves; the browser's scroll anchoring
+     would fight it while cards collapse/expand. */
+  overflow-anchor: none;
   /*
    * Starts where the hero's glow has turned fully black at the end of the
    * pin, whatever the window shape. Same terms as the hero: its fade (fade-top
@@ -2055,4 +2058,11 @@
   font-weight: 900;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+}
+
+/* Phones: no readouts strip (Off air / TC / Base / size) above the board. */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .boardReadouts {
+    display: none;
+  }
 }
