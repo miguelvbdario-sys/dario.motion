@@ -13,8 +13,9 @@
   --ink: #140000;
   position: relative;
   z-index: 1;
-  /* Starts right under the character's feet at the end of the hero pin. */
-  margin-top: calc(var(--u) * var(--pull, -200));
+  /* Starts right under the character at the end of the hero pin (desktop;
+     phones override below). More negative = closer. */
+  margin-top: calc(var(--u) * var(--pull, -780));
   padding: 0 calc(var(--s) * 64) calc(var(--s) * 96);
   background: #000;
   color: #efeeee;
@@ -1700,5 +1701,12 @@
   .statusDot[data-status="in"],
   .statusDot[data-status="out"] {
     animation: none;
+  }
+}
+
+/* Phones/portrait tablets: the hero is shorter there, keep the smaller pull. */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .section {
+    --pull: -200;
   }
 }
