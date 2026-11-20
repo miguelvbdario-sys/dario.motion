@@ -30,7 +30,7 @@ const ARROW_FRAMES = { first: 2, last: 85 };
 /** Head frame → arrow frame (the arrow keeps its 85 frames whatever the head length). */
 const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /** Scroll distance the hero stays pinned for, relative to the viewport height. */
-const PIN_DISTANCE = "+=110%";
+const PIN_DISTANCE = "+=60%";
 /** Touch: drag this many px sideways to run from rest to the left end. */
 const DRAG_DISTANCE = 200;
 /**
