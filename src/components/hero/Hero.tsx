@@ -303,7 +303,9 @@ export default function Hero() {
               end: pinDistance,
               invalidateOnRefresh: true,
               pin: true,
-              scrub: 0.5,
+              // No lag: the composition rises at exactly the scroll speed, so it moves
+              // together with the Broadcast cards (a lag made one look pushed by the other).
+              scrub: true,
               anticipatePin: 1,
             },
           })
