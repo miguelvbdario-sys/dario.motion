@@ -2246,7 +2246,7 @@
     right: 10px;
     display: block;
     width: 34%;
-    height: auto !important; /* a generic row-span rule sets 0 */
+    height: auto;
     overflow: hidden;
     border-radius: 4px;
     background: #000;
