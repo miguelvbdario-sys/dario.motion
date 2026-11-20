@@ -1848,3 +1848,110 @@
     display: none !important;
   }
 }
+
+/* ---------- Phones: sections as a vertical accordion ---------- */
+.accordion {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: calc(var(--s) * 20);
+}
+
+.accHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 0;
+  border-radius: 5px;
+  background: rgb(20 0 0 / 0.86);
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.accHeader .count {
+  margin-left: auto;
+}
+
+.accItem[data-open] > .accHeader {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.accItem[data-open] > .accHeader .square {
+  background: var(--red);
+}
+
+.accChevron {
+  font-size: 14px;
+  transition: transform 0.25s ease;
+}
+
+.accItem[data-open] .accChevron {
+  transform: rotate(180deg);
+}
+
+.accItem > .boardStack {
+  margin-top: 8px;
+}
+
+/* ---------- Phones: Broadcast Screens carousel control ---------- */
+.screenNav {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 0 4px;
+}
+
+.screenNavRow {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+}
+
+.screenArrow {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  padding: 0 0 3px;
+  border: 1px solid #efeeee;
+  border-radius: 50%;
+  background: transparent;
+  color: #efeeee;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.screenCount {
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #efeeee;
+}
+
+.screenCount span {
+  opacity: 0.5;
+}
+
+.screenTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 18px;
+  font-weight: 700;
+  color: #efeeee;
+  text-align: center;
+}
+
+/* The stage takes swipes sideways; vertical swipes still scroll the page. */
+.screenStage {
+  touch-action: pan-y;
+}

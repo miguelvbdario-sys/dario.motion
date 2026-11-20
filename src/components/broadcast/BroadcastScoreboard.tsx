@@ -266,7 +266,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             disabled={!goalEnabled}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel}>Goal home</span>
+            <span className={styles.filterLabel} aria-label="Goal home">Click to score</span>
             <span className={styles.count}>[{pad(score.home)}]</span>
           </button>
         </div>
@@ -298,7 +298,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
                 <span className={styles.goLiveRing} aria-hidden="true" />
                 <span className={styles.goLiveRing} aria-hidden="true" />
                 <span className={styles.goLiveDot} aria-hidden="true" />
-                {ready ? "Go live" : "Loading…"}
+                {ready ? "Click here" : "Loading…"}
               </button>
             </div>
           </div>
@@ -354,7 +354,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             disabled={!goalEnabled}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel}>Goal away</span>
+            <span className={styles.filterLabel} aria-label="Goal away">Click to score</span>
             <span className={styles.count}>[{pad(score.away)}]</span>
           </button>
         </div>

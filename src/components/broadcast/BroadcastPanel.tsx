@@ -14,6 +14,23 @@ import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
+/** Phones: the screens carousel advances by itself after this long (ms). */
+const SCREEN_AUTO = 7000;
+const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
+
+/** True on phones / portrait tablets (same query as the hero and the CSS). */
+function useCompact() {
+  const [compact, setCompact] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_QUERY);
+    const on = () => setCompact(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  return compact;
+}
+
 /** Striped stand-in for a missing 16:9 media. */
 function Placeholder169({ label = "[ PREVIEW 16:9 ]" }: { label?: string }) {
   return (
@@ -111,6 +128,33 @@ export default function BroadcastPanel({
   const screens = sections?.[tab]?.screens;
   const [screen, setScreen] = useState(0);
   const loops = screens ? screens[screen]?.loops : sections?.[tab]?.loops;
+  /** Phones/portrait tablets: tabs become a vertical accordion, screens a carousel. */
+  const compact = useCompact();
+  /** Accordion: the open section can be closed again. */
+  const [tabOpen, setTabOpen] = useState(true);
+  const screenCount = screens?.length ?? 0;
+  const stepScreen = (d: number) => screenCount && setScreen((i) => (i + d + screenCount) % screenCount);
+
+  // Phones: the screens carousel moves on by itself every SCREEN_AUTO ms
+  // (the timer restarts after every change, manual or automatic).
+  useEffect(() => {
+    if (!compact || kind !== "screens" || !live || !tabOpen || screenCount < 2) return;
+    const t = setTimeout(() => setScreen((i) => (i + 1) % screenCount), SCREEN_AUTO);
+    return () => clearTimeout(t);
+  }, [compact, kind, live, tabOpen, screen, screenCount]);
+
+  // Swipe the stage left/right to change screen (touch).
+  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const onStageDown = (e: React.PointerEvent) => {
+    if (compact) swipe.current = { x: e.clientX, y: e.clientY };
+  };
+  const onStageUp = (e: React.PointerEvent) => {
+    const st = swipe.current;
+    swipe.current = null;
+    if (!st) return;
+    const dx = e.clientX - st.x;
+    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - st.y)) stepScreen(dx < 0 ? 1 : -1);
+  };
 
   // Switching tab or screen: animate the content from its old height to the new
   // one, so the red card stretches/shrinks instead of jumping.
@@ -196,54 +240,7 @@ export default function BroadcastPanel({
     </div>
   );
 
-  return (
-    <div className={styles.panel}>
-      <div className={styles.guides} aria-hidden="true">
-        <span />
-        <span />
-        <span />
-        <span />
-      </div>
-
-      <div className={styles.labels}>
-        <span>[ Broadcast ]</span>
-        <span>{project.meta}</span>
-        <span>Live</span>
-        <span>{project.year}</span>
-      </div>
-
-      <span className={styles.dot} aria-hidden="true" />
-      <h3 className={styles.bigTitle}>{project.title}</h3>
-      <p className={styles.desc}>{project.desc}</p>
-
-      {/* Tabs (sections), the video selector, or plain filters. */}
-      {sections ? (
-        <PillBar
-          tabs
-          label={`${project.title} sections`}
-          items={sections.map((s, i) => ({ key: s.label, label: s.label, count: `[${pad(i + 1)}]` }))}
-          active={tab}
-          onSelect={setTab}
-        />
-      ) : videos ? (
-        <PillBar
-          label={`${project.title} videos`}
-          items={videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + 1)}]` }))}
-          active={active}
-          onSelect={setActive}
-        />
-      ) : (
-        project.filters.length > 0 && (
-          <PillBar
-            label={`${project.title} categories`}
-            items={project.filters.map((f, i) => ({ key: String(i), label: f.label, count: f.count }))}
-            active={active}
-            onSelect={setActive}
-          />
-        )
-      )}
-
-      {sections ? (
+  const stackEl = sections ? (
         <div ref={stack} className={styles.boardStack}>
           {/* The scoreboard stays mounted (hidden) so its state survives tab
               switches; its frames load the first time the card opens. */}
@@ -273,7 +270,7 @@ export default function BroadcastPanel({
           {kind === "screens" && screens && (
             <div className={styles.shields}>
               {/* Vertical list of screens on the left, the chosen one on the right. */}
-              <div className={styles.boardSide}>
+              {!compact && <div className={styles.boardSide}>
                 <p className={styles.sideLabel}>[ Screens ] Pick a screen</p>
                 <div className={styles.screenList} role="radiogroup" aria-label="Broadcast screens">
                   {screens.map((s, i) => (
@@ -292,8 +289,13 @@ export default function BroadcastPanel({
                     </button>
                   ))}
                 </div>
-              </div>
-              <div className={`${styles.preview} ${styles.screenStage}`}>
+              </div>}
+              <div
+                className={`${styles.preview} ${styles.screenStage}`}
+                onPointerDown={onStageDown}
+                onPointerUp={onStageUp}
+                onPointerCancel={() => (swipe.current = null)}
+              >
                 {screens[screen]?.assets ? (
                   // The whole package list, scrolling inside the 16:9 stage.
                   <div className={styles.assetsList} data-lenis-prevent>
@@ -331,6 +333,23 @@ export default function BroadcastPanel({
                   <span className={styles.previewLabel}>Screen · {screens[screen]?.label}</span>
                 )}
               </div>
+              {compact && (
+                // Phones: carousel control (arrows + counter), the screen's title under it.
+                <div className={styles.screenNav}>
+                  <div className={styles.screenNavRow}>
+                    <button type="button" className={styles.screenArrow} onClick={() => stepScreen(-1)} aria-label="Previous screen">
+                      ‹
+                    </button>
+                    <span className={styles.screenCount}>
+                      {pad(screen + 1)} <span>/</span> {pad(screenCount)}
+                    </span>
+                    <button type="button" className={styles.screenArrow} onClick={() => stepScreen(1)} aria-label="Next screen">
+                      ›
+                    </button>
+                  </div>
+                  <p className={styles.screenTitle}>{screens[screen]?.label}</p>
+                </div>
+              )}
             </div>
           )}
           {kind === "placeholder" && (
@@ -354,6 +373,86 @@ export default function BroadcastPanel({
           )}
           {!loops && kind === "scoreboard" && index}
         </div>
+  ) : null;
+
+  return (
+    <div className={styles.panel}>
+      <div className={styles.guides} aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+
+      <div className={styles.labels}>
+        <span>[ Broadcast ]</span>
+        <span>{project.meta}</span>
+        <span>Live</span>
+        <span>{project.year}</span>
+      </div>
+
+      <span className={styles.dot} aria-hidden="true" />
+      <h3 className={styles.bigTitle}>{project.title}</h3>
+      <p className={styles.desc}>{project.desc}</p>
+
+      {/* Tabs (sections), the video selector, or plain filters. */}
+      {sections && compact ? (
+        // Phones: vertical sections, one above the other; tap to open / close.
+        <div className={styles.accordion}>
+          {sections.map((sec, i) => {
+            const isOpen = i === tab && tabOpen;
+            return (
+              <div key={sec.label} className={styles.accItem} data-open={isOpen || undefined}>
+                <button
+                  type="button"
+                  className={styles.accHeader}
+                  aria-expanded={isOpen}
+                  onClick={() => {
+                    if (i === tab) setTabOpen((o) => !o);
+                    else {
+                      setTab(i);
+                      setTabOpen(true);
+                    }
+                  }}
+                >
+                  <span className={styles.square} aria-hidden="true" />
+                  <span className={styles.filterLabel}>{sec.label}</span>
+                  <span className={styles.count}>[{pad(i + 1)}]</span>
+                  <span className={styles.accChevron} aria-hidden="true">▾</span>
+                </button>
+                {isOpen && stackEl}
+              </div>
+            );
+          })}
+        </div>
+      ) : sections ? (
+        <PillBar
+          tabs
+          label={`${project.title} sections`}
+          items={sections.map((s, i) => ({ key: s.label, label: s.label, count: `[${pad(i + 1)}]` }))}
+          active={tab}
+          onSelect={setTab}
+        />
+      ) : videos ? (
+        <PillBar
+          label={`${project.title} videos`}
+          items={videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + 1)}]` }))}
+          active={active}
+          onSelect={setActive}
+        />
+      ) : (
+        project.filters.length > 0 && (
+          <PillBar
+            label={`${project.title} categories`}
+            items={project.filters.map((f, i) => ({ key: String(i), label: f.label, count: f.count }))}
+            active={active}
+            onSelect={setActive}
+          />
+        )
+      )}
+
+      {sections ? (
+        compact ? null : stackEl
       ) : (
         <div className={styles.mediaGrid}>
           <div className={styles.preview}>
