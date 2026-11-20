@@ -252,16 +252,18 @@ export default function Hero() {
           if (offset === 0) view.mode = "scroll";
         }
 
-        // Rest → the scroll head; anywhere else → the look sequence.
-        const useLook = offset !== 0;
+        // Phones/tablets: rest → the scroll head, anywhere else → the look sequence.
+        // Desktop always paints the look sequence (its rest frame included): the
+        // scroll head is a different render, ~6x a normal frame step away from
+        // the look rest, so swapping between them at rest showed as a jump.
+        const useLook = followMouse || offset !== 0;
         if (useLook !== onLook) {
           onLook = useLook;
           head.setActive(!useLook);
           look.setActive(useLook);
         }
         if (useLook) look.draw(Math.round(LOOK.rest + offset));
-        // Desktop: no scroll scrub on the head (it stays on its rest frame).
-        else head.draw(followMouse ? HEAD_FRAMES.first : view.scroll);
+        else head.draw(view.scroll);
       };
 
       if (followMouse) {
