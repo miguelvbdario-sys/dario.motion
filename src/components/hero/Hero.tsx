@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
 import dynamic from "next/dynamic";
@@ -36,36 +36,25 @@ const ARROW_FRAMES = { first: 2, last: 85 };
 const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /** Scroll distance the hero stays pinned for, relative to the viewport height. */
 const PIN_DISTANCE = "+=110%";
-/** Drag this many px sideways to run through the whole head animation. */
+/** Touch: drag this many px sideways to run from rest to the left end. */
 const DRAG_DISTANCE = 600;
-/** Drag this many px RIGHT to run through the whole look-right sequence. */
-const DRAG_DISTANCE_RIGHT = 300;
 /**
- * Desktop mouse zones. PLAY_FPS: playback speed of both sequences (their own
- * frame rate). FOLLOW_DEAD_ZONE: half-width of the centre (rest) zone, in
- * screen units where −1 = left edge and 1 = right edge.
+ * Desktop mouse zones. PLAY_FPS: playback speed (the sequence's own frame
+ * rate). FOLLOW_DEAD_ZONE: half-width of the centre (rest) zone, in screen
+ * units where −1 = left edge and 1 = right edge.
  */
 const PLAY_FPS = 30;
-/** Rewinding back to rest plays this many times faster than PLAY_FPS. */
+/** Playing back to rest runs this many times faster than PLAY_FPS. */
 const RETURN_SPEED = 1.6;
-/**
- * Frame ranges of the main head animation with a big hand move (measured):
- * the rewind slows to normal speed across them so they don't look like jumps.
- */
-const STRONG_MOVES: [number, number][] = [
-  [10, 13],
-  [44, 48],
-];
 const FOLLOW_DEAD_ZONE = 0.12;
-/**
- * Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge.
- * Shifted left because the character rests a little to the left.
- */
+/** Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge. */
 const FOLLOW_CENTER = 0;
-/** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
-const RIGHT_FRAMES = { first: 0, last: 37 };
-/** How quickly the head rewinds to the scroll frame after a drag (per second). */
-const RETURN_RATE = 4.5;
+/**
+ * "Look" sequence (/sequence/hero-look and hero-look-720): one render, files
+ * 000–098 = the source frames 023–121. rest = the rest pose (source frame 72);
+ * below it the head turns right, above it the left animation plays.
+ */
+const LOOK = { last: 98, rest: 49 };
 
 // HUD grid, measured on the wireframe (1920×1080).
 const V_LINES = ["15.89%", "38.52%", "61.12%", "83.75%"];
@@ -147,33 +136,32 @@ export default function Hero() {
         url: (frame) => `/sequence/arrow/SETA_${pad(frame)}.webp`,
       });
 
-      // "Look right" sequence, painted on the same canvas as the head.
-      const right = new FrameSequence({
+      // ---------- "Look" sequence: one render, left ↔ rest ↔ right ----------
+      // /sequence/hero-look: frame LOOK.rest is the rest pose (= the scroll
+      // head's frame 0); lower frames turn to look RIGHT, higher frames run
+      // the LEFT animation. It paints the same canvas as the scroll head; the
+      // inactive one keeps loading but never paints, so switching can't flash.
+      const look = new FrameSequence({
         canvas: headCanvas.current,
-        ...RIGHT_FRAMES,
-        url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-right")}/HEAD-RIGHT_${pad(frame)}.webp`,
+        first: 0,
+        last: LOOK.last,
+        url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-look")}/LOOK_${pad(frame)}.webp`,
       });
-      right.setActive(false); // loads in the background, paints only when shown
+      look.setActive(false);
       /** Which sequence owns the canvas. */
-      let onRight = false;
-      const rightSpan = RIGHT_FRAMES.last - RIGHT_FRAMES.first;
+      let onLook = false;
+      /** Offset from rest in look frames: < 0 = toward right, > 0 = toward left. */
+      let offset = 0;
+      const maxRight = LOOK.rest; // frames from rest to the look-right end
+      const maxLeft = LOOK.last - LOOK.rest; // frames from rest to the left end
 
-      // ---------- Drag the character to scrub its frames ----------
-      // Drag LEFT: the main head animation plays forward from where it is.
-      // Drag RIGHT: the "look right" sequence plays instead (never on scroll).
-      // On release both ease back: the look-right rewinds to its start, then
-      // the head returns to the frame that matches the page scroll.
-      const view = {
-        scroll: HEAD_FRAMES.first,
-        display: HEAD_FRAMES.first,
-        mode: "scroll" as "scroll" | "drag" | "return",
-        /** Frame of the look-right sequence; > 0 means it is on screen. */
-        right: 0,
-      };
-      const span = HEAD_FRAMES.last - HEAD_FRAMES.first;
+      // ---------- Touch: drag the character ----------
+      // Drag LEFT runs the left animation, drag RIGHT the look-right; on
+      // release it plays back to rest.
+      const view = { mode: "scroll" as "scroll" | "drag" | "return", scroll: HEAD_FRAMES.first };
       let dragStartX = 0;
       let dragStartY = 0;
-      let dragStartFrame = 0;
+      let dragStartOffset = 0;
       let pendingId = -1;
       let dragId = -1;
 
@@ -196,11 +184,7 @@ export default function Hero() {
         pendingId = e.pointerId;
         dragStartX = e.clientX;
         dragStartY = e.clientY;
-        dragStartFrame = view.display;
-        if (e.pointerType === "mouse") {
-          e.preventDefault(); // no text selection while dragging
-          startDrag(e);
-        }
+        dragStartOffset = offset;
       };
       const startDrag = (e: PointerEvent) => {
         dragId = e.pointerId;
@@ -214,14 +198,8 @@ export default function Hero() {
         stage.dataset.dragging = "";
       };
       const onMove = (e: PointerEvent) => {
-        // Hover hint: the translucent cursor disc over the character.
-        if (e.pointerType === "mouse" && view.mode !== "drag" && !followMouse) {
-          const hint = !blocked(e.target) && overCharacter(e.clientX, e.clientY);
-          if (hint) stage.dataset.cursor = "link";
-          else delete stage.dataset.cursor;
-        }
         if (e.pointerId === pendingId) {
-          // Touch: only a sideways swipe scrubs; a vertical one scrolls the page.
+          // Only a sideways swipe scrubs; a vertical one scrolls the page.
           const dx = Math.abs(e.clientX - dragStartX);
           const dy = Math.abs(e.clientY - dragStartY);
           if (dx < 8 && dy < 8) return;
@@ -232,18 +210,9 @@ export default function Hero() {
           startDrag(e);
         }
         if (e.pointerId !== dragId) return;
-        const dx = e.clientX - dragStartX;
-        if (dx <= 0) {
-          // LEFT: main animation forward; past the end it resists a little.
-          view.right = 0;
-          let frame = dragStartFrame + (-dx / DRAG_DISTANCE) * span;
-          if (frame > HEAD_FRAMES.last) frame = HEAD_FRAMES.last + (frame - HEAD_FRAMES.last) * 0.15;
-          view.display = frame;
-        } else {
-          // RIGHT: the look-right sequence, held on its last frame at the end.
-          view.display = dragStartFrame;
-          view.right = Math.min(rightSpan, (dx / DRAG_DISTANCE_RIGHT) * rightSpan);
-        }
+        // Left drag (negative dx) → toward the left end (positive offset).
+        const next = dragStartOffset - ((e.clientX - dragStartX) / DRAG_DISTANCE) * maxLeft;
+        offset = Math.max(-maxRight, Math.min(maxLeft, next));
       };
       const onUp = (e: PointerEvent) => {
         if (e.pointerId === pendingId) pendingId = -1;
@@ -253,16 +222,14 @@ export default function Hero() {
         delete stage.dataset.dragging;
       };
 
-      // ---------- Desktop: the head follows the mouse (no click) ----------
-      // Mouse on the RIGHT half of the screen plays the look-right sequence,
-      // on the LEFT half the main animation runs forward from the scroll frame.
-      // The further from the centre, the further it goes; it eases there slowly.
-      // Touch screens keep the drag above.
+      // ---------- Desktop: mouse zones (no click) ----------
+      // Mouse in the LEFT zone plays the left animation all the way, in the
+      // RIGHT zone the look-right all the way, in the centre zone it plays back
+      // to rest. Own frame rate forward, RETURN_SPEED× back. Going straight to
+      // the other side passes through rest, so it never jumps.
       const followMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
       /** −1 (left edge) … 0 (centre / mouse away) … 1 (right edge). */
       let mouseX = 0;
-      /** Eased amounts, 0…1: main animation ahead of scroll / look-right. */
-      const follow = { left: 0, right: 0 };
       const onWindowMove = (e: PointerEvent) => {
         if (e.pointerType === "mouse") mouseX = (e.clientX / window.innerWidth) * 2 - 1;
       };
@@ -270,51 +237,34 @@ export default function Hero() {
 
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
+        const step = dt * PLAY_FPS;
+        const back = step * RETURN_SPEED;
+        const toward = (target: number) => {
+          // Forward (away from rest) at step, back toward rest at `back`.
+          const away = Math.abs(target) > Math.abs(offset) && Math.sign(target) === Math.sign(offset || target);
+          const s = away ? step : back;
+          offset = offset < target ? Math.min(target, offset + s) : Math.max(target, offset - s);
+        };
         if (followMouse) {
-          // Zones, not position: mouse in the LEFT zone plays the main animation
-          // all the way; in the RIGHT zone the look-right all the way; in the
-          // centre zone (off-centre, see FOLLOW_CENTER) both rewind. Always at
-          // the sequences' own frame rate. One side at a time: switching
-          // sides rewinds the current one first.
           const d = mouseX - FOLLOW_CENTER;
           const zone = d > FOLLOW_DEAD_ZONE ? 1 : d < -FOLLOW_DEAD_ZONE ? -1 : 0;
-          const step = dt * PLAY_FPS;
-          // Rewinding to rest is faster, except across the main animation's
-          // big hand moves, which play back at normal speed so they don't snap.
-          const back = step * RETURN_SPEED;
-          const mainFrame = Math.round(view.scroll + follow.left);
-          const backMain = STRONG_MOVES.some(([a, b]) => mainFrame >= a && mainFrame <= b) ? step : back;
-          const leftEnd = HEAD_FRAMES.last - view.scroll;
-          if (zone === 1 && follow.left === 0) follow.right = Math.min(rightSpan, follow.right + step);
-          else follow.right = Math.max(0, follow.right - back);
-          if (zone === -1 && follow.right === 0) follow.left = Math.min(leftEnd, follow.left + step);
-          else follow.left = Math.max(0, follow.left - backMain);
-          view.display = Math.min(HEAD_FRAMES.last, view.scroll + follow.left);
-          view.right = follow.right;
-        } else if (view.mode === "scroll") view.display = view.scroll;
-        else if (view.mode === "return") {
-          const k = 1 - Math.exp(-dt * RETURN_RATE);
-          if (view.right > 0) {
-            // First the look-right rewinds to its start…
-            view.right -= view.right * k + dt * 6;
-            if (view.right < 0.5) view.right = 0;
-          } else {
-            // …then the head eases to the scroll frame.
-            view.display += (view.scroll - view.display) * k;
-            if (Math.abs(view.scroll - view.display) < 0.4) view.mode = "scroll";
-          }
+          const target = zone === 1 ? -maxRight : zone === -1 ? maxLeft : 0;
+          // Switching sides: back to rest first (same sign rule as toward()).
+          toward(Math.sign(target) !== Math.sign(offset) && offset !== 0 ? 0 : target);
+        } else if (view.mode === "return") {
+          toward(0);
+          if (offset === 0) view.mode = "scroll";
         }
-        // Both sequences paint the SAME canvas (no element swap, no flash).
-        // When the source changes, the incoming one is told to repaint.
-        const showRight = !!right && view.right > 0;
-        if (showRight !== onRight) {
-          onRight = showRight;
-          head.setActive(!showRight);
-          right.setActive(showRight);
+
+        // Rest → the scroll head; anywhere else → the look sequence.
+        const useLook = offset !== 0;
+        if (useLook !== onLook) {
+          onLook = useLook;
+          head.setActive(!useLook);
+          look.setActive(useLook);
         }
-        // Played in reverse: the start shows the sequence's last file.
-        if (showRight) right.draw(Math.round(RIGHT_FRAMES.last - view.right));
-        else head.draw(Math.min(HEAD_FRAMES.last, Math.max(HEAD_FRAMES.first, view.display)));
+        if (useLook) look.draw(Math.round(LOOK.rest + offset));
+        else head.draw(view.scroll);
       };
 
       if (followMouse) {
@@ -389,7 +339,7 @@ export default function Hero() {
         head.destroy();
         headSequence.current = null;
         arrow.destroy();
-        right?.destroy();
+        look.destroy();
       };
     },
     { scope: root },
