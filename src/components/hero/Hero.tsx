@@ -122,7 +122,8 @@ export default function Hero() {
       });
 
       // ---------- Drag the character to scrub its frames ----------
-      // A short horizontal drag runs through the whole animation. On release
+      // A short horizontal drag runs through the whole animation (left =
+      // forward, right = back, bouncing endlessly at both ends). On release
       // the figure rewinds (or fast-forwards) to the frame that matches the
       // page scroll.
       const view = { scroll: HEAD_FRAMES.first, display: HEAD_FRAMES.first, mode: "scroll" as "scroll" | "drag" | "return" };
@@ -188,11 +189,13 @@ export default function Hero() {
           startDrag(e);
         }
         if (e.pointerId !== dragId) return;
-        let frame = dragStartFrame + ((e.clientX - dragStartX) / DRAG_DISTANCE) * span;
-        // Past either end the figure resists a little instead of stopping dead.
-        if (frame > HEAD_FRAMES.last) frame = HEAD_FRAMES.last + (frame - HEAD_FRAMES.last) * 0.15;
-        if (frame < HEAD_FRAMES.first) frame = HEAD_FRAMES.first + (frame - HEAD_FRAMES.first) * 0.15;
-        view.display = frame;
+        // Drag LEFT plays forward, RIGHT rewinds.
+        const raw = dragStartFrame - HEAD_FRAMES.first - ((e.clientX - dragStartX) / DRAG_DISTANCE) * span;
+        // Ping-pong, endless: past the last frame it plays back, past the first
+        // it plays forward again (a triangle wave over the frame range).
+        const period = span * 2;
+        const p = ((raw % period) + period) % period;
+        view.display = HEAD_FRAMES.first + (p > span ? period - p : p);
       };
       const onUp = (e: PointerEvent) => {
         if (e.pointerId === pendingId) pendingId = -1;

@@ -281,7 +281,7 @@
    * It stays centred horizontally.
    */
   --head-size: 1300;
-  --head-y: 120;
+  --head-y: 60;
   z-index: 2;
   top: calc(var(--u) * var(--head-y));
   left: calc(var(--u) * (1920 - var(--head-size)) / 2);
@@ -292,7 +292,7 @@
    * Cast shadow behind the character, thrown to the left.
    * x (negative = left), y, blur, colour.
    */
-  filter: drop-shadow(calc(var(--u) * -60) calc(var(--u) * 24) calc(var(--u) * 30) rgb(0 0 0 / 0.65));
+  filter: drop-shadow(calc(var(--u) * -35) calc(var(--u) * 24) calc(var(--u) * 30) rgb(0 0 0 / 1));
 }
 
 /* ---------- 3D emblems ---------- */
