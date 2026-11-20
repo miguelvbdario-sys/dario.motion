@@ -2394,13 +2394,13 @@
   text-align: center;
 }
 
+/* Closing line: plain, small text. */
 .aboutOutro {
   grid-column: 1 / -1;
-  margin: calc(var(--s) * 8) 0 0;
+  margin: 0;
   font-family: var(--font-sans);
-  font-size: calc(var(--s) * 22);
-  font-weight: 900;
-  text-transform: uppercase;
+  font-size: calc(var(--s) * 15);
+  font-weight: 400;
   color: var(--ink);
 }
 
@@ -2419,7 +2419,7 @@
   }
 
   .aboutLead {
-    font-size: 28px;
+    font-size: 22px;
   }
 
   .aboutPoints {
@@ -2434,4 +2434,22 @@
   .alwaysBoard {
     margin: 8px 0 0;
   }
+}
+
+/* About: a loop on top of a point card. */
+.aboutPointLoop {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 9;
+  margin-bottom: 8px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #000;
+}
+
+.aboutPointLoop video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }

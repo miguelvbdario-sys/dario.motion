@@ -318,6 +318,11 @@ export default function BroadcastPanel({
           <ul className={styles.aboutPoints}>
             {ab.points.map((pt) => (
               <li key={pt.title}>
+                {pt.loop && (
+                  <span className={styles.aboutPointLoop}>
+                    <Loop src={pt.loop.src} poster={pt.loop.poster} active={live} />
+                  </span>
+                )}
                 <span className={styles.aboutPointTitle}>{pt.title}</span>
                 <span className={styles.aboutPointText}>{pt.text}</span>
               </li>
@@ -357,7 +362,7 @@ export default function BroadcastPanel({
           </div>
         )}
       </div>
-      <p className={styles.aboutOutro}>This portfolio is interactive, enjoy, take your time and click on all!</p>
+      {ab?.outro && <p className={styles.aboutOutro}>{ab.outro}</p>}
     </div>
   );
 

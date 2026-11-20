@@ -74,7 +74,10 @@ export type BroadcastProject = {
    */
   about?: {
     lead: string;
-    points: { title: string; text: string }[];
+    /** Optional loop per point (mp4 base path; poster = same name .jpg). */
+    points: { title: string; text: string; loop?: { src: string; poster: string } }[];
+    /** Closing line (plain, small). */
+    outro?: string;
     stats?: { value: string; label: string }[];
     /** Muted loops: mp4 + poster. */
     loops?: { src: string; poster: string }[];
@@ -107,12 +110,28 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2026",
     desc: "Official Paulistão 2026 broadcast assets",
     about: {
-      lead: "The full on-screen graphics package of Paulistão 2026, live on four broadcasters.",
+      lead: "Paulistão is São Paulo's state football championship, one of the biggest in Brazil. We made the graphics package and the animations for its official broadcast.",
       points: [
-        { title: "Scoreboard", text: "Built frame by frame for 16 clubs: plates, goals and a shield mode." },
-        { title: "Broadcast screens", text: "Line-ups, bracket, champion, final scoreboard and full time." },
-        { title: "Mascots & 3D", text: "A mascot per club breaking the goal, and a 3D trophy." },
-        { title: "Process", text: "Figma, Illustrator, After Effects and Blender, then installed for live." },
+        {
+          title: "The championship",
+          text: "16 clubs, from the first round to the final, broadcast live across the season.",
+          loop: { src: "/broadcast/paulistao/live/scoreboard-1.mp4", poster: "/broadcast/paulistao/live/scoreboard-1.jpg" },
+        },
+        {
+          title: "The package",
+          text: "Scoreboard, line-ups, goals, bracket and champion screens, designed and animated for the broadcast.",
+          loop: { src: "/broadcast/paulistao/lineups/sao-paulo.mp4", poster: "/broadcast/paulistao/lineups/sao-paulo.jpg" },
+        },
+        {
+          title: "On every channel",
+          text: "The same graphics ran live on TNT, HBO, Record and CazéTV.",
+          loop: { src: "/broadcast/paulistao/live/scoreboard-2.mp4", poster: "/broadcast/paulistao/live/scoreboard-2.jpg" },
+        },
+        {
+          title: "Through to the final",
+          text: "Ending with the champion screens, on air the night of the title.",
+          loop: { src: "/broadcast/paulistao/screens/champion-live.mp4", poster: "/broadcast/paulistao/screens/champion-live.jpg" },
+        },
       ],
       stats: [
         { value: "3", label: "Months" },
@@ -120,10 +139,7 @@ export const BROADCAST: BroadcastProject[] = [
         { value: "16", label: "Clubs" },
         { value: "6", label: "Member team" },
       ],
-      loops: [
-        { src: "/broadcast/paulistao/live/scoreboard-2.mp4", poster: "/broadcast/paulistao/live/scoreboard-2.jpg" },
-        { src: "/broadcast/paulistao/screens/champion-live.mp4", poster: "/broadcast/paulistao/screens/champion-live.jpg" },
-      ],
+      outro: "This portfolio is interactive, enjoy, take your time and click on all!",
       channels: ["TNT", "HBO", "Record", "CazéTV"],
     },
     filters: [], // the tabs below take their place
