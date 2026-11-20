@@ -7,6 +7,7 @@ import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
+import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
 gsap.registerPlugin(CustomEase);
@@ -341,8 +342,8 @@ export default function Broadcast() {
           if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
           else window.scrollTo(0, top);
         }
-        // The clicked row ends up in the middle of the screen.
-        const y = row.getBoundingClientRect().top + window.scrollY - (window.innerHeight - row.offsetHeight) / 2;
+        // The clicked row's centre ends up at FOCUS_AT of the screen height.
+        const y = row.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + row.offsetHeight / 2;
         if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
         else window.scrollTo({ top: y, behavior: "smooth" });
       }

@@ -10,6 +10,7 @@ import BroadcastShields from "./BroadcastShields";
 import BroadcastMascots from "./BroadcastMascots";
 import BroadcastProcess from "./BroadcastProcess";
 import { PAULISTAO_ASSETS, PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
+import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -194,10 +195,10 @@ export default function BroadcastPanel({
     const el = accRefs.current[sections ? tab : active];
     if (!el) return;
     requestAnimationFrame(() => {
-      // The clicked tab's header ends up in the middle of the screen.
+      // The clicked tab's header lands at FOCUS_AT (35%) of the screen height.
       const head = el.firstElementChild as HTMLElement | null;
       const h = head?.offsetHeight ?? 0;
-      const y = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight - h) / 2;
+      const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + h / 2;
       const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
       if (lenis) lenis.scrollTo(y, { duration: 0.7 });
       else window.scrollTo({ top: y, behavior: "smooth" });
