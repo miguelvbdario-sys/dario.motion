@@ -233,7 +233,7 @@ export default function Broadcast() {
     quick.current?.x(x);
     quick.current?.y(y);
 
-    const rowEl = (e.target as Element).closest<HTMLElement>("[data-row]");
+    const rowEl = e.target instanceof Element ? e.target.closest<HTMLElement>("[data-row]") : null;
     const i = rowEl ? Number(rowEl.dataset.row) : -1;
     if (i !== hovered.current) {
       const prev = hovered.current;
@@ -328,9 +328,22 @@ export default function Broadcast() {
       const row = rows.current[i];
       if (row) {
         const prevIdx = prev ? BROADCAST.findIndex((p) => p.id === prev) : -1;
-        let y = row.getBoundingClientRect().top + window.scrollY - SCROLL_GAP;
-        if (prevIdx >= 0 && prevIdx < i) y -= panels.current[prevIdx]?.offsetHeight ?? 0;
         const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+        // An open card ABOVE the new one: close it at once and shift the page by
+        // its height in the same frame, so nothing on screen moves; then glide
+        // to the new row. (Collapsing it while scrolling made the page bounce.)
+        const above = prevIdx >= 0 && prevIdx < i ? panels.current[prevIdx] : null;
+        if (above) {
+          const h = above.offsetHeight;
+          gsap.killTweensOf(above);
+          gsap.set(above, { height: 0 });
+          const inner = above.firstElementChild as HTMLElement | null;
+          if (inner) gsap.set(inner, { opacity: 0 });
+          const top = window.scrollY - h;
+          if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
+          else window.scrollTo(0, top);
+        }
+        const y = row.getBoundingClientRect().top + window.scrollY - SCROLL_GAP;
         if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
         else window.scrollTo({ top: y, behavior: "smooth" });
       }

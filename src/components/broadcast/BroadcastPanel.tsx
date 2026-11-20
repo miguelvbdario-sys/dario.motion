@@ -317,7 +317,7 @@ export default function BroadcastPanel({
         <div ref={stack} className={styles.boardStack}>
           {/* The scoreboard stays mounted (hidden) so its state survives tab
               switches; its frames load the first time the card opens. */}
-          {sections.some((s) => s.kind === "scoreboard") && (
+          {sections.some((s) => s.kind === "scoreboard") && !compact && (
             <div hidden={kind !== "scoreboard"}>
               <BroadcastScoreboard active={open} />
             </div>
@@ -503,13 +503,15 @@ export default function BroadcastPanel({
   );
 
   /** Phones: every card's choices as a vertical accordion (sections, videos or categories). */
+  // (Paulistão: the scoreboard is always shown on phones, so it isn't a tab.)
   const accItems = sections
-    ? sections.map((x) => x.label)
+    ? sections.map((x, i) => ({ label: x.label, index: i })).filter((x) => sections[x.index].kind !== "scoreboard")
     : videos
-      ? videos.map((v) => v.title)
+      ? videos.map((v, i) => ({ label: v.title, index: i }))
       : project.filters.length > 0
-        ? project.filters.map((f) => f.label)
+        ? project.filters.map((f, i) => ({ label: f.label, index: i }))
         : null;
+  const scoreSection = sections?.find((x) => x.kind === "scoreboard");
   const accActive = sections ? tab : active;
   const accBody = sections ? stackEl : mediaPreview;
 
@@ -538,9 +540,24 @@ export default function BroadcastPanel({
         // Phones: the Index first, then the choices as vertical tabs; tap to open / close.
         <>
           {index}
+          {scoreSection && (
+            // Always on: the interactive scoreboard and its live loops.
+            <div className={styles.boardStack}>
+              <BroadcastScoreboard active={open} />
+              {scoreSection.loops && (
+                <div className={styles.loopsGrid}>
+                  {scoreSection.loops.map((base) => (
+                    <div key={base} className={styles.loopCell}>
+                      <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
           {accItems ? (
             <div className={styles.accordion}>
-              {accItems.map((label, i) => {
+              {accItems.map(({ label, index: i }, n) => {
                 const isOpen = i === accActive && tabOpen;
                 return (
                   <div
@@ -568,7 +585,7 @@ export default function BroadcastPanel({
                     >
                       <span className={styles.square} aria-hidden="true" />
                       <span className={styles.filterLabel}>{label}</span>
-                      <span className={styles.count}>[{pad(i + 1)}]</span>
+                      <span className={styles.count}>[{pad(n + 1)}]</span>
                       <span className={styles.accChevron} aria-hidden="true">▾</span>
                     </button>
                     {isOpen && (
