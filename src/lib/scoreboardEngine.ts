@@ -1,6 +1,5 @@
 import {
   BASE_FRAMES,
-  FRAME_SIZE,
   GOAL_SCORE_FRAME,
   SCOREBOARD_CROP,
   SCOREBOARD_FPS,
@@ -416,34 +415,12 @@ export class ScoreboardEngine {
 
   private drawFrame(seq: Sequence, frame: number, ctx = this.ctx) {
     if (frame < 0 || !seq.loaded[frame]) return;
+    // Frames are pre-cropped to SCOREBOARD_CROP (and scaled down to save
+    // weight), so each one simply fills the canvas.
     const c = SCOREBOARD_CROP;
-    const img = seq.images[frame];
-    // Renders from a wider or taller comp share the same centre (some goals are 1460 wide).
-    const dx = (img.naturalWidth - FRAME_SIZE.width) / 2;
-    const dy = (img.naturalHeight - FRAME_SIZE.height) / 2;
-    // The crop may reach past the image (it is centred on the art with
-    // margins): clip the source to the image and offset the destination.
-    let sx = c.x + dx;
-    let sy = c.y + dy;
-    let w = c.width;
-    let h = c.height;
-    let ox = 0;
-    let oy = 0;
-    if (sx < 0) {
-      ox = -sx;
-      w += sx;
-      sx = 0;
-    }
-    if (sy < 0) {
-      oy = -sy;
-      h += sy;
-      sy = 0;
-    }
-    w = Math.min(w, img.naturalWidth - sx);
-    h = Math.min(h, img.naturalHeight - sy);
-    if (w <= 0 || h <= 0) return;
-    ctx?.drawImage(img, sx, sy, w, h, ox, oy, w, h);
+    ctx?.drawImage(seq.images[frame], 0, 0, c.width, c.height);
   }
+
 
   private setStatus(status: BoardStatus) {
     if (status === this.status) return;

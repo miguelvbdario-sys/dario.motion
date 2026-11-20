@@ -1,6 +1,6 @@
 /*
  * Interactive scoreboard: the frame sequences in /public/scoreboard.
- * Every frame is a full 1332×1080 render with transparency, so all layers line
+ * Original renders: full 1332×1080 with transparency, so all layers line
  * up when drawn on top of each other. The canvas only shows the band where the
  * board lives (SCOREBOARD_CROP).
  *
@@ -9,6 +9,9 @@
  *   away/<team>/     away team plate, 47 frames: AE frames 055–101 of the base
  *   goal/<team>/     goal animation (in and out in one go), length per team
  *   shield/<side>/<team>/  shield mode (crests replace the plates), 43 frames
+ *
+ * Frames in /public are PRE-CROPPED to SCOREBOARD_CROP and scaled to 75%
+ * (1056x443) to save weight: run new exports through the same crop first.
  *
  * To add a team: export its sequences in the same comp into those folders
  * (frames renamed 000.webp, 001.webp…) and add it to TEAMS below.
