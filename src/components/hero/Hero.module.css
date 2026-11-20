@@ -488,8 +488,11 @@
     --w: 390;
     --u: min(calc(100vw / 390), calc(100lvh / 720));
     --shift: calc(var(--u) * 330);
-    --fade-top: 640;
+    --fade-top: 510;
     --lift: 0px;
+    /* Phone: the hero ends just under the pills, so the next section follows
+       right after (the composition was raised by 130). */
+    height: calc(var(--u) * 620);
   }
 
   /* Two stacked lines: MIGUEL fills the width, DARIO hangs from the right edge. */
@@ -509,7 +512,7 @@
   .head {
     /* Phone: height of the character (lower number = higher up). */
     /* Width = size (smaller on phones); left keeps it centred; top keeps its middle in place. */
-    top: calc(var(--u) * 210);
+    top: calc(var(--u) * 80);
     left: calc(var(--u) * -95);
     width: calc(var(--u) * 560);
   }
@@ -522,7 +525,7 @@
   }
 
   .emblemRight {
-    top: calc(var(--u) * 338);
+    top: calc(var(--u) * 208);
     left: calc(var(--u) * 268);
     width: calc(var(--u) * 128);
   }
@@ -543,12 +546,12 @@
   }
 
   .senior {
-    top: calc(var(--u) * 292);
+    top: calc(var(--u) * 270);
     left: calc(var(--u) * 20);
   }
 
   .role {
-    top: calc(var(--u) * 292);
+    top: calc(var(--u) * 270);
     left: auto;
     right: calc(var(--u) * 18);
     text-align: right;
@@ -563,14 +566,14 @@
   }
 
   .nav {
-    top: calc(var(--u) * 618);
+    top: calc(var(--u) * 488);
     left: calc(var(--u) * 68);
     font-size: calc(var(--u) * 17);
   }
 
   /* Placed so the drifting stroke stays between the screen edge and the pills. */
   .arrow {
-    top: calc(var(--u) * 564);
+    top: calc(var(--u) * 434);
     left: calc(var(--u) * -59);
     width: calc(var(--u) * 180);
   }
