@@ -1,7 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { TEAMS } from "@/content/scoreboard";
+import { TeamSelect } from "./BroadcastScoreboard";
 import styles from "./Broadcast.module.css";
 
 /*
@@ -15,11 +16,19 @@ import styles from "./Broadcast.module.css";
 
 const SRC = (slug: string) => `/broadcast/paulistao/mascots/${slug}.mp4`;
 const STEPS = 1000;
+/**
+ * Touch drag weight: a finger moving the full card width plays only this
+ * fraction of the animation (lower = heavier). The mouse keeps the direct hover.
+ */
+const TOUCH_WEIGHT = 0.3;
+const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 function MascotRow({ slug, label }: { slug: string; label: string }) {
   const video = useRef<HTMLVideoElement>(null);
   const track = useRef<HTMLInputElement>(null);
   const dragging = useRef(false);
+  /** Touch: where the drag started (pointer x, slider value). */
+  const start = useRef({ x: 0, v: 0 });
   const [value, setValue] = useState(0);
   const [used, setUsed] = useState(false);
 
@@ -43,11 +52,19 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
       onPointerDown={(e) => {
         dragging.current = true;
         e.currentTarget.setPointerCapture(e.pointerId);
-        fromPointer(e.clientX);
+        if (e.pointerType === "mouse") fromPointer(e.clientX);
+        else start.current = { x: e.clientX, v: value };
         e.preventDefault();
       }}
-      // Mouse: just hovering scrubs (no click needed). Touch/pen: while pressed.
-      onPointerMove={(e) => (e.pointerType === "mouse" || dragging.current) && fromPointer(e.clientX)}
+      // Mouse: just hovering scrubs (no click needed). Touch/pen: a heavy,
+      // relative drag (TOUCH_WEIGHT) while pressed.
+      onPointerMove={(e) => {
+        if (e.pointerType === "mouse") return fromPointer(e.clientX);
+        if (!dragging.current) return;
+        const w = track.current?.getBoundingClientRect().width || 1;
+        const v = start.current.v + ((e.clientX - start.current.x) / w) * STEPS * TOUCH_WEIGHT;
+        scrub(Math.round(Math.min(STEPS, Math.max(0, v))));
+      }}
       onPointerUp={() => (dragging.current = false)}
       onPointerCancel={() => (dragging.current = false)}
     >
@@ -76,12 +93,26 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
 }
 
 export default function BroadcastMascots() {
+  // Phones: one goal at a time, picked from a team list (starts on the first).
+  const [compact, setCompact] = useState(false);
+  const [team, setTeam] = useState(TEAMS[0].slug);
+  useEffect(() => {
+    const mq = window.matchMedia(COMPACT_QUERY);
+    const on = () => setCompact(mq.matches);
+    on();
+    mq.addEventListener("change", on);
+    return () => mq.removeEventListener("change", on);
+  }, []);
+  const shown = compact ? TEAMS.filter((t) => t.slug === team) : TEAMS;
   return (
     <div className={styles.mascots}>
       <p className={styles.mascotsTitle}>Make the mascot break the goal</p>
-      <p className={styles.sideLabel}>[ Hover ] Move across a card left ↔ right to play and rewind</p>
+      <p className={styles.sideLabel}>
+        {compact ? "[ Drag ] Slide the card left ↔ right to play and rewind" : "[ Hover ] Move across a card left ↔ right to play and rewind"}
+      </p>
+      {compact && <TeamSelect side="home" label="Team" team={team} busy={false} onTeam={setTeam} />}
       <div className={styles.mascotGrid}>
-        {TEAMS.map((t) => (
+        {shown.map((t) => (
           <MascotRow key={t.slug} slug={t.slug} label={t.label} />
         ))}
       </div>

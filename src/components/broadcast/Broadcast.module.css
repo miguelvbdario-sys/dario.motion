@@ -2066,3 +2066,76 @@
     display: none;
   }
 }
+
+/* ---------- Phones: card tweaks ---------- */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* OUT / SHIELD MODE: just their own size, centred. */
+  .boardCentre > .filters {
+    justify-content: center;
+  }
+
+  .boardCentre .ctrl {
+    flex: 0 0 auto;
+  }
+
+  /* Live loops: always one under the other, full width (a lone loop too). */
+  .loopsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .loopsRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .screenLoopsMobile {
+    flex-direction: column;
+  }
+
+  .screenLoopsMobile .loopCell {
+    width: 100%;
+  }
+
+  /* [ Away ] sits under the away team picker. */
+  .boardSide[data-side="away"] > .sideLabel {
+    order: 1;
+  }
+
+  /* CLICK HERE: much smaller on phones. */
+  .goLive {
+    font-size: 14px;
+  }
+
+  /* Shields: SEE KEYFRAMES small; crests in two rows of four. */
+  .kfToggle {
+    height: 34px;
+    padding: 0 12px;
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .kfToggle .square {
+    width: 6px;
+    height: 6px;
+  }
+
+  .crests {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  /* Process: no numbers block (On air stays). */
+  .processStats {
+    display: none;
+  }
+
+  /* Programs (Olympics): thumbnails zoomed so the logo nearly fills the card. */
+  .extraThumb img {
+    transform: scale(2.2);
+  }
+}
+
+/* Mascots (phones): the team list is shown above the single goal card. */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .mascots > .teamSelect {
+    display: block;
+  }
+}

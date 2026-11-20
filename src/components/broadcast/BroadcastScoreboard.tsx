@@ -77,11 +77,14 @@ export function CrestGrid({
  */
 export function TeamSelect({
   side,
+  label,
   team,
   busy,
   onTeam,
 }: {
   side: Side;
+  /** Name used for screen readers (default: Home / Away). */
+  label?: string;
   team: string;
   busy: boolean;
   onTeam: (slug: string) => void;
@@ -97,7 +100,7 @@ export function TeamSelect({
     document.addEventListener("pointerdown", off);
     return () => document.removeEventListener("pointerdown", off);
   }, [open]);
-  const sideName = side === "home" ? "Home" : "Away";
+  const sideName = label ?? (side === "home" ? "Home" : "Away");
   return (
     <div ref={box} className={styles.teamSelect} data-open={open || undefined}>
       <button
