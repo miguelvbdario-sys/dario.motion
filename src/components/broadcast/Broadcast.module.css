@@ -167,10 +167,8 @@
 
 .panel {
   position: relative;
-  /* On wide windows the red card stops growing (more black at the side)
-     instead of stretching its blocks edge to edge. */
-  max-width: 1480px;
-  padding: calc(var(--s) * 28) calc(var(--s) * 40) calc(var(--s) * 40);
+  /* Sides: +15px of red around the content. */
+  padding: calc(var(--s) * 28) calc(var(--s) * 40 + 15px) calc(var(--s) * 40);
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
     var(--red);
@@ -180,7 +178,7 @@
 
 .guides {
   position: absolute;
-  inset: 0 calc(var(--s) * 40);
+  inset: 0 calc(var(--s) * 40 + 15px);
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   pointer-events: none;
@@ -732,8 +730,7 @@
 
 .processSteps {
   display: grid;
-  /* Always 3 across (6 slots: 5 steps + the stacked pair), whatever the width. */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--s) * 260), 1fr));
   gap: 4px;
   margin: 0;
   padding: 0;
@@ -1722,12 +1719,5 @@
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .section {
     margin-top: calc(var(--u) * -200);
-  }
-}
-
-/* Process steps: one column on phones. */
-@media (max-width: 767px) {
-  .processSteps {
-    grid-template-columns: minmax(0, 1fr);
   }
 }
