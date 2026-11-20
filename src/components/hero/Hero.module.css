@@ -508,9 +508,10 @@
 
   .head {
     /* Phone: height of the character (lower number = higher up). */
-    top: calc(var(--u) * 140);
-    left: calc(var(--u) * -165);
-    width: calc(var(--u) * 700);
+    /* Width = size (smaller on phones); left keeps it centred; top keeps its middle in place. */
+    top: calc(var(--u) * 210);
+    left: calc(var(--u) * -95);
+    width: calc(var(--u) * 560);
   }
 
   /* Pig: in the empty corner left of DARIO and under MIGUEL, centred on it. */
