@@ -20,7 +20,7 @@ const STEPS = 1000;
  * Touch drag weight: a finger moving the full card width plays only this
  * fraction of the animation (lower = heavier). The mouse keeps the direct hover.
  */
-const TOUCH_WEIGHT = 0.65;
+const TOUCH_WEIGHT = 1;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 function MascotRow({ slug, label }: { slug: string; label: string }) {
