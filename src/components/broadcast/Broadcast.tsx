@@ -32,8 +32,6 @@ const FLIP_TIME = 0.6;
 /** A flip in progress blocks media swaps and other flips for this long. */
 const FLIP_LOCK_MS = 620;
 const OPEN_TIME = 0.85;
-/** Space left above a row when a card opens and the page scrolls to it (px). */
-const SCROLL_GAP = 12;
 /** Floating card offset from the cursor (px). */
 const CARD_OFFSET_X = 200;
 /** Card size (320×180, 16:9): centred vertically on the cursor. */
@@ -343,7 +341,8 @@ export default function Broadcast() {
           if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
           else window.scrollTo(0, top);
         }
-        const y = row.getBoundingClientRect().top + window.scrollY - SCROLL_GAP;
+        // The clicked row ends up in the middle of the screen.
+        const y = row.getBoundingClientRect().top + window.scrollY - (window.innerHeight - row.offsetHeight) / 2;
         if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
         else window.scrollTo({ top: y, behavior: "smooth" });
       }

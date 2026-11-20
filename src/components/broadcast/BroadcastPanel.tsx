@@ -186,15 +186,18 @@ export default function BroadcastPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compact, kind, live, tabOpen, screen, screenCount]);
 
-  // Phones: opening a tab scrolls to its header (the tab above may have just
-  // collapsed, which would otherwise leave you far down the page).
+  // Phones: opening a tab scrolls its header to the middle of the screen (the
+  // tab above may have just collapsed, which would otherwise leave you far down).
   useEffect(() => {
     if (!accJump.current) return;
     accJump.current = false;
     const el = accRefs.current[sections ? tab : active];
     if (!el) return;
     requestAnimationFrame(() => {
-      const y = el.getBoundingClientRect().top + window.scrollY - 12;
+      // The clicked tab's header ends up in the middle of the screen.
+      const head = el.firstElementChild as HTMLElement | null;
+      const h = head?.offsetHeight ?? 0;
+      const y = el.getBoundingClientRect().top + window.scrollY - (window.innerHeight - h) / 2;
       const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
       if (lenis) lenis.scrollTo(y, { duration: 0.7 });
       else window.scrollTo({ top: y, behavior: "smooth" });
