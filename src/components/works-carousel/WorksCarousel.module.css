@@ -8,7 +8,8 @@
   justify-content: center;
   /* Now follows the BROADCAST section (which took the spot under the feet). */
   margin-top: calc(100vw / 1920 * var(--pull, 0));
-  padding: clamp(24px, 3vw, 48px) 0 clamp(48px, 6vw, 96px);
+  /* Space above / below the carousel (between sections). */
+  padding: clamp(64px, 7vw, 140px) 0 clamp(96px, 10vw, 200px);
   overflow: hidden;
   background: transparent;
 }

@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: calc(var(--s) * 140) calc(var(--s) * 64) calc(var(--s) * 140);
+  padding: calc(var(--s) * 200) calc(var(--s) * 64) calc(var(--s) * 180);
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
     var(--red);

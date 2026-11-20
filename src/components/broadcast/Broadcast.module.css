@@ -25,7 +25,8 @@
     var(--u) * var(--pull-at, 805) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) -
       min(100lvh, calc(var(--u) * 1235))
   );
-  padding: 0 calc(var(--s) * 64) calc(var(--s) * 96);
+  /* Bottom: space before the next section. */
+  padding: 0 calc(var(--s) * 64) calc(var(--s) * 200);
   background: #000;
   color: #efeeee;
   overflow-x: clip;
