@@ -97,7 +97,6 @@ export default function Hero() {
   const root = useRef<HTMLElement>(null);
   const headCanvas = useRef<HTMLCanvasElement>(null);
   const arrowCanvas = useRef<HTMLCanvasElement>(null);
-  const rightCanvas = useRef<HTMLCanvasElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const headSequence = useRef<FrameSequence | null>(null);
   const scanCanvas = useRef<HTMLCanvasElement>(null);
@@ -148,15 +147,15 @@ export default function Hero() {
         url: (frame) => `/sequence/arrow/SETA_${pad(frame)}.webp`,
       });
 
-      // "Look right" sequence (drag right only), on its own canvas over the head.
-      const rightEl = rightCanvas.current;
-      const right = rightEl
-        ? new FrameSequence({
-            canvas: rightEl,
-            ...RIGHT_FRAMES,
-            url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-right")}/HEAD-RIGHT_${pad(frame)}.webp`,
-          })
-        : null;
+      // "Look right" sequence, painted on the same canvas as the head.
+      const right = new FrameSequence({
+        canvas: headCanvas.current,
+        ...RIGHT_FRAMES,
+        url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-right")}/HEAD-RIGHT_${pad(frame)}.webp`,
+      });
+      right.setActive(false); // loads in the background, paints only when shown
+      /** Which sequence owns the canvas. */
+      let onRight = false;
       const rightSpan = RIGHT_FRAMES.last - RIGHT_FRAMES.first;
 
       // ---------- Drag the character to scrub its frames ----------
@@ -305,12 +304,17 @@ export default function Hero() {
             if (Math.abs(view.scroll - view.display) < 0.4) view.mode = "scroll";
           }
         }
+        // Both sequences paint the SAME canvas (no element swap, no flash).
+        // When the source changes, the incoming one is told to repaint.
         const showRight = !!right && view.right > 0;
-        // Played in reverse: the start of the drag shows the sequence's last file.
+        if (showRight !== onRight) {
+          onRight = showRight;
+          head.setActive(!showRight);
+          right.setActive(showRight);
+        }
+        // Played in reverse: the start shows the sequence's last file.
         if (showRight) right.draw(Math.round(RIGHT_FRAMES.last - view.right));
         else head.draw(Math.min(HEAD_FRAMES.last, Math.max(HEAD_FRAMES.first, view.display)));
-        if (rightEl) rightEl.style.visibility = showRight ? "visible" : "hidden";
-        if (headCanvas.current) headCanvas.current.style.visibility = showRight ? "hidden" : "visible";
       };
 
       if (followMouse) {
@@ -441,8 +445,6 @@ export default function Hero() {
             aria-label="Pixel-art portrait of Miguel Dario that turns as you scroll"
             data-head
           />
-          {/* "Look right" sequence: only shown while dragging the character to the right. */}
-          <canvas ref={rightCanvas} className={styles.head} aria-hidden="true" style={{ visibility: "hidden" }} />
 
 
           <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal>

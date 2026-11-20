@@ -62,6 +62,17 @@ export class FrameSequence {
     }
   }
 
+  /**
+   * For two sequences sharing one canvas: an inactive sequence keeps loading
+   * but never paints (not even when a frame finishes loading). Activating it
+   * forgets what it last painted, so its next draw() repaints.
+   */
+  setActive(active: boolean) {
+    this.inactive = !active;
+    if (active) this.painted = -1;
+  }
+  private inactive = false;
+
   destroy() {
     this.alive = false;
     this.pending.length = 0;
@@ -115,7 +126,7 @@ export class FrameSequence {
   }
 
   private paintBest() {
-    if (!this.alive || !this.ctx) return;
+    if (!this.alive || !this.ctx || this.inactive) return;
     const frame = this.nearest(this.wanted);
     if (frame < 0 || frame === this.painted) return;
     const img = this.images.get(frame);
