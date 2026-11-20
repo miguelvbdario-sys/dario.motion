@@ -2139,3 +2139,54 @@
     display: block;
   }
 }
+
+/* Phones: home | away side by side (50/50) above the board, both in the home
+   order (label, team list, CLICK TO SCORE). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .boardLayout {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .boardSide[data-side="home"] {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .boardSide[data-side="away"] {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .boardCentre {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .boardSide[data-side="away"] > .sideLabel,
+  .boardSide[data-side="away"] > .ctrl {
+    order: 0;
+  }
+
+  /* Narrow halves: tighter team button and goal button. */
+  .boardSide[data-side] .teamSelect > .teamOption {
+    gap: 8px;
+    padding: 6px 8px;
+    font-size: 13px;
+  }
+
+  .boardSide[data-side] .teamOption img {
+    width: 26px;
+    height: 26px;
+  }
+
+  .boardSide[data-side] > .ctrl {
+    justify-content: center;
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  .boardSide[data-side] > .ctrl .count {
+    display: none;
+  }
+}
