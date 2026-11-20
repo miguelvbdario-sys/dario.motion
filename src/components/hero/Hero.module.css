@@ -290,11 +290,7 @@
   width: calc(var(--u) * var(--head-size));
   aspect-ratio: 1;
   pointer-events: none;
-  /*
-   * Cast shadow behind the character, thrown to the left.
-   * x (negative = left), y, blur, colour.
-   */
-  filter: drop-shadow(calc(var(--u) * -35) calc(var(--u) * 24) calc(var(--u) * 30) rgb(0 0 0 / 1));
+  /* The cast shadow is baked into the frames (no CSS filter: cheaper to draw). */
 }
 
 /* ---------- 3D emblems ---------- */
