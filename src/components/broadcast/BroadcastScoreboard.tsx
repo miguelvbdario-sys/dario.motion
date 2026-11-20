@@ -276,6 +276,8 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
 
         {/* Centre: the board (half the width) and the program controls. */}
         <div className={styles.boardCentre}>
+          {/* Invitation, right above the board. */}
+          <p className={`${styles.sideLabel} ${styles.boardPrompt}`}>[ Choose your team and score the goal ]</p>
           <div className={styles.boardFrame}>
             <canvas
               ref={canvas}
