@@ -2453,3 +2453,10 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* Phones: rows with a thumbnail get a smaller title so it never runs under it. */
+@media (max-width: 767px), (hover: none) {
+  .row:has(.rowThumb) .title {
+    font-size: min(30px, 7.6vw);
+  }
+}
