@@ -20,15 +20,11 @@ const Emblem = dynamic(() => import("./Emblem"), { ssr: false });
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 /**
- * Which head sequence the hero uses. TEST: "NOVA SEQUENCIA CABEÇA" (66 frames,
- * in /sequence/hero-test and hero-test-720). Set to "original" to go back.
- * Keep in sync with HEAD_PRELOAD in src/app/page.tsx.
+ * Scroll head sequence (66 frames, /sequence/hero-test and hero-test-720).
+ * Phones/tablets scrub it with the scroll; desktop keeps it on frame 0 (the
+ * mouse zones drive the look sequence instead). Preloads: src/app/page.tsx.
  */
-export const HEAD_VARIANT: "original" | "test" = "test";
-const HEAD = {
-  original: { folder: "hero", last: 85 },
-  test: { folder: "hero-test", last: 65 },
-}[HEAD_VARIANT];
+const HEAD = { folder: "hero-test", last: 65 };
 
 const HEAD_FRAMES = { first: 0, last: HEAD.last };
 const ARROW_FRAMES = { first: 2, last: 85 };
@@ -264,7 +260,8 @@ export default function Hero() {
           look.setActive(useLook);
         }
         if (useLook) look.draw(Math.round(LOOK.rest + offset));
-        else head.draw(view.scroll);
+        // Desktop: no scroll scrub on the head (it stays on its rest frame).
+        else head.draw(followMouse ? HEAD_FRAMES.first : view.scroll);
       };
 
       if (followMouse) {
