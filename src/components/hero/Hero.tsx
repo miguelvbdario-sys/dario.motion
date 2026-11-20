@@ -147,7 +147,7 @@ export default function Hero() {
       headSequence.current = look;
       /** Offset from rest in look frames: < 0 = toward right, > 0 = toward left. */
       let offset = 0;
-      /** Phones/tablets: the part of the offset that comes from scrolling (rest → right end). */
+      /** The part of the offset that comes from scrolling (rest → right end). */
       let scrollOffset = 0;
       const maxRight = LOOK.rest; // frames from rest to the look-right end
       const maxLeft = LOOK.last - LOOK.rest; // frames from rest to the left end
@@ -245,6 +245,8 @@ export default function Hero() {
         mouseX = t < REST_ZONE.from ? -1 : t > REST_ZONE.to ? 1 : 0;
       };
       const onWindowLeave = () => (mouseX = 0);
+      /** Desktop: the head is on the scroll pose and follows the scroll 1:1. */
+      let scrollLocked = true;
 
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
@@ -256,15 +258,24 @@ export default function Hero() {
           const s = away ? step : back;
           offset = offset < target ? Math.min(target, offset + s) : Math.max(target, offset - s);
         };
+        // Scrolling turns the head from rest to the right end (desktop and phones).
+        scrollOffset = -(view.scroll / HEAD_FRAMES.last) * maxRight;
         if (followMouse) {
+          // Desktop: the mouse zones win; over the character (or away), the head
+          // sits where the scroll puts it.
           const zone = mouseX;
-          const target = zone === 1 ? -maxRight : zone === -1 ? maxLeft : 0;
-          // Switching sides: back to rest first (same sign rule as toward()).
-          toward(Math.sign(target) !== Math.sign(offset) && offset !== 0 ? 0 : target);
+          if (zone !== 0) scrollLocked = false;
+          if (scrollLocked) offset = scrollOffset;
+          else {
+            const target = zone === 1 ? -maxRight : zone === -1 ? maxLeft : scrollOffset;
+            // Switching sides: back to rest first (same sign rule as toward()).
+            toward(Math.sign(target) !== Math.sign(offset) && offset !== 0 ? 0 : target);
+            // Back on the scroll pose: follow the scroll directly again.
+            if (zone === 0 && offset === scrollOffset) scrollLocked = true;
+          }
         } else {
-          // Phones/tablets: scrolling turns the head from rest to the right end;
-          // a drag moves it from there, and on release it plays back.
-          scrollOffset = -(view.scroll / HEAD_FRAMES.last) * maxRight;
+          // Phones/tablets: a drag moves the head from the scroll pose, and on
+          // release it plays back.
           if (view.mode === "scroll") offset = scrollOffset;
           else if (view.mode === "return") {
             toward(scrollOffset);
