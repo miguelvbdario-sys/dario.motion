@@ -70,6 +70,77 @@ export function CrestGrid({
   );
 }
 
+/**
+ * Phones (scoreboard only): the crest grid becomes a compact list. Closed, it
+ * shows the chosen team; tapping opens every team, crest left of the name.
+ * The grid stays in the DOM for larger screens; CSS shows one or the other.
+ */
+export function TeamSelect({
+  side,
+  team,
+  busy,
+  onTeam,
+}: {
+  side: Side;
+  team: string;
+  busy: boolean;
+  onTeam: (slug: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const box = useRef<HTMLDivElement>(null);
+  // Close when tapping anywhere else.
+  useEffect(() => {
+    if (!open) return;
+    const off = (e: PointerEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false);
+    };
+    document.addEventListener("pointerdown", off);
+    return () => document.removeEventListener("pointerdown", off);
+  }, [open]);
+  const sideName = side === "home" ? "Home" : "Away";
+  return (
+    <div ref={box} className={styles.teamSelect} data-open={open || undefined}>
+      <button
+        type="button"
+        className={styles.teamOption}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        aria-label={`${sideName} team: ${teamLabel(team)}`}
+        disabled={busy}
+        onClick={() => setOpen((o) => !o)}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={crestSrc(team)} alt="" width={160} height={160} />
+        <span>{teamLabel(team)}</span>
+        <span className={styles.teamChevron} aria-hidden="true">▾</span>
+      </button>
+      {open && (
+        <ul className={styles.teamList} role="listbox" aria-label={`${sideName} team`}>
+          {TEAMS.map((t) => (
+            <li key={t.slug}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={t.slug === team}
+                className={styles.teamOption}
+                data-selected={t.slug === team || undefined}
+                onClick={() => {
+                  setOpen(false);
+                  if (t.slug !== team) onTeam(t.slug);
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={crestSrc(t.slug)} alt="" width={160} height={160} loading="lazy" />
+                <span>{t.label}</span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 export default function BroadcastScoreboard({ active }: { active: boolean }) {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
@@ -187,6 +258,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
         <div className={styles.boardSide} data-side="home">
           <p className={styles.sideLabel}>[ Home ]</p>
           <CrestGrid side="home" team={home} busy={busy !== null} onTeam={(s) => changeTeam("home", s)} />
+          <TeamSelect side="home" team={home} busy={busy !== null} onTeam={(s) => changeTeam("home", s)} />
           <button
             type="button"
             className={`${styles.filter} ${styles.ctrl}`}
@@ -232,17 +304,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
           </div>
 
           <div className={styles.filters} role="group" aria-label="Program">
-            <button
-              type="button"
-              className={`${styles.filter} ${styles.ctrl}`}
-              data-active={onAir || undefined}
-              aria-pressed={onAir}
-              onClick={goLive}
-              disabled={!ready || onAir}
-            >
-              <span className={styles.square} aria-hidden="true" />
-              <span className={styles.filterLabel}>In</span>
-            </button>
+            {/* No "In" button: going on air is done with GO LIVE only. */}
             <button
               type="button"
               className={`${styles.filter} ${styles.ctrl}`}
@@ -273,6 +335,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
         <div className={styles.boardSide} data-side="away">
           <p className={styles.sideLabel}>[ Away ]</p>
           <CrestGrid side="away" team={away} busy={busy !== null} onTeam={(s) => changeTeam("away", s)} />
+          <TeamSelect side="away" team={away} busy={busy !== null} onTeam={(s) => changeTeam("away", s)} />
           <button
             type="button"
             className={`${styles.filter} ${styles.ctrl}`}

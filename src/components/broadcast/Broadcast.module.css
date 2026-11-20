@@ -1738,3 +1738,81 @@
     margin-top: calc(var(--u) * -200);
   }
 }
+
+/* Team dropdown (scoreboard, phones only; the crest grid shows elsewhere). */
+.teamSelect {
+  display: none;
+  position: relative;
+}
+
+.teamSelect > .teamOption {
+  width: 100%;
+  border: 1px solid rgb(239 238 238 / 0.18);
+  background: rgb(20 0 0 / 0.86);
+}
+
+.teamOption {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: transparent;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+}
+
+.teamOption img {
+  width: 34px;
+  height: 34px;
+  flex: none;
+  object-fit: contain;
+}
+
+.teamOption[data-selected] {
+  background: rgb(239 238 238 / 0.14);
+}
+
+.teamChevron {
+  margin-left: auto;
+  font-size: 14px;
+  transition: transform 0.2s ease;
+}
+
+.teamSelect[data-open] .teamChevron {
+  transform: rotate(180deg);
+}
+
+/* Open list: drops over what is below, so the layout doesn't jump. */
+.teamList {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border-radius: 5px;
+  background: #1a0000;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .boardSide[data-side] .crests {
+    display: none;
+  }
+
+  .boardSide[data-side] .teamSelect {
+    display: block;
+  }
+}
