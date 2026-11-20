@@ -99,6 +99,7 @@ export const BROADCAST: BroadcastProject[] = [
     sections: [
       // Loops: /public/broadcast/paulistao/live (cut from match highlights).
       { label: "Scoreboard", kind: "scoreboard", loops: [1, 2, 3, 4].map((n) => `/broadcast/paulistao/live/scoreboard-${n}`) },
+      { label: "Shields", kind: "shields" },
       {
         label: "Broadcast Screens",
         kind: "screens",
@@ -124,7 +125,6 @@ export const BROADCAST: BroadcastProject[] = [
           { label: "All assets", video: null, assets: true },
         ],
       },
-      { label: "Shields", kind: "shields" },
       { label: "Mascots", kind: "mascots" },
       { label: "Process", kind: "process" }, // 3D trophy (BroadcastTrophy.tsx)
       { label: "Live", kind: "youtube", youtube: "pMxhbLuqH3c" },
