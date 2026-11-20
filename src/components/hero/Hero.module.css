@@ -16,7 +16,9 @@
 
   position: relative;
   height: 100vh;
-  height: 100lvh;
+  /* Never taller than the composition (glow fully black at 1235 design px):
+     on tall windows the next section follows instead of a black block. */
+  height: min(100lvh, calc(var(--u) * 1235));
   overflow: hidden;
   isolation: isolate;
   background: var(--color-void);

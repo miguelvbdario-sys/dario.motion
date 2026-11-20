@@ -30,7 +30,14 @@ const ARROW_FRAMES = { first: 2, last: 85 };
 /** Head frame → arrow frame (the arrow keeps its 85 frames whatever the head length). */
 const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /** Scroll distance the hero stays pinned for, relative to the viewport height. */
-const PIN_DISTANCE = "+=60%";
+/**
+ * Scroll distance the hero stays pinned for. Desktop: exactly the distance the
+ * composition travels (--shift, 430 design px), so when the pin starts the
+ * Broadcast list already sits right under the hero. Phones: 60% of the screen.
+ */
+const PIN_SHIFT = 430;
+const pinDistance = () =>
+  window.matchMedia(COMPACT_QUERY).matches ? "+=60%" : `+=${Math.round((window.innerWidth / 1920) * PIN_SHIFT)}`;
 /** Touch: drag this many px sideways to run from rest to the left end. */
 const DRAG_DISTANCE = 200;
 /**
@@ -293,7 +300,8 @@ export default function Hero() {
             scrollTrigger: {
               trigger: stage,
               start: "top top",
-              end: PIN_DISTANCE,
+              end: pinDistance,
+              invalidateOnRefresh: true,
               pin: true,
               scrub: 0.5,
               anticipatePin: 1,

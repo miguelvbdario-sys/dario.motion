@@ -17,11 +17,13 @@
    * Starts where the hero's glow has turned fully black at the end of the
    * pin, whatever the window shape. Same terms as the hero: its fade (fade-top
    * 1020 + 215 to full black − the 430 it travels = 805 design px), minus the
-   * hero's --lift on wide short windows, minus the hero height (100lvh).
+   * hero's --lift on wide short windows, minus the hero height (screen
+   * height, capped at 1235 design px on tall windows).
    * --pull-at: raise it to start lower, lower it to start closer.
    */
   margin-top: calc(
-    var(--u) * var(--pull-at, 805) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) - 100lvh
+    var(--u) * var(--pull-at, 805) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) -
+      min(100lvh, calc(var(--u) * 1235))
   );
   padding: 0 calc(var(--s) * 64) calc(var(--s) * 96);
   background: #000;
