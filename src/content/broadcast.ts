@@ -78,6 +78,8 @@ export type BroadcastProject = {
     points: { title: string; text: string; loop?: { src: string; poster: string } }[];
     /** Closing line (plain, small). */
     outro?: string;
+    /** Hide the Index (client / details / year) in this About. */
+    noIndex?: boolean;
     stats?: { value: string; label: string }[];
     /** Muted loops: mp4 + poster. */
     loops?: { src: string; poster: string }[];
@@ -110,7 +112,7 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2026",
     desc: "Official Paulistão 2026 broadcast assets",
     about: {
-      lead: "Paulistão is São Paulo's state football championship, one of the biggest in Brazil. We made the graphics package and the animations for its official broadcast.",
+      lead: "Paulistão is São Paulo's state football championship, the biggest in Brazil. We made the graphics package and the animations for its official broadcast.",
       points: [
         {
           title: "The championship",
@@ -129,7 +131,7 @@ export const BROADCAST: BroadcastProject[] = [
         },
         {
           title: "Through to the final",
-          text: "Ending with the champion screens, on air the night of the title.",
+          text: "In partnership between FPF and Livemode, we delivered every asset a championship broadcast needs.",
           loop: { src: "/broadcast/paulistao/screens/champion-live.mp4", poster: "/broadcast/paulistao/screens/champion-live.jpg" },
         },
       ],
@@ -140,6 +142,7 @@ export const BROADCAST: BroadcastProject[] = [
         { value: "6", label: "Member team" },
       ],
       outro: "This portfolio is interactive, enjoy, take your time and click on all!",
+      noIndex: true,
       channels: ["TNT", "HBO", "Record", "CazéTV"],
     },
     filters: [], // the tabs below take their place
@@ -147,7 +150,7 @@ export const BROADCAST: BroadcastProject[] = [
     sections: [
       { label: "About the project", kind: "about" },
       // Loops: /public/broadcast/paulistao/live (cut from match highlights).
-      { label: "Scoreboard", kind: "scoreboard", loops: [1, 2, 3, 4].map((n) => `/broadcast/paulistao/live/scoreboard-${n}`) },
+      { label: "Scoreboard", kind: "scoreboard", loops: [3, 4].map((n) => `/broadcast/paulistao/live/scoreboard-${n}`) },
       { label: "Shields", kind: "shields" },
       {
         label: "Broadcast Screens",

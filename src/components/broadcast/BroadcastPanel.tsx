@@ -350,7 +350,7 @@ export default function BroadcastPanel({
             ))}
           </dl>
         )}
-        {index}
+        {!ab?.noIndex && index}
         {ab?.channels && (
           <div className={styles.aboutChannels}>
             <span className={styles.sideLabel}>[ On air ]</span>
