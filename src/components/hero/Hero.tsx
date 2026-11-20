@@ -53,7 +53,7 @@ const FOLLOW_DEAD_ZONE = 0.12;
  * Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge.
  * Shifted left because the character rests a little to the left.
  */
-const FOLLOW_CENTER = -0.15;
+const FOLLOW_CENTER = 0;
 /** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
 const RIGHT_FRAMES = { first: 0, last: 37 };
 /** How quickly the head rewinds to the scroll frame after a drag (per second). */
