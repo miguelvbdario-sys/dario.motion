@@ -1805,6 +1805,31 @@
   border-radius: 5px;
   background: #1a0000;
   box-shadow: 0 12px 30px rgb(0 0 0 / 0.5);
+  /* Four teams at a time (row = 34px crest + 16px padding + 2px gap); drag to see the rest. */
+  max-height: calc(4 * 52px + 6px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Opens by unfolding down from the button. */
+  transform-origin: top;
+  animation: teamListIn 0.24s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes teamListIn {
+  from {
+    opacity: 0;
+    transform: scaleY(0.4);
+  }
+  to {
+    opacity: 1;
+    transform: scaleY(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teamList {
+    animation: none;
+  }
 }
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
@@ -1814,5 +1839,12 @@
 
   .boardSide[data-side] .teamSelect {
     display: block;
+  }
+}
+
+/* Phones: hide things that are desktop-only (e.g. the scoreboard "In"). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .desktopOnly {
+    display: none !important;
   }
 }

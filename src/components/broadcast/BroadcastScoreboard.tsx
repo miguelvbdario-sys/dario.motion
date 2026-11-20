@@ -115,7 +115,7 @@ export function TeamSelect({
         <span className={styles.teamChevron} aria-hidden="true">▾</span>
       </button>
       {open && (
-        <ul className={styles.teamList} role="listbox" aria-label={`${sideName} team`}>
+        <ul className={styles.teamList} data-lenis-prevent role="listbox" aria-label={`${sideName} team`}>
           {TEAMS.map((t) => (
             <li key={t.slug}>
               <button
@@ -304,7 +304,18 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
           </div>
 
           <div className={styles.filters} role="group" aria-label="Program">
-            {/* No "In" button: going on air is done with GO LIVE only. */}
+            {/* "In": desktop only (phones go on air with GO LIVE). */}
+            <button
+              type="button"
+              className={`${styles.filter} ${styles.ctrl} ${styles.desktopOnly}`}
+              data-active={onAir || undefined}
+              aria-pressed={onAir}
+              onClick={goLive}
+              disabled={!ready || onAir}
+            >
+              <span className={styles.square} aria-hidden="true" />
+              <span className={styles.filterLabel}>In</span>
+            </button>
             <button
               type="button"
               className={`${styles.filter} ${styles.ctrl}`}
