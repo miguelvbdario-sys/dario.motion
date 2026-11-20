@@ -168,7 +168,7 @@
 .panel {
   position: relative;
   /* Sides: +15px of red around the content. */
-  padding: calc(var(--s) * 28) calc(var(--s) * 40 + 15px) calc(var(--s) * 40);
+  padding: calc(var(--s) * 28) calc(var(--s) * 40 + 110px) calc(var(--s) * 40);
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
     var(--red);
@@ -1683,12 +1683,17 @@
     width: 100%;
   }
 
-  /* Board first, then home and away below it. */
+  /* Home (crests, then its goal) above the board, away below it
+     (its goal first, then the crests). */
   .boardLayout {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .boardCentre {
+  .boardSide[data-side="away"] > .sideLabel {
+    order: -2;
+  }
+
+  .boardSide[data-side="away"] > .ctrl {
     order: -1;
   }
 
@@ -1702,8 +1707,20 @@
     justify-content: center;
   }
 
+  /* Shields tab: one long row of small crests. */
   .crests {
     grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  /* Scoreboard: 4 per row, 2 rows, bigger tap targets. */
+  .boardSide[data-side] .crests {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .boardSide[data-side] .crest {
+    padding: 12%;
   }
 }
 
