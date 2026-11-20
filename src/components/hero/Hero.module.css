@@ -10,7 +10,7 @@
   --w: 1920; /* design width */
   --u: calc(100vw / 1920); /* one design pixel */
   --shift: calc(var(--u) * 430); /* distance the composition travels while pinned */
-  --fade-top: 870; /* where the glow starts dissolving into black */
+  --fade-top: 1020; /* where the glow starts dissolving into black (Broadcast.module.css follows it) */
   /* On very wide, short windows, pull the composition up so the pills and the vulture stay on screen. */
   --lift: clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110));
 

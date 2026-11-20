@@ -13,9 +13,16 @@
   --ink: #140000;
   position: relative;
   z-index: 1;
-  /* Starts right under the character at the end of the hero pin (desktop;
-     phones override below). More negative = closer. */
-  margin-top: calc(var(--u) * var(--pull, -780));
+  /*
+   * Starts where the hero's glow has turned fully black at the end of the
+   * pin, whatever the window shape. Same terms as the hero: its fade (fade-top
+   * 1020 + 215 to full black − the 430 it travels = 805 design px), minus the
+   * hero's --lift on wide short windows, minus the hero height (100lvh).
+   * --pull-at: raise it to start lower, lower it to start closer.
+   */
+  margin-top: calc(
+    var(--u) * var(--pull-at, 805) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) - 100lvh
+  );
   padding: 0 calc(var(--s) * 64) calc(var(--s) * 96);
   background: #000;
   color: #efeeee;
@@ -1704,9 +1711,9 @@
   }
 }
 
-/* Phones/portrait tablets: the hero is shorter there, keep the smaller pull. */
+/* Phones/portrait tablets: the hero has its own height there (see Hero.module.css). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .section {
-    --pull: -200;
+    margin-top: calc(var(--u) * -200);
   }
 }
