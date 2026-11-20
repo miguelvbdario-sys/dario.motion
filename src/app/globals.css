@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* Design tokens — see DESIGN.md */
+@theme {
+  --color-void: #000000;
+  --color-crimson: #540022;
+  --color-ember: #ff7214;
+  --color-signal: #fbcb09;
+  --color-bone: #efeeee;
+  --color-ink: #140006;
+
+  --font-display: var(--font-tusker), Impact, "Arial Narrow Bold", sans-serif;
+  --font-script: var(--font-wildest), "Brush Script MT", cursive;
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+
+:root {
+  --hud-line: rgb(239 238 238 / 0.25);
+  color-scheme: dark;
+}
+
+html {
+  background: var(--color-void);
+}
+
+body {
+  background: var(--color-void);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+}
+
+/* The custom cursor replaces the system one (mouse and trackpad only). */
+.has-custom-cursor,
+.has-custom-cursor *,
+.has-custom-cursor *::before,
+.has-custom-cursor *::after {
+  cursor: none !important;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--color-signal);
+  color: var(--color-ink);
+}

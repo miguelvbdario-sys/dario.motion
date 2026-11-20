@@ -1,0 +1,263 @@
+﻿/* Concave carousel — alternative layout for PORTFOLIO WORKS (see DESIGN.md §5). */
+
+.section {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  /* Now follows the BROADCAST section (which took the spot under the feet). */
+  margin-top: calc(100vw / 1920 * var(--pull, 0));
+  padding: clamp(24px, 3vw, 48px) 0 clamp(48px, 6vw, 96px);
+  overflow: hidden;
+  background: transparent;
+}
+
+/* Small section title above the wall: Inter Black, all caps. */
+.heading {
+  position: relative;
+  z-index: 2;
+  /* The wall keeps room above the panels (for the hover zoom): pull the
+     title down into it, just above the cards (panel width × −0.3). */
+  margin: 0 0 calc(clamp(200px, 22vw, 520px) * -0.3);
+  padding: 0 clamp(16px, 4.4vw, 64px);
+  font-family: var(--font-sans);
+  font-size: clamp(0.85rem, 1vw, 1.1rem);
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-align: center;
+  /* Balances the tracking left after the last letter, so it centres exactly. */
+  text-indent: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-bone);
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- The wall ---------- */
+
+.stage {
+  /* Width of the centre panel. JS measures it to build the curve. */
+  --panel-w: clamp(200px, 22vw, 520px);
+  position: relative;
+  /* Room for the wall, the zoomed panel, its reflection and the caption. */
+  height: calc(var(--panel-w) * 9 / 16 * 3);
+  touch-action: pan-y;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* The perspective is set here by JS. The ring stays flat (no preserve-3d) on
+   purpose: panels are then stacked by z-index, so a zoomed one can be raised. */
+.ring {
+  position: absolute;
+  left: 50%;
+  top: 44%;
+  width: 0;
+  height: 0;
+}
+
+.panel {
+  --zoom: 1.5;
+  --zoom-ease: cubic-bezier(0.1, 0.9, 0.15, 1);
+  position: absolute;
+  left: calc(var(--panel-w) / -2);
+  top: calc(var(--panel-w) * 9 / 16 / -2);
+  width: var(--panel-w);
+  aspect-ratio: 16 / 9;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* Hover timing matches the grid version: 1.5s in and out. */
+.card {
+  --hover-time: 1.5s;
+  --hover-ease: cubic-bezier(0.33, 1, 0.68, 1);
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  /* Rounded corners; they crop a sliver of each video. */
+  border-radius: clamp(8px, 0.75vw, 14px);
+  background: #0a0a0a;
+  transform: scale(1);
+  /* The zoom shoots out fast, then settles for the rest of the 1.5s. */
+  transition: transform var(--hover-time) var(--zoom-ease);
+  -webkit-tap-highlight-color: transparent;
+  /* Faint reflection on the floor below each panel (Chromium and Safari).
+     The mask is drawn on the un-flipped image, so "to top" makes the
+     reflection strongest at the panel's edge and fade to 0 going down. */
+  -webkit-box-reflect: below 10px linear-gradient(to top, rgb(255 255 255 / 0.22), transparent 45%);
+}
+
+.media {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.dim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* Same 70% black as the grid; it lifts on hover. */
+.shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity var(--hover-time) var(--hover-ease);
+}
+
+@media (hover: hover) {
+  .panel:hover .card {
+    transform: scale(var(--zoom));
+  }
+  /* Push the caption down by the extra height the zoom adds below the card. */
+  .panel:hover .caption {
+    transform: translateY(calc(var(--panel-w) * 9 / 16 * (var(--zoom) - 1) / 2));
+  }
+  .panel:hover .shade {
+    opacity: 0;
+  }
+}
+
+/* Touch screens need nothing extra: the auto-focus (JS) already lifts the
+   centre panel's overlay and zooms it slightly. */
+
+.card:focus-visible {
+  outline: 2px solid var(--color-signal);
+  outline-offset: 4px;
+}
+
+.card:focus-visible .shade {
+  opacity: 0;
+}
+
+/* ---------- Caption + arrows ---------- */
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(20px, 2.4vw, 36px);
+  padding: 0 16px;
+  text-align: center;
+}
+
+/* Small Inter caption under each panel. It turns with its panel and fades in
+   only near the centre (opacity set by JS every frame). */
+.caption {
+  position: absolute;
+  top: calc(100% + clamp(18px, 1.6vw, 30px));
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35em;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform var(--hover-time, 1.5s) var(--zoom-ease);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(1.25rem, 1.75vw, 2.25rem);
+  font-weight: 900;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+  color: var(--color-bone);
+}
+
+.meta {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(0.95rem, 1.05vw, 1.35rem);
+  font-weight: 400;
+  color: rgb(239 238 238 / 0.55);
+}
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+/* Thin white outline circle; fills with grey on hover. */
+.arrow {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  padding: 0;
+  border: 1px solid rgb(239 238 238 / 0.85);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-bone);
+  transition:
+    background-color 0.35s ease,
+    border-color 0.35s ease,
+    color 0.35s ease,
+    transform 0.25s ease;
+}
+
+.arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+/* Hover: bone white with a dark chevron, like every button on the site. */
+.arrow:hover {
+  border-color: var(--color-bone);
+  background: var(--color-bone);
+  color: #000;
+}
+
+.arrow:active {
+  transform: scale(0.92);
+}
+.counter {
+  min-width: 5.5em;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  font-variant-numeric: tabular-nums;
+}
+
+.counterSep {
+  opacity: 0.45;
+}
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 767px) {
+  .stage {
+    --panel-w: 64vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .shade {
+    transition-duration: 0.2s;
+  }
+}

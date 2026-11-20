@@ -1,0 +1,208 @@
+/* ABOUT (#about), see DESIGN.md "04 · ABOUT". Sizes at the 1440 reference (--s). */
+
+.section {
+  --s: clamp(0.8px, calc(100vw / 1440), 1.25px);
+  --red: #e60000;
+  --ink: #140000;
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  padding: calc(var(--s) * 140) calc(var(--s) * 64) calc(var(--s) * 140);
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
+    var(--red);
+  color: var(--ink);
+}
+
+/* Four guide columns, like the BROADCAST cards. */
+.guides {
+  position: absolute;
+  inset: 0 calc(var(--s) * 64);
+  z-index: -1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  pointer-events: none;
+}
+
+.guides > span {
+  border-left: 1px solid rgb(0 0 0 / 0.14);
+}
+
+/* label · portrait · text */
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.8fr) calc(var(--s) * 240) minmax(0, 1.8fr);
+  column-gap: calc(var(--s) * 56);
+  gap: calc(var(--s) * 28);
+  align-items: start;
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 13);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* ---------- Portrait + script behind it ---------- */
+
+.portrait {
+  position: relative;
+}
+
+/*
+ * "MIGUEL DARIO" in Wildest, all caps, tilted −20°, huge, behind the photo
+ * and at low opacity so the text on the right stays readable.
+ * --script-x nudges it sideways, --script-size scales it.
+ */
+.script {
+  --script-size: calc(var(--s) * 380);
+  --script-x: -54%;
+  /* Black on the left fading to 0% on the right (where the text sits). */
+  background: linear-gradient(to right, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.4) 45%, rgb(0 0 0 / 0) 90%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  position: absolute;
+  z-index: 0;
+  top: 95%;
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: var(--font-script);
+  font-size: var(--script-size);
+  line-height: 0.85;
+  text-transform: uppercase;
+  color: #000;
+  white-space: nowrap;
+  transform: translate(var(--script-x), -50%) rotate(-20deg);
+  pointer-events: none;
+  user-select: none;
+}
+
+.photo {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 1080 / 1000;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+.photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ---------- Text ---------- */
+
+.text {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 24);
+  max-width: 44ch;
+}
+
+.lead {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 32);
+  font-weight: 900;
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 20);
+  font-weight: 400;
+  line-height: 1.35;
+  color: #2a0000;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: calc(var(--s) * 8);
+}
+
+/* Dark rectangles with a red dot (reference); hover = bone white, like every button on the site. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75em;
+  padding: 0.75em 1.15em;
+  border-radius: 4px;
+  background: #140000;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 18);
+  font-weight: 500;
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.buttonDot {
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--red);
+}
+
+.button:hover {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.button:focus-visible {
+  outline: 2px solid #000;
+  outline-offset: 3px;
+}
+
+/* ---------- Phones ---------- */
+
+@media (max-width: 767px) {
+  .section {
+    --s: 1px;
+    padding: 72px 16px 88px;
+  }
+
+  .guides {
+    inset: 0 16px;
+  }
+
+  .grid {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+
+  /* Small square photo, centred, with the name around it. */
+  .portrait {
+    width: min(48vw, 200px);
+    margin: 24px auto;
+  }
+
+  .script {
+    --script-size: 200px;
+  }
+
+  .lead {
+    font-size: 24px;
+  }
+
+  .body {
+    font-size: 17px;
+  }
+}

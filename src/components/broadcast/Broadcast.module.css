@@ -1,0 +1,1704 @@
+﻿/*
+ * BROADCAST (#broadcast), see DESIGN.md "02 · BROADCAST".
+ *
+ * Sizes are written at the 1440px reference and scale with --s (one reference
+ * pixel, clamped so small type stays readable). The zig-zag indent ("offset")
+ * is in design px of the 1920 grid (--u).
+ */
+
+.section {
+  --u: calc(100vw / 1920);
+  --s: clamp(0.8px, calc(100vw / 1440), 1.25px);
+  --red: #e60000;
+  --ink: #140000;
+  position: relative;
+  z-index: 1;
+  /* Starts right under the character's feet at the end of the hero pin. */
+  margin-top: calc(var(--u) * var(--pull, -200));
+  padding: 0 calc(var(--s) * 64) calc(var(--s) * 96);
+  background: #000;
+  color: #efeeee;
+  overflow-x: clip;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* ---------- List ---------- */
+
+.list {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.row {
+  --h: calc(var(--s) * 88);
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: max-content;
+  max-width: 100%;
+  height: var(--h);
+  padding: 0;
+  border: 0;
+  background: #121212;
+  color: inherit;
+  cursor: pointer;
+  overflow: hidden;
+  text-align: left;
+}
+
+.row[data-align="left"] {
+  align-self: flex-start;
+  margin-left: calc(var(--u) * var(--offset, 0));
+}
+
+.row[data-align="right"] {
+  align-self: flex-end;
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 3px;
+}
+
+.content {
+  display: flex;
+  align-items: center;
+  gap: calc(var(--s) * 28);
+  height: var(--h);
+  padding: 0 calc(var(--s) * 36);
+  white-space: nowrap;
+}
+
+.content[data-meta-first] {
+  flex-direction: row-reverse;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: calc(var(--s) * 64);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  color: #efeeee;
+}
+
+.meta {
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 11);
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #efeeee;
+  opacity: 0.6;
+}
+
+/* Black copy inside the red bars: the text turns black where the red passes. */
+.content[data-black] .title {
+  color: #000;
+}
+
+.content[data-black] .meta {
+  color: #000;
+  opacity: 0.75;
+}
+
+/* Two red bars: one grows from the top, one from the bottom (GSAP). */
+.bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+  overflow: hidden;
+  background: var(--red);
+  pointer-events: none;
+}
+
+.bar[data-bar="top"] {
+  top: 0;
+}
+
+.bar[data-bar="bottom"] {
+  bottom: 0;
+}
+
+.bar > .content {
+  position: absolute;
+  left: 0;
+  right: 0;
+}
+
+.bar[data-bar="top"] > .content {
+  top: 0;
+}
+
+.bar[data-bar="bottom"] > .content {
+  bottom: 0;
+}
+
+/* ---------- Open card (height animated by GSAP) ---------- */
+
+.panelWrap {
+  height: 0;
+  overflow: hidden;
+  width: 100%;
+}
+
+.panel {
+  position: relative;
+  padding: calc(var(--s) * 28) calc(var(--s) * 40) calc(var(--s) * 40);
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
+    var(--red);
+  color: var(--ink);
+  isolation: isolate;
+}
+
+.guides {
+  position: absolute;
+  inset: 0 calc(var(--s) * 40);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  pointer-events: none;
+  z-index: -1;
+}
+
+.guides > span {
+  border-left: 1px solid rgb(0 0 0 / 0.14);
+}
+
+.labels {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 13);
+  color: var(--ink);
+}
+
+.labels > span {
+  padding-left: calc(var(--s) * 10);
+}
+
+.dot {
+  display: block;
+  width: 11px;
+  height: 11px;
+  margin: calc(var(--s) * 40) 0 calc(var(--s) * 18);
+  border-radius: 50%;
+  background: #000;
+}
+
+.bigTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 104);
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.desc {
+  max-width: 34ch;
+  margin: calc(var(--s) * 22) 0 calc(var(--s) * 32);
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 22);
+  font-weight: 400;
+  line-height: 1.3;
+  color: #2a0000;
+}
+
+/* Filter bar (also used by the scoreboard controls). */
+.filters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 5px;
+  border-radius: 5px;
+  background: rgb(20 0 0 / 0.86);
+}
+
+.filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: rgb(239 238 238 / 0.72);
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 16);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    opacity 0.25s;
+}
+
+/* Hover: a bone-white pill with dark text (stronger than the active state). */
+.filter:hover:not(:disabled) {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.filter:hover:not(:disabled) .square {
+  background: var(--red);
+}
+
+.filter:hover:not(:disabled) .count {
+  color: var(--red);
+}
+
+.filter[data-active] {
+  background: rgb(239 238 238 / 0.09);
+  color: #efeeee;
+}
+
+.filter:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* An active state that can't be pressed again (e.g. "In" while on air) stays lit. */
+.filter[data-active]:disabled {
+  opacity: 1;
+}
+
+.filter:focus-visible,
+.watch:focus-visible,
+.goLive:focus-visible,
+.crest:focus-visible,
+.extra:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: 2px;
+}
+
+.square {
+  width: 6px;
+  height: 6px;
+  flex: none;
+  background: rgb(239 238 238 / 0.45);
+}
+
+.filter[data-active] .square {
+  background: var(--red);
+}
+
+.filter[data-moving] .square {
+  animation: blink 0.4s steps(2, jump-none) infinite;
+}
+
+@keyframes blink {
+  to {
+    opacity: 0.2;
+  }
+}
+
+.filterLabel {
+  color: inherit;
+}
+
+.count {
+  font-family: var(--font-mono);
+  font-size: 0.8em;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.filter[data-active] .count {
+  color: var(--red);
+}
+
+/* Media + index. */
+.mediaGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: calc(var(--s) * 20);
+}
+
+.preview {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+.preview video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.previewLabel {
+  position: absolute;
+  top: 10px;
+  left: 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #efeeee;
+  mix-blend-mode: difference;
+}
+
+.index {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 18);
+  padding: calc(var(--s) * 22) calc(var(--s) * 24);
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+}
+
+.indexLabel {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgb(239 238 238 / 0.6);
+}
+
+.indexRows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.indexRows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgb(239 238 238 / 0.12);
+}
+
+.indexRows > div:last-child {
+  border-bottom: 1px solid rgb(239 238 238 / 0.12);
+}
+
+.indexRows dt {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.indexRows dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 16);
+  font-weight: 500;
+  text-align: right;
+}
+
+.watch {
+  align-self: flex-start;
+  margin-top: auto;
+  padding: 0.7em 1.4em;
+  border: 0;
+  border-radius: 999px;
+  background: var(--red);
+  color: #000;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 15);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    color 0.25s,
+    opacity 0.25s;
+}
+
+/* Hover: red → bone white, so it clearly reads as clickable. */
+.watch:hover:not(:disabled) {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.watch:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+/* Vimeo preview: fills the 16:9 box, not clickable (the card's buttons drive it). */
+.previewFrame {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: none;
+}
+
+/* On air strip and program extras. */
+.onAir,
+.extras {
+  margin-top: calc(var(--s) * 28);
+}
+
+.stripHead {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 13);
+  color: var(--ink);
+}
+
+.onAirGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.onAirTile {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+.onAirTile video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Programs: small, low-key tiles. */
+/* Programs: half the width each, with a large 16:9 thumb. */
+.extrasGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.extra {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 6px 6px 12px;
+  border: 0;
+  border-radius: 5px;
+  background: rgb(20 0 0 / 0.86);
+  color: rgb(239 238 238 / 0.85);
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 18);
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* Hover: the card turns bone white with dark text, like every button here. */
+.extra:hover {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.extraThumb {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #111;
+}
+
+.extraThumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.extra:hover .extraThumb img {
+  transform: scale(1.04);
+}
+
+/* Play badge: a round red disc that turns white on hover. */
+.extraPlay {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: calc(var(--s) * 56);
+  height: calc(var(--s) * 56);
+  padding: calc(var(--s) * 16);
+  border-radius: 50%;
+  background: var(--red);
+  color: #000;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
+}
+
+.extra:hover .extraPlay {
+  background: #efeeee;
+  transform: scale(1.1);
+}
+
+.extraTitle {
+  padding: 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* Striped stand-in for missing media. */
+.stripes {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  background: repeating-linear-gradient(-45deg, #1b1b1b 0 10px, #111 10px 20px);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  color: rgb(239 238 238 / 0.6);
+}
+
+.stripes[hidden] {
+  display: none;
+}
+
+/* ---------- Floating flip card ---------- */
+
+.cardPos {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 5;
+  width: 320px;
+  height: 180px;
+  pointer-events: none;
+  will-change: transform;
+  /* Hidden (not just transparent) until shown: the CRT edge filter would
+     otherwise redraw the invisible 3D card. GSAP toggles it (autoAlpha). */
+  visibility: hidden;
+  opacity: 0;
+}
+
+.cardTilt {
+  width: 100%;
+  height: 100%;
+  perspective: 900px;
+}
+
+.flipper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+.face[data-face="b"] {
+  transform: rotateX(180deg);
+}
+
+.face video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.face video[hidden] {
+  display: none;
+}
+
+/* ---------- Scoreboard (inside the Paulistão card) ---------- */
+
+/* Line-up stage: 16:9 instead of the shields' square, full width of its column. */
+.shieldStage.lineupStage {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+}
+
+/* PROCESS tab: trophy + stats on the left, steps on the right. */
+.process {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: calc(var(--s) * 32);
+  align-items: start;
+}
+
+.processSide {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: calc(var(--s) * 220);
+}
+
+.processStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+}
+
+.processStats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 10px 12px;
+  border-radius: 5px;
+  background: #111;
+}
+
+.processStats > .processTeam {
+  grid-column: 1 / -1;
+  flex-direction: row;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.processStats dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 34);
+  font-weight: 700;
+  line-height: 1;
+  color: #efeeee;
+}
+
+.processStats dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.processMain {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 18);
+}
+
+.processLead {
+  margin: 0;
+  max-width: 28ch;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 30);
+  font-weight: 600;
+  line-height: 1.05;
+  color: #111;
+}
+
+.processSteps {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(calc(var(--s) * 260), 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.processStep {
+  display: flex;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+  transition: scale 0.25s ease, background-color 0.25s, color 0.25s;
+}
+
+/* Hover: slight zoom, colours inverted (white card, black text). */
+.processStep:hover {
+  position: relative;
+  z-index: 1;
+  scale: 1.04;
+  background: #efeeee;
+  color: #111;
+}
+
+.processStep:hover .processText,
+.processStep:hover .processTool {
+  color: #111;
+}
+
+.processStep:hover .processTool {
+  border-color: rgb(17 17 17 / 0.35);
+}
+
+.processNum {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--red);
+}
+
+.processTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 18);
+  font-weight: 600;
+}
+
+.processTool {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 6px;
+  padding: 2px 6px;
+  border: 1px solid rgb(239 238 238 / 0.3);
+  border-radius: 3px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: rgb(239 238 238 / 0.7);
+}
+
+.processText {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 14);
+  line-height: 1.4;
+  color: rgb(239 238 238 / 0.7);
+}
+
+/* Two short steps stacked in one grid slot. */
+.processPair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.processPair > .processStep {
+  flex: 1;
+}
+
+/* Behind-the-scenes still under a step (Figma board, AE timeline, wireframe). */
+.processImg {
+  display: block;
+  width: 100%;
+  height: calc(var(--s) * 150);
+  margin-top: 12px;
+  border-radius: 3px;
+  background: #050505;
+  object-fit: contain;
+}
+
+.processStep > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.processChannels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.processChannels .sideLabel {
+  grid-column: 1 / -1;
+  margin: 4px 0 2px;
+  color: #111;
+}
+
+.processChannel {
+  padding: 12px 14px;
+  text-align: center;
+  border-radius: 3px;
+  background: #111;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 18);
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px) {
+  .process {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .processSide {
+    width: 100%;
+  }
+}
+
+/* PROCESS tab: small square with the 3D trophy (drag to rotate). */
+.trophyWrap {
+  display: flex;
+}
+
+.trophy {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 5px;
+  background: radial-gradient(circle at 50% 40%, #2a2a2a, #0b0b0b 70%);
+  cursor: grab;
+  touch-action: pan-y;
+}
+
+.trophy:active {
+  cursor: grabbing;
+}
+
+.trophy canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.trophyLoading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+/* MASCOTS tab: title, then every team's goal band with its scrub slider. */
+.mascots {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 16);
+}
+
+.mascotsTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 44);
+  font-weight: 600;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #efeeee;
+}
+
+.mascotGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+/* The whole card is the grip: drag left/right anywhere on it. */
+.mascot {
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  overflow: hidden;
+  background: #111;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+/* The cropped band: 1280 × 264. */
+.mascotVideo {
+  position: relative;
+  aspect-ratio: 1280 / 264;
+  background: #1c1c1c;
+}
+
+/* "Drag →" hint, nudging right, until the card is first used. */
+.mascotHint {
+  position: absolute;
+  left: 12px;
+  bottom: 10px;
+  padding: 5px 10px;
+  border-radius: 3px;
+  background: var(--red);
+  color: #efeeee;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+  transition: opacity 0.3s;
+}
+
+.mascotHint span {
+  display: inline-block;
+  animation: hintNudge 1s ease-in-out infinite;
+}
+
+.mascotHint[data-hidden] {
+  opacity: 0;
+}
+
+@keyframes hintNudge {
+  50% {
+    transform: translateX(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mascotHint span {
+    animation: none;
+  }
+}
+
+.mascotVideo video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.mascotSlider {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 10px 14px;
+}
+
+/* Team name: top-left corner of the video. */
+.mascotName {
+  position: absolute;
+  top: 8px;
+  left: 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.7);
+}
+
+.mascotSlider input {
+  flex: 1;
+  height: 36px;
+  margin: 0;
+  background: transparent;
+  cursor: ew-resize;
+  appearance: none;
+}
+
+.mascotSlider input:active {
+  cursor: grabbing;
+}
+
+.mascotSlider input::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--red) var(--p), rgb(239 238 238 / 0.2) var(--p));
+}
+
+.mascotSlider input::-moz-range-track {
+  height: 6px;
+  border-radius: 2px;
+  background: linear-gradient(to right, var(--red) var(--p), rgb(239 238 238 / 0.2) var(--p));
+}
+
+/* Round handle; hovering the card turns it red and bigger. */
+.mascotSlider input::-webkit-slider-thumb {
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border: 0;
+  border-radius: 50%;
+  background: #efeeee;
+  appearance: none;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.mascotSlider input::-moz-range-thumb {
+  width: 28px;
+  height: 28px;
+  border: 0;
+  border-radius: 50%;
+  background: #efeeee;
+  transition: transform 0.2s, background-color 0.2s;
+}
+
+.mascot:hover .mascotSlider input::-webkit-slider-thumb {
+  background: var(--red);
+  transform: scale(1.35);
+}
+
+.mascot:hover .mascotSlider input::-moz-range-thumb {
+  background: var(--red);
+  transform: scale(1.35);
+}
+
+.mascotSlider input:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+  .mascotGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ALL ASSETS screen: the package list, scrolling inside the 16:9 stage. */
+.assetsTitle {
+  margin: 0 0 24px;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 44);
+  font-weight: 600;
+  line-height: 0.95;
+  text-transform: uppercase;
+  color: #efeeee;
+}
+
+.assetsCount {
+  display: block;
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: rgb(239 238 238 / 0.6);
+}
+
+.assetsList {
+  position: absolute;
+  inset: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: calc(var(--s) * 22) calc(var(--s) * 24);
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+}
+
+.assetsSection {
+  margin: 0 0 10px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--red);
+}
+
+.assetsList section + section {
+  margin-top: 28px;
+}
+
+.assetsGroup {
+  padding: 10px 0;
+  border-top: 1px solid rgb(239 238 238 / 0.12);
+}
+
+.assetsGroupTitle {
+  margin: 0 0 6px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.assetsGroup ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 16);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.assetsSub {
+  color: rgb(239 238 238 / 0.5);
+  font-weight: 400;
+}
+
+/* Broadcast screens: vertical list of names (left column of .shields). */
+.screenList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 5px;
+  border-radius: 5px;
+  background: #111;
+}
+
+.screenItem {
+  justify-content: flex-start;
+  width: 100%;
+  padding: 14px 16px;
+  font-size: calc(var(--s) * 20);
+}
+
+.screenItem .count {
+  margin-left: auto;
+}
+
+/* The chosen screen: 16:9, in the right column (narrower than full width). */
+.screenStage {
+  align-self: start;
+}
+
+/* Screens: examples under the stage (same columns as .shields, right one). */
+.screenLoops {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: calc(var(--s) * 20);
+}
+
+/* Right-aligned: with one example it sits under the stage's right half. */
+.screenLoops > .loopsGrid {
+  grid-column: 2;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.screenLoops .loopCell {
+  width: calc(50% - 4px);
+}
+
+@media (max-width: 767px) {
+  .screenLoops {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .screenLoops > .loopsGrid {
+    grid-column: 1;
+  }
+}
+
+/* Live loops (2×2, 16:9) on the left, Index on the right. */
+.loopsRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 8px;
+}
+
+.loopsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-content: start;
+  gap: 8px;
+}
+
+.loopCell {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #000;
+}
+
+.loopCell video,
+.loopCell img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (max-width: 767px) {
+  .loopsRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.boardStack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: calc(var(--s) * 20);
+}
+
+.board {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.boardReadouts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--ink);
+}
+
+.boardReadouts > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: calc(var(--s) * 10);
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(20 0 0 / 0.35);
+}
+
+.statusDot[data-status="shown"] {
+  background: #000;
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 0.2);
+}
+
+.statusDot[data-status="in"],
+.statusDot[data-status="out"] {
+  background: #000;
+  animation: blink 0.5s steps(2, jump-none) infinite;
+}
+
+/* Three columns: home crests · the board (half the width) · away crests. */
+.boardLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr) minmax(0, 1fr);
+  gap: calc(var(--s) * 20);
+  align-items: start;
+}
+
+.boardSide {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sideLabel {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 13);
+  color: var(--ink);
+}
+
+.boardCentre {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+.boardCentre > .boardFrame {
+  width: 100%;
+}
+
+/* SHIELDS tab: crest grid on the left, the animation in a square on the right. */
+.shields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  gap: calc(var(--s) * 20);
+  align-items: start;
+}
+
+.shieldStage {
+  position: relative;
+  justify-self: center;
+  width: min(100%, calc(var(--s) * 520));
+  aspect-ratio: 1;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #000;
+}
+
+/* Bottom-left of the stage: replay button, then SEE KEYFRAMES on its right. */
+.stageControls {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.kfToggle {
+  height: 64px;
+  padding: 0 24px;
+  gap: 14px;
+  font-size: calc(var(--s) * 22);
+  background: rgb(0 0 0 / 0.55);
+}
+
+.kfToggle .square {
+  width: 10px;
+  height: 10px;
+}
+
+/* Replay: square button. */
+.replay {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  flex: none;
+  padding: 0;
+  border: 1px solid rgb(239 238 238 / 0.5);
+  border-radius: 3px;
+  background: rgb(0 0 0 / 0.55);
+  color: #efeeee;
+  cursor: pointer;
+}
+
+.replay svg {
+  width: 17px;
+  height: 20px;
+  margin-left: 3px;
+}
+
+.replay:hover {
+  background: #efeeee;
+  color: var(--red);
+  border-color: #efeeee;
+}
+
+.replay:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: 2px;
+}
+
+.shieldStage video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Crest grid: small dark tiles; hover = white tile (clickable). */
+.crests {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+  padding: 5px;
+  border-radius: 5px;
+  background: rgb(20 0 0 / 0.86);
+}
+
+.crest {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  padding: 18%;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  background: rgb(239 238 238 / 0.04);
+  cursor: pointer;
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.crest img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+}
+
+/* Selected team: lit tile with a bone outline and a red mark. */
+.crest[data-selected] {
+  border-color: #efeeee;
+  background: rgb(239 238 238 / 0.14);
+  box-shadow: inset 0 -3px 0 var(--red);
+}
+
+.crest:hover:not(:disabled) {
+  border-color: #efeeee;
+  background: #efeeee;
+  transform: translateY(-2px);
+}
+
+.crest:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+
+/* Scoreboard controls: bigger, outlined, so they clearly read as buttons. */
+.ctrl {
+  padding: 11px 18px;
+  border: 1px solid rgb(239 238 238 / 0.3);
+  background: rgb(20 0 0 / 0.86);
+  color: #efeeee;
+  font-size: max(14px, calc(var(--s) * 16));
+}
+
+.boardSide > .ctrl {
+  justify-content: center;
+  width: 100%;
+}
+
+.ctrl[data-active] {
+  border-color: #efeeee;
+  background: rgb(239 238 238 / 0.16);
+}
+
+.ctrl:hover:not(:disabled) {
+  border-color: #efeeee;
+}
+
+.boardFrame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+.boardCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  /* aspect-ratio comes from SCOREBOARD_CROP (inline, BroadcastScoreboard.tsx). */
+}
+
+.cue {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.4s,
+    visibility 0.4s;
+}
+
+.cue[data-visible] {
+  opacity: 1;
+  visibility: visible;
+}
+
+.goLive {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.6em 1.3em;
+  border: 0;
+  position: relative;
+  border-radius: 999px;
+  background: var(--red);
+  color: #000;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 22);
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition:
+    background-color 0.25s,
+    color 0.25s;
+}
+
+.goLive:hover:not(:disabled) {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.goLive:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.goLiveDot {
+  width: 0.45em;
+  height: 0.45em;
+  border-radius: 50%;
+  background: #000;
+}
+
+/* A red line pulses out around the button to call attention. */
+.goLiveRing {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 2px solid var(--red);
+  pointer-events: none;
+  opacity: 0;
+  animation: goLivePulse 2.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+}
+/* Each ring starts a third of the cycle after the previous one. */
+.goLiveRing:nth-child(2) {
+  animation-delay: calc(2.6s / 3);
+}
+.goLiveRing:nth-child(3) {
+  animation-delay: calc(2.6s * 2 / 3);
+}
+.goLive:disabled .goLiveRing {
+  animation: none;
+}
+@keyframes goLivePulse {
+  0% {
+    inset: 0;
+    opacity: 1;
+  }
+  100% {
+    inset: -34px;
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .goLiveRing {
+    animation: none;
+    opacity: 0;
+  }
+}
+
+/* ---------- Phones and touch screens ---------- */
+
+@media (max-width: 767px), (hover: none) {
+  .section {
+    --s: 1px;
+    padding: 0 16px 64px;
+  }
+
+  .row,
+  .row[data-align="left"],
+  .row[data-align="right"] {
+    --h: auto;
+    align-self: stretch;
+    width: 100%;
+    margin-left: 0;
+    height: auto;
+  }
+
+  .content,
+  .content[data-meta-first] {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+    height: auto;
+    padding: 24px 14px 12px;
+    white-space: normal;
+  }
+
+  .title {
+    font-size: 40px;
+  }
+
+  /* No hover here: the tapped (open) row simply turns red with black text. */
+  .bar {
+    display: none;
+  }
+
+  .row[data-open] {
+    background: var(--red);
+  }
+
+  .row[data-open] .title {
+    color: #000;
+  }
+
+  .row[data-open] .meta {
+    color: #000;
+    opacity: 0.75;
+  }
+
+  .cardPos {
+    display: none;
+  }
+
+  .panel {
+    padding: 20px 16px 24px;
+  }
+
+  .guides {
+    inset: 0 16px;
+  }
+
+  .labels,
+  .boardReadouts {
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 6px;
+  }
+
+  .bigTitle {
+    font-size: 52px;
+  }
+
+  .desc {
+    font-size: 18px;
+  }
+
+  .panel > .filters {
+    display: flex;
+    flex-wrap: nowrap;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  .mediaGrid,
+  .onAirGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .extra {
+    width: 100%;
+  }
+
+  .watch {
+    align-self: stretch;
+  }
+
+  .shields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shieldStage {
+    order: -1;
+    width: 100%;
+  }
+
+  /* Board first, then home and away below it. */
+  .boardLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .boardCentre {
+    order: -1;
+  }
+
+  .boardCentre > .filters {
+    display: flex;
+    width: 100%;
+  }
+
+  .boardCentre .ctrl {
+    flex: 1 1 auto;
+    justify-content: center;
+  }
+
+  .crests {
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter[data-moving] .square,
+  .statusDot[data-status="in"],
+  .statusDot[data-status="out"] {
+    animation: none;
+  }
+}

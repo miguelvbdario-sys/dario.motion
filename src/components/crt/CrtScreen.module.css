@@ -1,0 +1,39 @@
+/* Old curved TV over the whole site (see CrtScreen.tsx). */
+
+.defs {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+/* The bulge: everything behind this layer is redrawn through the barrel filter. */
+.bulge {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  pointer-events: none;
+  -webkit-backdrop-filter: url(#crt-bulge);
+  backdrop-filter: url(#crt-bulge);
+}
+
+/* The glass: rounded black corners, vignette, faint scanlines. */
+.glass {
+  position: fixed;
+  inset: 0;
+  z-index: 9001;
+  pointer-events: none;
+  /* A light corner rounding, then the edges fade to black instead of being cut. */
+  border-radius: clamp(6px, 1vmin, 12px);
+  box-shadow:
+    0 0 0 60px #000,
+    inset 0 0 clamp(18px, 3vmin, 36px) clamp(4px, 0.8vmin, 10px) #000,
+    inset 0 0 clamp(60px, 14vmin, 180px) rgb(0 0 0 / 0.55);
+  background: repeating-linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.1) 0,
+    rgb(0 0 0 / 0.1) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}

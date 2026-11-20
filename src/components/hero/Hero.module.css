@@ -1,0 +1,564 @@
+﻿/*
+ * HERO composition.
+ *
+ * Every position is written in "design pixels" taken from the wireframe
+ * (1920px wide on desktop, 390px wide on phones) and multiplied by --u, so
+ * the whole composition scales as one piece.
+ */
+
+.stage {
+  --w: 1920; /* design width */
+  --u: calc(100vw / 1920); /* one design pixel */
+  --shift: calc(var(--u) * 430); /* distance the composition travels while pinned */
+  --fade-top: 870; /* where the glow starts dissolving into black */
+  /* On very wide, short windows, pull the composition up so the pills and the vulture stay on screen. */
+  --lift: clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110));
+
+  position: relative;
+  height: 100vh;
+  height: 100lvh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--color-void);
+  /* Vertical swipes scroll the page; sideways swipes scrub the character. */
+  touch-action: pan-y;
+  color: var(--color-bone);
+}
+
+/* ---------- Fixed layers: glow + HUD grid ---------- */
+
+/* Crimson base with a soft ember wash along the top. */
+.bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  /* Dark room: the base is almost black (a trace of wine), lit only by a few
+     points of light. The mouse flashlight (.bgFollow) reveals the rest. */
+  /* All based on #e60000, darkened towards black. */
+  background:
+    radial-gradient(34% 30% at 58% 0%, rgb(230 0 0 / 0.2) 0%, rgb(230 0 0 / 0.06) 55%, transparent 100%),
+    color-mix(in srgb, #e60000 9%, #000);
+}
+
+.bg > * {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* The hot core, right of centre. It "breathes": a slow swell in strength and
+   a small drift, about 11s per cycle. */
+.bgCore {
+  /* A point of light (ember) inside a small wine halo, fading to black. */
+  background:
+    radial-gradient(
+      26% 32% at 34% 64%,
+      rgb(230 0 0 / 0.55) 0%,
+      rgb(230 0 0 / 0.28) 40%,
+      transparent 100%
+    ),
+    radial-gradient(
+      48% 58% at 34% 64%,
+      rgb(92 0 0 / 0.75) 0%,
+      rgb(92 0 0 / 0.3) 55%,
+      transparent 100%
+    );
+  transform-origin: 34% 64%;
+  animation: breathe 11s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.88;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: translate3d(1.5%, -1%, 0) scale(1.06);
+  }
+}
+
+/* Flashlight: the lit room (the brand crimson with its ember glows) is laid
+   over the dark one and only shows inside a soft beam that follows the mouse
+   (position set by JS in --gx/--gy). Size: the 24vmax in the mask. */
+.bgFollow {
+  background:
+    radial-gradient(10vmax 10vmax at var(--gx, 34%) var(--gy, 64%), rgb(255 80 60 / 0.2) 0%, transparent 100%),
+    radial-gradient(54% 64% at 34% 64%, rgb(230 0 0 / 0.6) 0%, rgb(230 0 0 / 0.3) 50%, transparent 100%),
+    radial-gradient(50% 56% at 58% 2%, rgb(230 0 0 / 0.3) 0%, transparent 100%),
+    color-mix(in srgb, #e60000 38%, #000);
+  -webkit-mask-image: radial-gradient(
+    24vmax 24vmax at var(--gx, 34%) var(--gy, 64%),
+    #000 0%,
+    rgb(0 0 0 / 0.75) 35%,
+    rgb(0 0 0 / 0.25) 70%,
+    transparent 100%
+  );
+  mask-image: radial-gradient(
+    24vmax 24vmax at var(--gx, 34%) var(--gy, 64%),
+    #000 0%,
+    rgb(0 0 0 / 0.75) 35%,
+    rgb(0 0 0 / 0.25) 70%,
+    transparent 100%
+  );
+  opacity: var(--go, 0);
+}
+
+/* Faint CRT scanlines on the background only, echoing the character's. Drawn
+   on a canvas (src/lib/scanlineField.ts) so they bend under the mouse light. */
+.bgScan {
+  width: 100%;
+  height: 100%;
+}
+/* Off screen (set by Hero.tsx): the looping animations stop costing frames. */
+.stage[data-offscreen] .bgCore,
+.stage[data-offscreen] .grain {
+  animation-play-state: paused;
+}
+
+/* Moving film grain over the whole hero. */
+.grain {
+  position: absolute;
+  /* Only as big as the jitter needs (it moves up to 5%): blending a layer 4×
+     the screen every frame was costly. Own GPU layer for the jumps. */
+  inset: -8%;
+  will-change: transform;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.09;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  background-size: 220px 220px;
+  animation: grain 0.8s steps(1) infinite;
+}
+
+@keyframes grain {
+  0% { transform: translate3d(0, 0, 0); }
+  12% { transform: translate3d(-3%, 2%, 0); }
+  25% { transform: translate3d(2%, -4%, 0); }
+  37% { transform: translate3d(-5%, -1%, 0); }
+  50% { transform: translate3d(4%, 3%, 0); }
+  62% { transform: translate3d(-1%, 5%, 0); }
+  75% { transform: translate3d(5%, -2%, 0); }
+  87% { transform: translate3d(-4%, -5%, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bgCore,
+  .grain {
+    animation: none;
+  }
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  /* Overall strength of the HUD grid (lines and "+" marks). Phones: see below. */
+  opacity: 0.3;
+}
+
+/* "+" marks where the HUD lines cross. */
+.cross {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 11px;
+  height: 11px;
+  margin: -5px 0 0 -5px;
+  background:
+    linear-gradient(rgb(239 238 238 / 0.85), rgb(239 238 238 / 0.85)) center / 100% 1px no-repeat,
+    linear-gradient(rgb(239 238 238 / 0.85), rgb(239 238 238 / 0.85)) center / 1px 100% no-repeat;
+}
+
+
+
+/* The wireframe's lines are additive: they brighten whatever glow sits behind them. */
+.vline,
+.hline {
+  position: absolute;
+  background: rgb(239 238 238 / 0.43);
+  mix-blend-mode: plus-lighter;
+}
+
+.vline {
+  top: 0;
+  bottom: 0;
+  left: var(--at);
+  width: 1px;
+  transform-origin: top;
+}
+
+.hline {
+  left: 0;
+  right: 0;
+  top: var(--at);
+  height: 1px;
+  transform-origin: left;
+}
+
+/* ---------- Travelling layer ---------- */
+
+.scroll {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, calc(var(--p, 0) * var(--shift) * -1), 0);
+  will-change: transform;
+}
+
+/* The black that rises over the glow and the grid as the page scrolls. */
+.fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(var(--u) * var(--fade-top) - var(--lift));
+  height: 150lvh;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0) 0,
+    rgb(0 0 0 / 0.45) calc(var(--u) * 80),
+    rgb(0 0 0 / 0.86) calc(var(--u) * 150),
+    #000 calc(var(--u) * 215)
+  );
+}
+
+.comp {
+  position: absolute;
+  top: calc(var(--lift) * -1);
+  bottom: 0;
+  left: 50%;
+  width: calc(var(--u) * var(--w));
+  margin-left: calc(var(--u) * var(--w) * -0.5);
+}
+
+.comp > * {
+  position: absolute;
+  margin: 0;
+}
+
+/* ---------- Name ---------- */
+
+.title {
+  z-index: 1;
+  /* Measured on the wireframe: cap height 267px, 15px of tracking, and the M
+     and the O bleeding past the edges of the screen. */
+  top: calc(var(--u) * 226);
+  left: calc(var(--u) * -42);
+  right: calc(var(--u) * -30);
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-display);
+  font-size: calc(var(--u) * 281);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.title > span {
+  display: block;
+}
+
+/* Hover tint: only the letter under the cursor takes the colour (set by
+   VectorOverlay through data-active), fading in and out over 0.5s. */
+.letter {
+  transition: color 0.5s ease;
+}
+
+.letter[data-active] {
+  color: #ae3623;
+}
+/* ---------- Portrait sequence ---------- */
+
+.head {
+  z-index: 2;
+  top: calc(var(--u) * -197);
+  left: 0;
+  width: calc(var(--u) * 1920);
+  aspect-ratio: 1;
+  pointer-events: none;
+}
+
+/* ---------- 3D emblems ---------- */
+
+.emblem {
+  z-index: 3;
+  aspect-ratio: 1;
+}
+
+.emblemLeft {
+  top: calc(var(--u) * 56);
+  left: calc(var(--u) * 165);
+  width: calc(var(--u) * 384);
+}
+
+.emblemRight {
+  top: calc(var(--u) * 490);
+  left: calc(var(--u) * 1329);
+  width: calc(var(--u) * 422);
+}
+
+.emblemCanvas {
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.emblemCanvas[data-dragging] {
+  cursor: grabbing;
+}
+
+/* OrbitControls sets touch-action: none inline, which would trap page scrolling
+   on phones. With pan-y a vertical swipe still scrolls and a sideways drag spins. */
+.emblemCanvas canvas {
+  touch-action: pan-y !important;
+}
+
+/* ---------- Handwritten labels ---------- */
+
+.script {
+  margin: 0;
+  font-family: var(--font-script);
+  font-size: max(calc(var(--u) * 30), 13px);
+  line-height: 1;
+  letter-spacing: 0.38em;
+  white-space: nowrap;
+}
+
+/* @dario.motion — edit its font, size and spacing here. */
+.handle {
+  position: absolute;
+  /* Low enough that the CRT bulge doesn't bend/cut it at the top edge. */
+  top: calc(var(--u) * 64);
+  /* Centred without a transform: GSAP animates this element's transform. */
+  left: 0;
+  right: 0;
+  width: fit-content;
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  /* Desktop size: 16 = px on a 1920px-wide screen (scales with width); 11px minimum. */
+  font-size: max(calc(var(--u) * 16), 11px);
+  font-weight: 700;
+  line-height: 1;
+  /* Tracking 100 (as in After Effects / Figma) = 100/1000 of the font size. */
+  letter-spacing: 0.5em;
+  white-space: nowrap;
+  /* Not selectable: no text highlight, and no vector selection box. */
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.senior {
+  z-index: 4;
+  top: calc(var(--u) * 517);
+  left: calc(var(--u) * 200);
+}
+
+.role {
+  z-index: 4;
+  top: calc(var(--u) * 515);
+  left: calc(var(--u) * 1378);
+}
+
+/* ---------- Pills + arrow ---------- */
+
+.nav {
+  z-index: 4;
+  top: calc(var(--u) * 613);
+  left: calc(var(--u) * 163);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.37em;
+  font-family: var(--font-sans);
+  font-size: max(calc(var(--u) * 27), 12px);
+  font-weight: 900;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  min-width: 5.26em;
+  height: 1.3em;
+  padding: 0 0.72em;
+  border-radius: 999px;
+  background: var(--color-signal);
+  color: var(--color-ink);
+  line-height: 1;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--color-bone);
+  outline-offset: 3px;
+}
+
+/* Hover: bone white, dark text (the pills are links to the sections). */
+@media (hover: hover) {
+  .pill:hover {
+    background: var(--color-bone);
+    color: #000;
+  }
+}
+
+.arrow {
+  z-index: 4;
+  /* The stroke drifts sideways inside its frame (x 88–178 of 259). This keeps
+     it just left of the pills for the whole sequence. */
+  top: calc(var(--u) * 515);
+  left: calc(var(--u) * -22);
+  width: calc(var(--u) * 259);
+  aspect-ratio: 259 / 275;
+  pointer-events: none;
+}
+
+/* ---------- Vector hover overlay (mouse only) ---------- */
+
+.vector {
+  --ink: rgb(239 238 238 / 0.55);
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.vectorFrame {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border: 1px solid var(--ink);
+  opacity: var(--frm, 0);
+  will-change: transform, width, height;
+}
+
+.vectorLabel {
+  position: absolute;
+  left: 3px;
+  top: 2px;
+  font-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  font-size: 10px;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  color: rgb(239 238 238 / 0.8);
+  white-space: nowrap;
+}
+
+/* ---------- Intro: hidden until GSAP reveals them ---------- */
+
+@media (prefers-reduced-motion: no-preference) {
+  .stage [data-reveal],
+  .stage [data-word],
+  .stage [data-head],
+  .stage [data-vline],
+  .stage [data-hline],
+  .stage [data-mark] {
+    opacity: 0;
+  }
+}
+
+/* ---------- Phones and portrait tablets ---------- */
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .stage {
+    --w: 390;
+    --u: min(calc(100vw / 390), calc(100lvh / 720));
+    --shift: calc(var(--u) * 330);
+    --fade-top: 640;
+    --lift: 0px;
+  }
+
+  /* Two stacked lines: MIGUEL fills the width, DARIO hangs from the right edge. */
+  .title {
+    top: calc(var(--u) * 50);
+    left: calc(var(--u) * 2);
+    right: calc(var(--u) * -4);
+    flex-direction: column;
+    gap: calc(var(--u) * 6);
+    font-size: calc(var(--u) * 103);
+  }
+
+  .title > span:last-child {
+    align-self: flex-end;
+  }
+
+  .head {
+    /* Phone: height of the character (lower number = higher up). */
+    top: calc(var(--u) * 58);
+    left: calc(var(--u) * -315);
+    width: calc(var(--u) * 1000);
+  }
+
+  /* Pig: in the empty corner left of DARIO and under MIGUEL, centred on it. */
+  .emblemLeft {
+    top: calc(var(--u) * 136);
+    left: calc(var(--u) * -10);
+    width: calc(var(--u) * 118);
+  }
+
+  .emblemRight {
+    top: calc(var(--u) * 338);
+    left: calc(var(--u) * 268);
+    width: calc(var(--u) * 128);
+  }
+
+  .script {
+    font-size: calc(var(--u) * 15);
+  }
+
+  /* HUD grid strength on phones. */
+  .grid {
+    opacity: 0.3;
+  }
+
+  .handle {
+    top: calc(var(--u) * 16);
+    /* Phone size: 9 = px on a 390px-wide phone (scales with width). */
+    font-size: calc(var(--u) * 9);
+  }
+
+  .senior {
+    top: calc(var(--u) * 292);
+    left: calc(var(--u) * 20);
+  }
+
+  .role {
+    top: calc(var(--u) * 292);
+    left: auto;
+    right: calc(var(--u) * 18);
+    text-align: right;
+  }
+
+  .role span {
+    display: block;
+  }
+
+  .role span + span {
+    margin-top: 0.35em;
+  }
+
+  .nav {
+    top: calc(var(--u) * 618);
+    left: calc(var(--u) * 68);
+    font-size: calc(var(--u) * 17);
+  }
+
+  /* Placed so the drifting stroke stays between the screen edge and the pills. */
+  .arrow {
+    top: calc(var(--u) * 564);
+    left: calc(var(--u) * -59);
+    width: calc(var(--u) * 180);
+  }
+}

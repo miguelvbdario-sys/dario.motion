@@ -1,0 +1,189 @@
+/* Fullscreen player (WorkPlayer.tsx): video + Index panel on black. */
+
+.player {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: rgb(0 0 0 / 0.94);
+  color: var(--color-bone);
+  overscroll-behavior: contain;
+}
+
+.player::backdrop {
+  background: transparent;
+}
+
+/* Open / close animate with GSAP (WorkPlayer.tsx): a grow with ease-out. */
+.player[open] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Index column beside the video (width + gap). */
+.playerInner {
+  --index-w: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: min(94vw, calc((100dvh - 140px) * 16 / 9 + var(--index-w) + 16px));
+  will-change: transform, opacity;
+}
+
+/* Vertical (9:16) videos: a portrait frame as tall as the screen allows. */
+.playerInner[data-vertical] {
+  width: min(94vw, calc((100dvh - 140px) * 9 / 16 + var(--index-w) + 16px));
+}
+
+/* ---------- Header ---------- */
+
+.playerHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.playerTitle {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 4.5rem);
+  font-weight: 800;
+  line-height: 0.9;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.playerInner[data-vertical] .playerTitle {
+  font-size: clamp(1.5rem, 2.6vw, 2.75rem);
+}
+
+.playerMeta {
+  margin: 8px 0 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.playerClose {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 48px;
+  height: 48px;
+  padding: 0;
+  /* Red square with a white border (same red as the broadcast cards). */
+  border: 2px solid #efeeee;
+  border-radius: 0;
+  background: #e60000;
+  color: #efeeee;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.playerClose:hover {
+  background: #efeeee;
+  color: #e60000;
+}
+
+/* ---------- Video + Index ---------- */
+
+.playerBody {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+
+.playerVideo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.playerInner[data-vertical] .playerVideo {
+  aspect-ratio: 9 / 16;
+}
+
+.playerBody > .playerVideo {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Index: dark panel with credits on hairlines (same look as the BROADCAST card). */
+.playerIndex {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: var(--index-w);
+  padding: 22px 24px;
+  border-radius: 5px;
+  background: #111;
+  color: var(--color-bone);
+}
+
+.playerIndexLabel {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: rgb(239 238 238 / 0.6);
+}
+
+.playerIndexRows {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+.playerIndexRows > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 0;
+  border-top: 1px solid rgb(239 238 238 / 0.12);
+}
+
+.playerIndexRows > div:last-child {
+  border-bottom: 1px solid rgb(239 238 238 / 0.12);
+}
+
+.playerIndexRows dt {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.playerIndexRows dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 16px;
+  font-weight: 500;
+  text-align: right;
+}
+
+/* ---------- Narrow screens: the Index goes under the video ---------- */
+/* Last, so it also wins over the vertical-video width above. */
+
+@media (max-width: 899px) {
+  .playerInner,
+  .playerInner[data-vertical] {
+    width: 92vw;
+  }
+
+  .playerBody {
+    flex-direction: column;
+  }
+
+  .playerIndex {
+    width: 100%;
+  }
+}
