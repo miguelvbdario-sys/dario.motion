@@ -2,7 +2,8 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Dev only: lets a phone on the same Wi-Fi load the dev server (http://<PC IP>:3000).
-  allowedDevOrigins: ["192.168.*.*", "10.*.*.*"],
+  // Tailscale (private network between your devices): 100.x addresses and *.ts.net names.
+  allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "100.*.*.*", "**.ts.net"],
   cacheComponents: true,
   partialPrefetching: true,
   turbopack: {
