@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
@@ -16,7 +16,34 @@ const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Phones: the screens carousel advances by itself after this long (ms). */
 const SCREEN_AUTO = 7000;
+/** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
+const SLIDE_MS = 450;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
+
+/**
+ * Accordion body (phones): unfolds from 0 to its height when it mounts and
+ * folds back to 0 when `closing` turns on, then calls onClosed.
+ */
+function AccBody({ closing, onClosed, children }: { closing: boolean; onClosed: () => void; children: React.ReactNode }) {
+  const el = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    if (!el.current) return;
+    gsap.fromTo(
+      el.current,
+      { height: 0, opacity: 0 },
+      { height: "auto", opacity: 1, duration: 0.45, ease: "power3.out", clearProps: "height,opacity" },
+    );
+  }, []);
+  useEffect(() => {
+    if (!closing || !el.current) return;
+    gsap.to(el.current, { height: 0, opacity: 0, duration: 0.35, ease: "power3.in", onComplete: onClosed });
+  }, [closing, onClosed]);
+  return (
+    <div ref={el} className={styles.accBody}>
+      {children}
+    </div>
+  );
+}
 
 /** True on phones / portrait tablets (same query as the hero and the CSS). */
 function useCompact() {
@@ -132,16 +159,36 @@ export default function BroadcastPanel({
   const compact = useCompact();
   /** Accordion: the open section can be closed again. */
   const [tabOpen, setTabOpen] = useState(true);
+  /** Accordion: the open section is folding closed (kept mounted until done). */
+  const [closing, setClosing] = useState(false);
+  const finishClose = useCallback(() => {
+    setClosing(false);
+    setTabOpen(false);
+  }, []);
+  /** Screens carousel: the screen sliding out, and the slide direction. */
+  const [leaving, setLeaving] = useState<{ index: number; dir: 1 | -1 } | null>(null);
   const screenCount = screens?.length ?? 0;
-  const stepScreen = (d: number) => screenCount && setScreen((i) => (i + d + screenCount) % screenCount);
+  const stepScreen = (d: number) => {
+    if (!screenCount) return;
+    setLeaving({ index: screen, dir: d > 0 ? 1 : -1 });
+    setScreen((i) => (i + d + screenCount) % screenCount);
+  };
 
   // Phones: the screens carousel moves on by itself every SCREEN_AUTO ms
   // (the timer restarts after every change, manual or automatic).
   useEffect(() => {
     if (!compact || kind !== "screens" || !live || !tabOpen || screenCount < 2) return;
-    const t = setTimeout(() => setScreen((i) => (i + 1) % screenCount), SCREEN_AUTO);
+    const t = setTimeout(() => stepScreen(1), SCREEN_AUTO);
     return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [compact, kind, live, tabOpen, screen, screenCount]);
+
+  // The screen sliding out is dropped once the slide is over.
+  useEffect(() => {
+    if (!leaving) return;
+    const t = setTimeout(() => setLeaving(null), SLIDE_MS);
+    return () => clearTimeout(t);
+  }, [leaving]);
 
   // Swipe the stage left/right to change screen (touch).
   const swipe = useRef<{ x: number; y: number } | null>(null);
@@ -158,9 +205,16 @@ export default function BroadcastPanel({
 
   // Switching tab or screen: animate the content from its old height to the new
   // one, so the red card stretches/shrinks instead of jumping.
+  const lastTab = useRef(tab);
   useLayoutEffect(() => {
     const el = stack.current;
+    const tabChanged = lastTab.current !== tab;
+    lastTab.current = tab;
     if (!el) return;
+    if (compact && tabChanged) {
+      stackH.current = el.offsetHeight;
+      return;
+    }
     gsap.killTweensOf(el);
     el.style.height = "";
     const next = el.offsetHeight;
@@ -325,14 +379,41 @@ export default function BroadcastPanel({
                     ))}
                   </div>
                 ) : screens[screen]?.video ? (
-                  <Loop key={screens[screen].video} src={screens[screen].video!} active={live} />
+                  // Phones: the incoming screen slides in while the old one slides out.
+                  <div
+                    key={screen}
+                    className={styles.slideLayer}
+                    data-in={compact && leaving ? (leaving.dir > 0 ? "right" : "left") : undefined}
+                  >
+                    <Loop src={screens[screen].video!} active={live} />
+                  </div>
                 ) : (
                   <Placeholder169 />
+                )}
+                {compact && leaving && screens[leaving.index]?.video && (
+                  <div
+                    key={`out-${leaving.index}`}
+                    className={styles.slideLayer}
+                    data-out={leaving.dir > 0 ? "left" : "right"}
+                    aria-hidden="true"
+                  >
+                    <Loop src={screens[leaving.index].video!} active={live} />
+                  </div>
                 )}
                 {!screens[screen]?.assets && (
                   <span className={styles.previewLabel}>Screen · {screens[screen]?.label}</span>
                 )}
               </div>
+              {compact && loops && (
+                // Phones: the screen's live examples, centred, above the carousel control.
+                <div className={styles.screenLoopsMobile}>
+                  {loops.map((base) => (
+                    <div key={base} className={styles.loopCell}>
+                      <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
+                    </div>
+                  ))}
+                </div>
+              )}
               {compact && (
                 // Phones: carousel control (arrows + counter), the screen's title under it.
                 <div className={styles.screenNav}>
@@ -359,7 +440,7 @@ export default function BroadcastPanel({
           )}
           {/* Live examples. Scoreboard: left of the Index (the only tab with it).
               Screens: under the stage, in the right column. */}
-          {loops && (
+          {loops && !(compact && kind === "screens") && (
             <div className={kind === "screens" ? styles.screenLoops : styles.loopsRow}>
               <div className={styles.loopsGrid}>
                 {loops.map((base) => (
@@ -408,7 +489,8 @@ export default function BroadcastPanel({
                   className={styles.accHeader}
                   aria-expanded={isOpen}
                   onClick={() => {
-                    if (i === tab) setTabOpen((o) => !o);
+                    if (closing) return;
+                    if (i === tab && tabOpen) setClosing(true);
                     else {
                       setTab(i);
                       setTabOpen(true);
@@ -420,7 +502,11 @@ export default function BroadcastPanel({
                   <span className={styles.count}>[{pad(i + 1)}]</span>
                   <span className={styles.accChevron} aria-hidden="true">▾</span>
                 </button>
-                {isOpen && stackEl}
+                {isOpen && (
+                  <AccBody key={sec.label} closing={closing} onClosed={finishClose}>
+                    {stackEl}
+                  </AccBody>
+                )}
               </div>
             );
           })}

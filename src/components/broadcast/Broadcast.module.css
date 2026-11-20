@@ -1955,3 +1955,104 @@
 .screenStage {
   touch-action: pan-y;
 }
+
+/* Scoreboard controls in capitals (CLICK TO SCORE, IN, OUT, SHIELD MODE). */
+.board .ctrl .filterLabel {
+  text-transform: uppercase;
+}
+
+/* ---------- Phones: Process order = trophy, text, steps, then numbers + On air ---------- */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .processSide {
+    display: contents;
+  }
+
+  .processSide > .trophyWrap {
+    order: 0;
+  }
+
+  .processMain {
+    order: 1;
+  }
+
+  .processStats {
+    order: 2;
+  }
+
+  .processChannels {
+    order: 3;
+  }
+}
+
+/* ---------- Phones: screens carousel slide (both screens visible while it moves) ---------- */
+.slideLayer {
+  position: absolute;
+  inset: 0;
+}
+
+.slideLayer video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slideLayer[data-in="right"] {
+  animation: slideInRight 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.slideLayer[data-in="left"] {
+  animation: slideInLeft 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.slideLayer[data-out="left"] {
+  animation: slideOutLeft 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+.slideLayer[data-out="right"] {
+  animation: slideOutRight 0.45s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideInLeft {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+@keyframes slideOutLeft {
+  from { transform: translateX(0); }
+  to { transform: translateX(-100%); }
+}
+
+@keyframes slideOutRight {
+  from { transform: translateX(0); }
+  to { transform: translateX(100%); }
+}
+
+/* Accordion body: clipped while it unfolds/folds. */
+.accBody {
+  overflow: hidden;
+}
+
+/* Phones: a screen's live examples, centred between the stage and the control. */
+.screenLoopsMobile {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.screenLoopsMobile .loopCell {
+  width: calc(50% - 4px);
+}
+
+/* Carousel title: black weight, all caps. */
+.screenTitle {
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
