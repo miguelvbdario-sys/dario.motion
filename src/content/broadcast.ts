@@ -219,16 +219,18 @@ export const BROADCAST: BroadcastProject[] = [
     about: {
       lead: "LED screens for CazéTV's studios at Paris 2024, in the Games' identity.",
       points: [
-        { title: "Studio screens", text: "Athlete, medal and ceremony packages for the studio LED walls." },
-        { title: "Templates", text: "A Paris template system the team fed live, all day." },
-        { title: "24h live", text: "On air around the clock during the Games." },
+        {
+          title: "Studio screens",
+          text: "Athlete, medal and ceremony packages for the studio LED walls.",
+          loop: { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
+        },
+        {
+          title: "24h live",
+          text: "On air around the clock during the Games.",
+          loop: { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
+        },
         { title: "Programs", text: "Vignettes for Tamo em Paris and Partiu Paris." },
       ],
-      loops: [
-        { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
-        { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
-      ],
-      channels: ["CazéTV"],
     },
     filters: [],
     fullVideo: null,
