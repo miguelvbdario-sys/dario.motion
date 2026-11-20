@@ -21,6 +21,12 @@ const STEPS = 1000;
  * fraction of the animation (lower = heavier). The mouse keeps the direct hover.
  */
 const TOUCH_WEIGHT = 1;
+/** Touch on the video: a drag needs this many px sideways… */
+const SWIPE_MIN = 22;
+/** …and this many times more sideways than vertical. */
+const SWIPE_RATIO = 2;
+/** Moving this far vertically first hands the gesture to page scrolling. */
+const SWIPE_SCROLL = 10;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 function MascotRow({ slug, label }: { slug: string; label: string }) {
@@ -93,9 +99,14 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
         if (pending.current) {
           const dx = Math.abs(e.clientX - start.current.x);
           const dy = Math.abs(e.clientY - start.current.y);
-          if (dx < 8 && dy < 8) return;
+          // Scroll wins unless the finger clearly goes sideways: at least
+          // SWIPE_MIN px across and SWIPE_RATIO times more across than down.
+          if (dy > SWIPE_SCROLL) {
+            pending.current = false; // vertical enough: the page scrolls
+            return;
+          }
+          if (dx < SWIPE_MIN || dx < dy * SWIPE_RATIO) return;
           pending.current = false;
-          if (dy >= dx) return; // vertical: the page scrolls
           dragging.current = true;
           e.currentTarget.setPointerCapture(e.pointerId);
         }
