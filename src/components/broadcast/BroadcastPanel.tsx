@@ -569,6 +569,7 @@ export default function BroadcastPanel({
   const accActive = sections ? tab : active;
   const scoreboardBlock = scoreSection ? (
     <div className={`${styles.boardStack} ${styles.alwaysBoard}`}>
+      <p className={`${styles.sideLabel} ${styles.boardPrompt}`}>[ Choose your team and score the goal ]</p>
       <BroadcastScoreboard active={open} />
       {scoreSection.loops && (
         <div className={styles.loopsGrid}>

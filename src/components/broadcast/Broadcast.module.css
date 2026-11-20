@@ -2460,3 +2460,9 @@
     font-size: min(30px, 7.6vw);
   }
 }
+
+/* Phones: invitation line right above the always-on scoreboard. */
+.boardPrompt {
+  margin: 12px 0 0;
+  text-align: center;
+}
