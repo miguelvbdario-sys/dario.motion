@@ -40,6 +40,13 @@ const PIN_DISTANCE = "+=110%";
 const DRAG_DISTANCE = 600;
 /** Drag this many px RIGHT to run through the whole look-right sequence. */
 const DRAG_DISTANCE_RIGHT = 300;
+/**
+ * Desktop mouse-follow. FOLLOW_RATE: how fast the head eases toward the mouse
+ * (lower = slower). FOLLOW_DEAD_ZONE: centre band (fraction of half the screen)
+ * where nothing plays.
+ */
+const FOLLOW_RATE = 1.6;
+const FOLLOW_DEAD_ZONE = 0.12;
 /** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
 const RIGHT_FRAMES = { first: 0, last: 37 };
 /** How quickly the head rewinds to the scroll frame after a drag (per second). */
@@ -194,7 +201,7 @@ export default function Hero() {
       };
       const onMove = (e: PointerEvent) => {
         // Hover hint: the translucent cursor disc over the character.
-        if (e.pointerType === "mouse" && view.mode !== "drag") {
+        if (e.pointerType === "mouse" && view.mode !== "drag" && !followMouse) {
           const hint = !blocked(e.target) && overCharacter(e.clientX, e.clientY);
           if (hint) stage.dataset.cursor = "link";
           else delete stage.dataset.cursor;
@@ -232,9 +239,35 @@ export default function Hero() {
         delete stage.dataset.dragging;
       };
 
+      // ---------- Desktop: the head follows the mouse (no click) ----------
+      // Mouse on the RIGHT half of the screen plays the look-right sequence,
+      // on the LEFT half the main animation runs forward from the scroll frame.
+      // The further from the centre, the further it goes; it eases there slowly.
+      // Touch screens keep the drag above.
+      const followMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      /** −1 (left edge) … 0 (centre / mouse away) … 1 (right edge). */
+      let mouseX = 0;
+      /** Eased amounts, 0…1: main animation ahead of scroll / look-right. */
+      const follow = { left: 0, right: 0 };
+      const onWindowMove = (e: PointerEvent) => {
+        if (e.pointerType === "mouse") mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+      };
+      const onWindowLeave = () => (mouseX = 0);
+
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
-        if (view.mode === "scroll") view.display = view.scroll;
+        if (followMouse) {
+          const amount = Math.min(1, Math.max(0, (Math.abs(mouseX) - FOLLOW_DEAD_ZONE) / (1 - FOLLOW_DEAD_ZONE)));
+          const k = 1 - Math.exp(-dt * FOLLOW_RATE);
+          const wantRight = mouseX > 0 ? amount : 0;
+          const wantLeft = mouseX < 0 ? amount : 0;
+          // One side at a time: the other side settles back to 0 first.
+          follow.right += ((follow.left > 0.01 ? 0 : wantRight) - follow.right) * k;
+          follow.left += ((follow.right > 0.01 ? 0 : wantLeft) - follow.left) * k;
+          view.display = view.scroll + follow.left * (HEAD_FRAMES.last - view.scroll);
+          view.right = follow.right * rightSpan;
+          if (view.right < 0.5) view.right = 0;
+        } else if (view.mode === "scroll") view.display = view.scroll;
         else if (view.mode === "return") {
           const k = 1 - Math.exp(-dt * RETURN_RATE);
           if (view.right > 0) {
@@ -255,7 +288,12 @@ export default function Hero() {
         if (headCanvas.current) headCanvas.current.style.visibility = showRight ? "hidden" : "visible";
       };
 
-      stage.addEventListener("pointerdown", onDown);
+      if (followMouse) {
+        window.addEventListener("pointermove", onWindowMove);
+        document.documentElement.addEventListener("mouseleave", onWindowLeave);
+      } else {
+        stage.addEventListener("pointerdown", onDown);
+      }
       stage.addEventListener("pointermove", onMove);
       stage.addEventListener("pointerup", onUp);
       stage.addEventListener("pointercancel", onUp);
@@ -314,6 +352,8 @@ export default function Hero() {
         mm.revert();
         gsap.ticker.remove(tickHead);
         stage.removeEventListener("pointerdown", onDown);
+        window.removeEventListener("pointermove", onWindowMove);
+        document.documentElement.removeEventListener("mouseleave", onWindowLeave);
         stage.removeEventListener("pointermove", onMove);
         stage.removeEventListener("pointerup", onUp);
         stage.removeEventListener("pointercancel", onUp);
