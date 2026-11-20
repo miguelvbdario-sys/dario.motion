@@ -27,8 +27,10 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
   const video = useRef<HTMLVideoElement>(null);
   const track = useRef<HTMLInputElement>(null);
   const dragging = useRef(false);
-  /** Touch: where the drag started (pointer x, slider value). */
-  const start = useRef({ x: 0, v: 0 });
+  /** Touch: where the drag started (pointer x/y, slider value). */
+  const start = useRef({ x: 0, y: 0, v: 0 });
+  /** Touch on the video: waiting to see if the finger goes sideways (drag) or up/down (scroll). */
+  const pending = useRef(false);
   const [value, setValue] = useState(0);
   const [used, setUsed] = useState(false);
 
@@ -37,19 +39,19 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
    * target is kept and applied when it lands. Firing a seek per pointer move
    * let older seeks finish after newer ones, so frames jumped back and forth.
    */
-  const pending = useRef<number | null>(null);
+  const pendingSeek = useRef<number | null>(null);
   const seek = (t: number) => {
     const el = video.current;
     if (!el) return;
     if (el.seeking) {
-      pending.current = t;
+      pendingSeek.current = t;
       return;
     }
     el.currentTime = t;
   };
   const onSeeked = () => {
-    const t = pending.current;
-    pending.current = null;
+    const t = pendingSeek.current;
+    pendingSeek.current = null;
     if (t !== null && video.current && Math.abs(video.current.currentTime - t) > 0.001) video.current.currentTime = t;
   };
   const scrub = (v: number) => {
@@ -70,23 +72,46 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
     <div
       className={styles.mascot}
       onPointerDown={(e) => {
-        dragging.current = true;
-        e.currentTarget.setPointerCapture(e.pointerId);
-        if (e.pointerType === "mouse") fromPointer(e.clientX);
-        else start.current = { x: e.clientX, v: value };
-        e.preventDefault();
+        if (e.pointerType === "mouse") {
+          dragging.current = true;
+          fromPointer(e.clientX);
+          return;
+        }
+        start.current = { x: e.clientX, y: e.clientY, v: value };
+        // Touch on the slider: drag at once. On the video: decide by direction.
+        if ((e.target as Element).closest("label")) {
+          dragging.current = true;
+          e.currentTarget.setPointerCapture(e.pointerId);
+        } else {
+          pending.current = true;
+        }
       }}
       // Mouse: just hovering scrubs (no click needed). Touch/pen: a heavy,
       // relative drag (TOUCH_WEIGHT) while pressed.
       onPointerMove={(e) => {
         if (e.pointerType === "mouse") return fromPointer(e.clientX);
+        if (pending.current) {
+          const dx = Math.abs(e.clientX - start.current.x);
+          const dy = Math.abs(e.clientY - start.current.y);
+          if (dx < 8 && dy < 8) return;
+          pending.current = false;
+          if (dy >= dx) return; // vertical: the page scrolls
+          dragging.current = true;
+          e.currentTarget.setPointerCapture(e.pointerId);
+        }
         if (!dragging.current) return;
         const w = track.current?.getBoundingClientRect().width || 1;
         const v = start.current.v + ((e.clientX - start.current.x) / w) * STEPS * TOUCH_WEIGHT;
         scrub(Math.round(Math.min(STEPS, Math.max(0, v))));
       }}
-      onPointerUp={() => (dragging.current = false)}
-      onPointerCancel={() => (dragging.current = false)}
+      onPointerUp={() => {
+        dragging.current = false;
+        pending.current = false;
+      }}
+      onPointerCancel={() => {
+        dragging.current = false;
+        pending.current = false;
+      }}
     >
       <div className={styles.mascotVideo}>
         <video

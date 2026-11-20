@@ -2212,8 +2212,19 @@
     pointer-events: none;
   }
 
+  /* The video lets vertical swipes scroll the page (a sideways swipe drags);
+     the slider row drags right away in any direction. */
   .mascot {
+    touch-action: pan-y;
+  }
+
+  .mascotSlider {
     touch-action: none;
+  }
+
+  /* The club name is already in the team list above. */
+  .mascotName {
+    display: none;
   }
 }
 
