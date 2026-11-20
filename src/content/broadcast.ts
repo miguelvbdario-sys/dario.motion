@@ -112,7 +112,7 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2026",
     desc: "Official Paulistão 2026 broadcast assets",
     about: {
-      lead: "Paulistão is São Paulo's state football championship, the biggest in Brazil. We made the graphics package and the animations for its official broadcast.",
+      lead: "Paulistão is São Paulo's state football championship, the biggest in Brazil.\nWe made the graphics package and the animations for its official broadcast.",
       points: [
         {
           title: "The championship",

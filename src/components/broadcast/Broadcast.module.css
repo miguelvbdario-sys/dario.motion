@@ -2485,3 +2485,107 @@
     letter-spacing: 0;
   }
 }
+
+/* Lead parts ("\n" in the lead): inline on phones, paragraphs on desktop. */
+.aboutLeadPart {
+  display: inline;
+}
+
+/* Outro line + "Discover the scoreboard" button. */
+.aboutOutroRow {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+}
+
+.aboutCta {
+  padding: 12px 20px;
+  border: 0;
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 15);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.aboutCta:hover {
+  background: #efeeee;
+  color: #111;
+}
+
+/*
+ * Desktop About with stats (Paulistão): lead across the full width in two
+ * paragraphs, the 2×2 loop cards centred, then stats + channels in one row
+ * across, then the bigger outro line with the button.
+ */
+@media (min-width: 768px) and (min-aspect-ratio: 3/4) {
+  .about:has(.aboutStats) {
+    grid-template-columns: minmax(0, 1fr);
+    gap: calc(var(--s) * 36);
+  }
+
+  .about:has(.aboutStats) .aboutMain {
+    gap: calc(var(--s) * 36);
+  }
+
+  .about:has(.aboutStats) .aboutLead {
+    max-width: none;
+  }
+
+  .about:has(.aboutStats) .aboutLeadPart {
+    display: block;
+  }
+
+  .about:has(.aboutStats) .aboutLeadPart + .aboutLeadPart {
+    margin-top: 0.4em;
+  }
+
+  .about:has(.aboutStats) .aboutPoints {
+    width: min(100%, calc(var(--s) * 1040));
+    margin: 0 auto;
+  }
+
+  .about:has(.aboutStats) .aboutSide {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 4px;
+    align-items: end;
+  }
+
+  .about:has(.aboutStats) .aboutStats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .about:has(.aboutStats) .aboutChannels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .about:has(.aboutStats) .aboutChannels .processChannel {
+    display: grid;
+    place-items: center;
+    height: 100%;
+  }
+
+  .about:has(.aboutStats) .aboutOutro {
+    font-size: calc(var(--s) * 28);
+    font-weight: 700;
+  }
+}
+
+@media (min-width: 768px) and (min-aspect-ratio: 3/4) {
+  /* Outro and button on one line. */
+  .about:has(.aboutStats) .aboutOutroRow {
+    flex-wrap: nowrap;
+  }
+
+  .about:has(.aboutStats) .aboutCta {
+    flex: none;
+    white-space: nowrap;
+  }
+}

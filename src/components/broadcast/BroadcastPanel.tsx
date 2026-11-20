@@ -310,10 +310,29 @@ export default function BroadcastPanel({
 
   /** "About the project": short read + loops + the Index; ends with the invitation. */
   const ab = project.about;
+  const boardTab = sections?.findIndex((s) => s.kind === "scoreboard") ?? -1;
+  /** Desktop: open the Scoreboard tab and bring the tab content (from its top) into view. */
+  const discoverBoard = () => {
+    const el = stack.current;
+    setTab(boardTab);
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
+    const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+    if (lenis) lenis.scrollTo(y, { duration: 0.9 });
+    else window.scrollTo({ top: y, behavior: "smooth" });
+  };
   const aboutEl = (
     <div className={styles.about}>
       <div className={styles.aboutMain}>
-        <p className={styles.aboutLead}>{ab?.lead ?? project.desc}</p>
+        {/* "\n" in the lead: a paragraph break on desktop, a plain space on phones. */}
+        <p className={styles.aboutLead}>
+          {(ab?.lead ?? project.desc).split("\n").map((part, i) => (
+            <span key={i} className={styles.aboutLeadPart}>
+              {i > 0 && " "}
+              {part}
+            </span>
+          ))}
+        </p>
         {ab && (
           <ul className={styles.aboutPoints}>
             {ab.points.map((pt) => (
@@ -362,7 +381,17 @@ export default function BroadcastPanel({
           </div>
         )}
       </div>
-      {ab?.outro && <p className={styles.aboutOutro}>{ab.outro}</p>}
+      {ab?.outro && (
+        <div className={styles.aboutOutroRow}>
+          <p className={styles.aboutOutro}>{ab.outro}</p>
+          {/* Desktop: jump to the Scoreboard tab (phones show the board right below). */}
+          {!compact && boardTab >= 0 && (
+            <button type="button" className={styles.aboutCta} onClick={discoverBoard}>
+              [ Discover the scoreboard ]
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 
