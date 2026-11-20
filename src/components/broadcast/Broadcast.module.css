@@ -2190,3 +2190,29 @@
     display: none;
   }
 }
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* OUT / SHIELD MODE: same size as the CLICK TO SCORE buttons (half each). */
+  .boardCentre > .filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+
+  .boardCentre .ctrl {
+    justify-content: center;
+    padding-inline: 6px;
+    font-size: 12px;
+  }
+
+  /* Mascots: on touch the card is the grip; the native slider would jump to
+     the finger and fight the drag (it stays for keyboard use). */
+  .mascotSlider input {
+    pointer-events: none;
+  }
+
+  .mascot {
+    touch-action: none;
+  }
+}

@@ -32,11 +32,31 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
   const [value, setValue] = useState(0);
   const [used, setUsed] = useState(false);
 
+  /**
+   * Seeks one at a time: while the video is still seeking, only the latest
+   * target is kept and applied when it lands. Firing a seek per pointer move
+   * let older seeks finish after newer ones, so frames jumped back and forth.
+   */
+  const pending = useRef<number | null>(null);
+  const seek = (t: number) => {
+    const el = video.current;
+    if (!el) return;
+    if (el.seeking) {
+      pending.current = t;
+      return;
+    }
+    el.currentTime = t;
+  };
+  const onSeeked = () => {
+    const t = pending.current;
+    pending.current = null;
+    if (t !== null && video.current && Math.abs(video.current.currentTime - t) > 0.001) video.current.currentTime = t;
+  };
   const scrub = (v: number) => {
     setValue(v);
     setUsed(true);
     const el = video.current;
-    if (el && el.duration) el.currentTime = (v / STEPS) * Math.max(0, el.duration - 0.04);
+    if (el && el.duration) seek((v / STEPS) * Math.max(0, el.duration - 0.04));
   };
 
   // Pointer x → position along the slider track (the whole card is the grip).
@@ -69,7 +89,16 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
       onPointerCancel={() => (dragging.current = false)}
     >
       <div className={styles.mascotVideo}>
-        <video ref={video} src={SRC(slug)} muted playsInline preload="auto" disablePictureInPicture aria-hidden="true" />
+        <video
+          ref={video}
+          src={SRC(slug)}
+          muted
+          playsInline
+          preload="auto"
+          disablePictureInPicture
+          aria-hidden="true"
+          onSeeked={onSeeked}
+        />
         <span className={styles.mascotName}>{label}</span>
         <span className={styles.mascotHint} data-hidden={used || undefined} aria-hidden="true">
           Drag <span>→</span>
