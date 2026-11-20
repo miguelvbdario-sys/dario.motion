@@ -45,8 +45,15 @@ const DRAG_DISTANCE_RIGHT = 300;
  * (lower = slower). FOLLOW_DEAD_ZONE: centre band (fraction of half the screen)
  * where nothing plays.
  */
-const FOLLOW_RATE = 1.6;
+const FOLLOW_RATE = 2.6;
 const FOLLOW_DEAD_ZONE = 0.12;
+/**
+ * Where the centre dead zone sits: −1 = left edge, 0 = middle, 1 = right edge.
+ * Shifted left because the character rests a little to the left.
+ */
+const FOLLOW_CENTER = -0.15;
+/** Dead zone at each side edge (same units): past it the animation is at its end. */
+const FOLLOW_EDGE_ZONE = 0.12;
 /** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
 const RIGHT_FRAMES = { first: 0, last: 37 };
 /** How quickly the head rewinds to the scroll frame after a drag (per second). */
@@ -257,10 +264,14 @@ export default function Hero() {
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
         if (followMouse) {
-          const amount = Math.min(1, Math.max(0, (Math.abs(mouseX) - FOLLOW_DEAD_ZONE) / (1 - FOLLOW_DEAD_ZONE)));
+          // Distance from the (off-centre) rest point, measured between the
+          // centre dead zone and the dead zone at that side's edge.
+          const d = mouseX - FOLLOW_CENTER;
+          const reach = (d > 0 ? 1 - FOLLOW_CENTER : 1 + FOLLOW_CENTER) - FOLLOW_EDGE_ZONE - FOLLOW_DEAD_ZONE;
+          const amount = Math.min(1, Math.max(0, (Math.abs(d) - FOLLOW_DEAD_ZONE) / reach));
           const k = 1 - Math.exp(-dt * FOLLOW_RATE);
-          const wantRight = mouseX > 0 ? amount : 0;
-          const wantLeft = mouseX < 0 ? amount : 0;
+          const wantRight = d > 0 ? amount : 0;
+          const wantLeft = d < 0 ? amount : 0;
           // One side at a time: the other side settles back to 0 first.
           follow.right += ((follow.left > 0.01 ? 0 : wantRight) - follow.right) * k;
           follow.left += ((follow.right > 0.01 ? 0 : wantLeft) - follow.left) * k;
