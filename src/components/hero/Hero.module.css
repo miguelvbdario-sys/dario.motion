@@ -275,12 +275,24 @@
 /* ---------- Portrait sequence ---------- */
 
 .head {
+  /*
+   * Size and position of the character (design px, 1920 wide).
+   * --head-size: width of the square (was 1920). --head-y: top edge.
+   * It stays centred horizontally.
+   */
+  --head-size: 1300;
+  --head-y: 120;
   z-index: 2;
-  top: calc(var(--u) * -197);
-  left: 0;
-  width: calc(var(--u) * 1920);
+  top: calc(var(--u) * var(--head-y));
+  left: calc(var(--u) * (1920 - var(--head-size)) / 2);
+  width: calc(var(--u) * var(--head-size));
   aspect-ratio: 1;
   pointer-events: none;
+  /*
+   * Cast shadow behind the character, thrown to the left.
+   * x (negative = left), y, blur, colour.
+   */
+  filter: drop-shadow(calc(var(--u) * -60) calc(var(--u) * 24) calc(var(--u) * 30) rgb(0 0 0 / 0.65));
 }
 
 /* ---------- 3D emblems ---------- */
@@ -496,9 +508,9 @@
 
   .head {
     /* Phone: height of the character (lower number = higher up). */
-    top: calc(var(--u) * 58);
-    left: calc(var(--u) * -315);
-    width: calc(var(--u) * 1000);
+    top: calc(var(--u) * 140);
+    left: calc(var(--u) * -165);
+    width: calc(var(--u) * 700);
   }
 
   /* Pig: in the empty corner left of DARIO and under MIGUEL, centred on it. */
