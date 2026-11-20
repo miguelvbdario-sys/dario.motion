@@ -20,11 +20,10 @@ const Emblem = dynamic(() => import("./Emblem"), { ssr: false });
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 /**
- * Scroll head sequence (66 frames, /sequence/hero-test and hero-test-720).
- * Phones/tablets scrub it with the scroll; desktop keeps it on frame 0 (the
- * mouse zones drive the look sequence instead). Preloads: src/app/page.tsx.
+ * Head sequence folder (/sequence/hero-look, phones: hero-look-720) and the
+ * length of the scroll scrub in playhead steps (also drives the arrow).
  */
-const HEAD = { folder: "hero-test", last: 65 };
+const HEAD = { folder: "hero-look", last: 65 };
 
 const HEAD_FRAMES = { first: 0, last: HEAD.last };
 const ARROW_FRAMES = { first: 2, last: 85 };
@@ -40,13 +39,13 @@ const DRAG_DISTANCE = 600;
  */
 const PLAY_FPS = 30;
 /** Playing back to rest runs this many times faster than PLAY_FPS. */
-const RETURN_SPEED = 2.6;
+const RETURN_SPEED = 2.0;
 /**
  * Centre (rest) zone = the character's width on screen: its horizontal extent
  * in the rest frame, as fractions of the head canvas (measured 0.247 → 0.771).
- * Lower `from` / higher `to` widens it.
+ * Lower `from` / higher `to` widens it. top/bottom: its height (touch hit area).
  */
-const REST_ZONE = { from: 0.247, to: 0.771 };
+const REST_ZONE = { from: 0.247, to: 0.771, top: 0.157, bottom: 0.69 };
 /**
  * "Look" sequence (/sequence/hero-look and hero-look-720): one render, files
  * 000–098 = the source frames 023–121. rest = the rest pose (source frame 72);
@@ -122,34 +121,27 @@ export default function Hero() {
 
       // Phones get the lighter 720px frames.
       const headFolder = window.matchMedia(COMPACT_QUERY).matches ? `${HEAD.folder}-720` : HEAD.folder;
-      const head = new FrameSequence({
-        canvas: headCanvas.current,
-        ...HEAD_FRAMES,
-        url: (frame) => `/sequence/${headFolder}/VIDEO-HEAD_${pad(frame)}.webp`,
-      });
-      headSequence.current = head;
       const arrow = new FrameSequence({
         canvas: arrowCanvas.current,
         ...ARROW_FRAMES,
         url: (frame) => `/sequence/arrow/SETA_${pad(frame)}.webp`,
       });
 
-      // ---------- "Look" sequence: one render, left ↔ rest ↔ right ----------
-      // /sequence/hero-look: frame LOOK.rest is the rest pose (= the scroll
-      // head's frame 0); lower frames turn to look RIGHT, higher frames run
-      // the LEFT animation. It paints the same canvas as the scroll head; the
-      // inactive one keeps loading but never paints, so switching can't flash.
+      // ---------- The head: one "look" render, left ↔ rest ↔ right ----------
+      // /sequence/hero-look: frame LOOK.rest is the rest pose; lower frames turn
+      // to look RIGHT, higher frames run the LEFT animation. It is the only
+      // sequence on the head canvas (one render, so nothing can jump).
       const look = new FrameSequence({
         canvas: headCanvas.current,
         first: 0,
         last: LOOK.last,
-        url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-look")}/LOOK_${pad(frame)}.webp`,
+        url: (frame) => `/sequence/${headFolder}/LOOK_${pad(frame)}.webp`,
       });
-      look.setActive(false);
-      /** Which sequence owns the canvas. */
-      let onLook = false;
+      headSequence.current = look;
       /** Offset from rest in look frames: < 0 = toward right, > 0 = toward left. */
       let offset = 0;
+      /** Phones/tablets: the part of the offset that comes from scrolling (rest → right end). */
+      let scrollOffset = 0;
       const maxRight = LOOK.rest; // frames from rest to the look-right end
       const maxLeft = LOOK.last - LOOK.rest; // frames from rest to the left end
 
@@ -167,13 +159,17 @@ export default function Hero() {
         const canvas = headCanvas.current;
         if (!canvas) return false;
         const r = canvas.getBoundingClientRect();
-        return head.alphaAt((x - r.left) / r.width, (y - r.top) / r.height) > 60;
+        // The character's box in its rest frame (not single pixels: the pixel
+        // art has gaps, so a pixel test missed most touches).
+        const tx = (x - r.left) / r.width;
+        const ty = (y - r.top) / r.height;
+        return tx >= REST_ZONE.from && tx <= REST_ZONE.to && ty >= REST_ZONE.top && ty <= REST_ZONE.bottom;
       };
       // Other interactive things sit on top of the character's square canvas.
       // (The stage itself carries data-cursor while hovering the character, so it is excluded.)
       const blocked = (target: EventTarget | null) => {
         if (!(target instanceof Element)) return false;
-        const hit = target.closest("[data-vector], [data-cursor], button, a");
+        const hit = target.closest("[data-vector], [data-cursor], [data-nodrag], button, a");
         return !!hit && hit !== stage;
       };
 
@@ -253,23 +249,17 @@ export default function Hero() {
           const target = zone === 1 ? -maxRight : zone === -1 ? maxLeft : 0;
           // Switching sides: back to rest first (same sign rule as toward()).
           toward(Math.sign(target) !== Math.sign(offset) && offset !== 0 ? 0 : target);
-        } else if (view.mode === "return") {
-          toward(0);
-          if (offset === 0) view.mode = "scroll";
+        } else {
+          // Phones/tablets: scrolling turns the head from rest to the right end;
+          // a drag moves it from there, and on release it plays back.
+          scrollOffset = -(view.scroll / HEAD_FRAMES.last) * maxRight;
+          if (view.mode === "scroll") offset = scrollOffset;
+          else if (view.mode === "return") {
+            toward(scrollOffset);
+            if (offset === scrollOffset) view.mode = "scroll";
+          }
         }
-
-        // Phones/tablets: rest → the scroll head, anywhere else → the look sequence.
-        // Desktop always paints the look sequence (its rest frame included): the
-        // scroll head is a different render, ~6x a normal frame step away from
-        // the look rest, so swapping between them at rest showed as a jump.
-        const useLook = followMouse || offset !== 0;
-        if (useLook !== onLook) {
-          onLook = useLook;
-          head.setActive(!useLook);
-          look.setActive(useLook);
-        }
-        if (useLook) look.draw(Math.round(LOOK.rest + offset));
-        else head.draw(view.scroll);
+        look.draw(Math.round(LOOK.rest + Math.max(-maxRight, Math.min(maxLeft, offset))));
       };
 
       if (followMouse) {
@@ -341,10 +331,9 @@ export default function Hero() {
         stage.removeEventListener("pointermove", onMove);
         stage.removeEventListener("pointerup", onUp);
         stage.removeEventListener("pointercancel", onUp);
-        head.destroy();
+        look.destroy();
         headSequence.current = null;
         arrow.destroy();
-        look.destroy();
       };
     },
     { scope: root },
@@ -402,10 +391,10 @@ export default function Hero() {
           />
 
 
-          <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal>
+          <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal data-nodrag>
             <Emblem id="left" src="/3d/emblem-left.gltf" label="Chrome 3D pig emblem" speed={0.75} />
           </div>
-          <div className={`${styles.emblem} ${styles.emblemRight}`} data-reveal>
+          <div className={`${styles.emblem} ${styles.emblemRight}`} data-reveal data-nodrag>
             <Emblem id="right" src="/3d/emblem-right.gltf" label="Chrome 3D vulture emblem" speed={-0.6} />
           </div>
 

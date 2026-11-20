@@ -10,14 +10,14 @@ export default function Home() {
       <link
         rel="preload"
         as="image"
-        href="/sequence/hero-test/VIDEO-HEAD_000.webp"
+        href="/sequence/hero-look/LOOK_049.webp"
         media="(min-width: 768px) and (min-aspect-ratio: 751/1000)"
         fetchPriority="high"
       />
       <link
         rel="preload"
         as="image"
-        href="/sequence/hero-test-720/VIDEO-HEAD_000.webp"
+        href="/sequence/hero-look-720/LOOK_049.webp"
         media="(max-width: 767px), (max-aspect-ratio: 3/4)"
         fetchPriority="high"
       />
