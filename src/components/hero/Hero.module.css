@@ -512,7 +512,7 @@
   .head {
     /* Phone: height of the character (lower number = higher up). */
     /* Width = size (smaller on phones); left keeps it centred; top keeps its middle in place. */
-    top: calc(var(--u) * 80);
+    top: calc(var(--u) * 110);
     left: calc(var(--u) * -95);
     width: calc(var(--u) * 560);
   }
@@ -525,7 +525,7 @@
   }
 
   .emblemRight {
-    top: calc(var(--u) * 208);
+    top: calc(var(--u) * 168);
     left: calc(var(--u) * 268);
     width: calc(var(--u) * 128);
   }
@@ -546,12 +546,12 @@
   }
 
   .senior {
-    top: calc(var(--u) * 270);
+    top: calc(var(--u) * 300);
     left: calc(var(--u) * 20);
   }
 
   .role {
-    top: calc(var(--u) * 270);
+    top: calc(var(--u) * 300);
     left: auto;
     right: calc(var(--u) * 18);
     text-align: right;
