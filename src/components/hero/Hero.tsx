@@ -41,19 +41,17 @@ const DRAG_DISTANCE = 600;
 /** Drag this many px RIGHT to run through the whole look-right sequence. */
 const DRAG_DISTANCE_RIGHT = 300;
 /**
- * Desktop mouse-follow. FOLLOW_RATE: how fast the head eases toward the mouse
- * (lower = slower). FOLLOW_DEAD_ZONE: centre band (fraction of half the screen)
- * where nothing plays.
+ * Desktop mouse zones. PLAY_FPS: playback speed of both sequences (their own
+ * frame rate). FOLLOW_DEAD_ZONE: half-width of the centre (rest) zone, in
+ * screen units where −1 = left edge and 1 = right edge.
  */
-const FOLLOW_RATE = 2.6;
+const PLAY_FPS = 30;
 const FOLLOW_DEAD_ZONE = 0.12;
 /**
- * Where the centre dead zone sits: −1 = left edge, 0 = middle, 1 = right edge.
+ * Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge.
  * Shifted left because the character rests a little to the left.
  */
 const FOLLOW_CENTER = -0.15;
-/** Dead zone at each side edge (same units): past it the animation is at its end. */
-const FOLLOW_EDGE_ZONE = 0.12;
 /** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
 const RIGHT_FRAMES = { first: 0, last: 37 };
 /** How quickly the head rewinds to the scroll frame after a drag (per second). */
@@ -264,20 +262,21 @@ export default function Hero() {
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
         if (followMouse) {
-          // Distance from the (off-centre) rest point, measured between the
-          // centre dead zone and the dead zone at that side's edge.
+          // Zones, not position: mouse in the LEFT zone plays the main animation
+          // all the way; in the RIGHT zone the look-right all the way; in the
+          // centre zone (off-centre, see FOLLOW_CENTER) both rewind. Always at
+          // the sequences' own frame rate. One side at a time: switching
+          // sides rewinds the current one first.
           const d = mouseX - FOLLOW_CENTER;
-          const reach = (d > 0 ? 1 - FOLLOW_CENTER : 1 + FOLLOW_CENTER) - FOLLOW_EDGE_ZONE - FOLLOW_DEAD_ZONE;
-          const amount = Math.min(1, Math.max(0, (Math.abs(d) - FOLLOW_DEAD_ZONE) / reach));
-          const k = 1 - Math.exp(-dt * FOLLOW_RATE);
-          const wantRight = d > 0 ? amount : 0;
-          const wantLeft = d < 0 ? amount : 0;
-          // One side at a time: the other side settles back to 0 first.
-          follow.right += ((follow.left > 0.01 ? 0 : wantRight) - follow.right) * k;
-          follow.left += ((follow.right > 0.01 ? 0 : wantLeft) - follow.left) * k;
-          view.display = view.scroll + follow.left * (HEAD_FRAMES.last - view.scroll);
-          view.right = follow.right * rightSpan;
-          if (view.right < 0.5) view.right = 0;
+          const zone = d > FOLLOW_DEAD_ZONE ? 1 : d < -FOLLOW_DEAD_ZONE ? -1 : 0;
+          const step = dt * PLAY_FPS;
+          const leftEnd = HEAD_FRAMES.last - view.scroll;
+          if (zone === 1 && follow.left === 0) follow.right = Math.min(rightSpan, follow.right + step);
+          else follow.right = Math.max(0, follow.right - step);
+          if (zone === -1 && follow.right === 0) follow.left = Math.min(leftEnd, follow.left + step);
+          else follow.left = Math.max(0, follow.left - step);
+          view.display = Math.min(HEAD_FRAMES.last, view.scroll + follow.left);
+          view.right = follow.right;
         } else if (view.mode === "scroll") view.display = view.scroll;
         else if (view.mode === "return") {
           const k = 1 - Math.exp(-dt * RETURN_RATE);
