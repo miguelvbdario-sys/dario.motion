@@ -187,3 +187,19 @@
     width: 100%;
   }
 }
+
+/* Phones: the close button stays on screen (fixed top-right), and a 9:16 video
+   is sized to fit the screen height instead of running past it. */
+@media (max-width: 899px) {
+  .playerClose {
+    position: fixed;
+    top: max(12px, env(safe-area-inset-top));
+    right: 12px;
+    z-index: 10;
+  }
+
+  .playerInner[data-vertical] .playerVideo {
+    width: min(100%, calc((100dvh - 120px) * 9 / 16));
+    align-self: center;
+  }
+}
