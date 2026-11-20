@@ -48,6 +48,14 @@ const DRAG_DISTANCE_RIGHT = 300;
 const PLAY_FPS = 30;
 /** Rewinding back to rest plays this many times faster than PLAY_FPS. */
 const RETURN_SPEED = 1.6;
+/**
+ * Frame ranges of the main head animation with a big hand move (measured):
+ * the rewind slows to normal speed across them so they don't look like jumps.
+ */
+const STRONG_MOVES: [number, number][] = [
+  [10, 13],
+  [44, 48],
+];
 const FOLLOW_DEAD_ZONE = 0.12;
 /**
  * Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge.
@@ -272,12 +280,16 @@ export default function Hero() {
           const d = mouseX - FOLLOW_CENTER;
           const zone = d > FOLLOW_DEAD_ZONE ? 1 : d < -FOLLOW_DEAD_ZONE ? -1 : 0;
           const step = dt * PLAY_FPS;
-          const back = step * RETURN_SPEED; // rewinding to rest is a bit faster
+          // Rewinding to rest is faster, except across the main animation's
+          // big hand moves, which play back at normal speed so they don't snap.
+          const back = step * RETURN_SPEED;
+          const mainFrame = Math.round(view.scroll + follow.left);
+          const backMain = STRONG_MOVES.some(([a, b]) => mainFrame >= a && mainFrame <= b) ? step : back;
           const leftEnd = HEAD_FRAMES.last - view.scroll;
           if (zone === 1 && follow.left === 0) follow.right = Math.min(rightSpan, follow.right + step);
           else follow.right = Math.max(0, follow.right - back);
           if (zone === -1 && follow.right === 0) follow.left = Math.min(leftEnd, follow.left + step);
-          else follow.left = Math.max(0, follow.left - back);
+          else follow.left = Math.max(0, follow.left - backMain);
           view.display = Math.min(HEAD_FRAMES.last, view.scroll + follow.left);
           view.right = follow.right;
         } else if (view.mode === "scroll") view.display = view.scroll;
