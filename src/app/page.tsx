@@ -1,4 +1,4 @@
-﻿import Hero from "@/components/hero/Hero";
+import Hero from "@/components/hero/Hero";
 import Broadcast from "@/components/broadcast/Broadcast";
 import WorksCarousel from "@/components/works-carousel/WorksCarousel";
 import About from "@/components/about/About";
@@ -10,14 +10,14 @@ export default function Home() {
       <link
         rel="preload"
         as="image"
-        href="/sequence/hero/VIDEO-HEAD_000.webp"
+        href="/sequence/hero-test/VIDEO-HEAD_000.webp" /* HEAD_VARIANT test; original: /sequence/hero/ */
         media="(min-width: 768px) and (min-aspect-ratio: 751/1000)"
         fetchPriority="high"
       />
       <link
         rel="preload"
         as="image"
-        href="/sequence/hero-720/VIDEO-HEAD_000.webp"
+        href="/sequence/hero-test-720/VIDEO-HEAD_000.webp" /* original: /sequence/hero-720/ */
         media="(max-width: 767px), (max-aspect-ratio: 3/4)"
         fetchPriority="high"
       />

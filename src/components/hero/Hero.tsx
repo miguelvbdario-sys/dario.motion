@@ -19,8 +19,21 @@ const Emblem = dynamic(() => import("./Emblem"), { ssr: false });
 /** Keep in sync with the media query in Hero.module.css and the preloads in page.tsx. */
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
-const HEAD_FRAMES = { first: 0, last: 85 };
+/**
+ * Which head sequence the hero uses. TEST: "NOVA SEQUENCIA CABEÇA" (66 frames,
+ * in /sequence/hero-test and hero-test-720). Set to "original" to go back.
+ * Keep in sync with HEAD_PRELOAD in src/app/page.tsx.
+ */
+export const HEAD_VARIANT: "original" | "test" = "test";
+const HEAD = {
+  original: { folder: "hero", last: 85 },
+  test: { folder: "hero-test", last: 65 },
+}[HEAD_VARIANT];
+
+const HEAD_FRAMES = { first: 0, last: HEAD.last };
 const ARROW_FRAMES = { first: 2, last: 85 };
+/** Head frame → arrow frame (the arrow keeps its 85 frames whatever the head length). */
+const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /** Scroll distance the hero stays pinned for, relative to the viewport height. */
 const PIN_DISTANCE = "+=110%";
 /** Drag this many px sideways to run through the whole head animation. */
@@ -95,7 +108,7 @@ export default function Hero() {
       if (!stage || !headCanvas.current || !arrowCanvas.current) return;
 
       // Phones get the lighter 720px frames.
-      const headFolder = window.matchMedia(COMPACT_QUERY).matches ? "hero-720" : "hero";
+      const headFolder = window.matchMedia(COMPACT_QUERY).matches ? `${HEAD.folder}-720` : HEAD.folder;
       const head = new FrameSequence({
         canvas: headCanvas.current,
         ...HEAD_FRAMES,
@@ -216,7 +229,7 @@ export default function Hero() {
         const render = () => {
           // The head follows view (scroll, or a drag); the arrow always follows scroll.
           view.scroll = playhead.frame;
-          arrow.draw(playhead.frame);
+          arrow.draw(Math.round(arrowFrame(playhead.frame)));
         };
         gsap
           .timeline({
