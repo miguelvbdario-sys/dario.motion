@@ -47,7 +47,7 @@ export type BroadcastProject = {
    */
   sections?: {
     label: string;
-    kind: "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "placeholder";
+    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "placeholder";
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
     /**
@@ -68,6 +68,18 @@ export type BroadcastProject = {
   videos?: { title: string; vimeo: string }[];
   /** "On air" strip: short loops of how it looked live. */
   onAir?: { src: string; poster: string }[];
+  /**
+   * "About the project" tab (first tab of every card): a short read for people
+   * scrolling fast. The Index (client / details / year) lives only here.
+   */
+  about?: {
+    lead: string;
+    points: { title: string; text: string }[];
+    stats?: { value: string; label: string }[];
+    /** Muted loops: mp4 + poster. */
+    loops?: { src: string; poster: string }[];
+    channels?: string[];
+  };
   /** Small extras (e.g. program vignettes), played with sound in the player. */
   extras?: { title: string; video: string; poster: string }[];
 };
@@ -94,9 +106,30 @@ export const BROADCAST: BroadcastProject[] = [
     role: "On air · HBO, TNT, Record, CazéTV",
     year: "2026",
     desc: "Official Paulistão 2026 broadcast assets",
+    about: {
+      lead: "The full on-screen graphics package of Paulistão 2026, live on four broadcasters.",
+      points: [
+        { title: "Scoreboard", text: "Built frame by frame for 16 clubs: plates, goals and a shield mode." },
+        { title: "Broadcast screens", text: "Line-ups, bracket, champion, final scoreboard and full time." },
+        { title: "Mascots & 3D", text: "A mascot per club breaking the goal, and a 3D trophy." },
+        { title: "Process", text: "Figma, Illustrator, After Effects and Blender, then installed for live." },
+      ],
+      stats: [
+        { value: "3", label: "Months" },
+        { value: "110", label: "Assets" },
+        { value: "16", label: "Clubs" },
+        { value: "6", label: "Member team" },
+      ],
+      loops: [
+        { src: "/broadcast/paulistao/live/scoreboard-2.mp4", poster: "/broadcast/paulistao/live/scoreboard-2.jpg" },
+        { src: "/broadcast/paulistao/screens/champion-live.mp4", poster: "/broadcast/paulistao/screens/champion-live.jpg" },
+      ],
+      channels: ["TNT", "HBO", "Record", "CazéTV"],
+    },
     filters: [], // the tabs below take their place
     fullVideo: null, // TODO: substituir
     sections: [
+      { label: "About the project", kind: "about" },
       // Loops: /public/broadcast/paulistao/live (cut from match highlights).
       { label: "Scoreboard", kind: "scoreboard", loops: [1, 2, 3, 4].map((n) => `/broadcast/paulistao/live/scoreboard-${n}`) },
       { label: "Shields", kind: "shields" },
@@ -164,6 +197,20 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2024",
     team: "Anderson Frade · Marcelo Pineschi",
     desc: "Development of LED screens for the official broadcast studios of the Paris 2024 Olympics, ensuring the alignment with the event's identity.",
+    about: {
+      lead: "LED screens for CazéTV's studios at Paris 2024, in the Games' identity.",
+      points: [
+        { title: "Studio screens", text: "Athlete, medal and ceremony packages for the studio LED walls." },
+        { title: "Templates", text: "A Paris template system the team fed live, all day." },
+        { title: "24h live", text: "On air around the clock during the Games." },
+        { title: "Programs", text: "Vignettes for Tamo em Paris and Partiu Paris." },
+      ],
+      loops: [
+        { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
+        { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
+      ],
+      channels: ["CazéTV"],
+    },
     filters: [],
     fullVideo: null,
     videos: [

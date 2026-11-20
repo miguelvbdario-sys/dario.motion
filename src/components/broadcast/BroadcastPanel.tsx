@@ -142,7 +142,8 @@ export default function BroadcastPanel({
   near: boolean;
   onPlay: (work: Work, origin: HTMLElement) => void;
 }) {
-  const [active, setActive] = useState(0); // chosen video / filter
+  // Chosen video / filter; -1 = the "About the project" tab (where cards open).
+  const [active, setActive] = useState(-1);
   const [tab, setTab] = useState(0); // chosen section
   /** Tab/screen content; its height change is animated (stretch/shrink). */
   const stack = useRef<HTMLDivElement>(null);
@@ -307,6 +308,59 @@ export default function BroadcastPanel({
     </div>
   );
 
+  /** "About the project": short read + loops + the Index; ends with the invitation. */
+  const ab = project.about;
+  const aboutEl = (
+    <div className={styles.about}>
+      <div className={styles.aboutMain}>
+        <p className={styles.aboutLead}>{ab?.lead ?? project.desc}</p>
+        {ab && (
+          <ul className={styles.aboutPoints}>
+            {ab.points.map((pt) => (
+              <li key={pt.title}>
+                <span className={styles.aboutPointTitle}>{pt.title}</span>
+                <span className={styles.aboutPointText}>{pt.text}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+        {ab?.loops && (
+          <div className={styles.aboutLoops}>
+            {ab.loops.map((l) => (
+              <div key={l.src} className={styles.loopCell}>
+                <Loop src={l.src} poster={l.poster} active={live} />
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className={styles.aboutSide}>
+        {ab?.stats && (
+          <dl className={styles.aboutStats}>
+            {ab.stats.map((st) => (
+              <div key={st.label}>
+                <dd>{st.value}</dd>
+                <dt>{st.label}</dt>
+              </div>
+            ))}
+          </dl>
+        )}
+        {index}
+        {ab?.channels && (
+          <div className={styles.aboutChannels}>
+            <span className={styles.sideLabel}>[ On air ]</span>
+            {ab.channels.map((c) => (
+              <span key={c} className={styles.processChannel}>
+                {c}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+      <p className={styles.aboutOutro}>This portfolio is interactive, enjoy, take your time and click on all!</p>
+    </div>
+  );
+
   const stackEl = sections ? (
         <div ref={stack} className={styles.boardStack}>
           {/* The scoreboard stays mounted (hidden) so its state survives tab
@@ -316,6 +370,7 @@ export default function BroadcastPanel({
               <BroadcastScoreboard active={open} />
             </div>
           )}
+          {kind === "about" && aboutEl}
           {kind === "shields" && <BroadcastShields active={live} />}
           {kind === "mascots" && <BroadcastMascots />}
           {kind === "process" && <BroadcastProcess active={live} />}
@@ -455,7 +510,7 @@ export default function BroadcastPanel({
           {/* Live examples. Scoreboard: left of the Index (the only tab with it).
               Screens: under the stage, in the right column. */}
           {loops && !(compact && kind === "screens") && (
-            <div className={kind === "screens" ? styles.screenLoops : styles.loopsRow}>
+            <div className={kind === "screens" ? styles.screenLoops : styles.loopsFull}>
               <div className={styles.loopsGrid}>
                 {loops.map((base) => (
                   <div key={base} className={styles.loopCell}>
@@ -463,10 +518,8 @@ export default function BroadcastPanel({
                   </div>
                 ))}
               </div>
-              {kind === "scoreboard" && !compact && index}
             </div>
           )}
-          {!loops && kind === "scoreboard" && !compact && index}
         </div>
   ) : null;
 
@@ -501,14 +554,29 @@ export default function BroadcastPanel({
   // (Paulistão: the scoreboard is always shown on phones, so it isn't a tab.)
   const accItems = sections
     ? sections.map((x, i) => ({ label: x.label, index: i })).filter((x) => sections[x.index].kind !== "scoreboard")
-    : videos
-      ? videos.map((v, i) => ({ label: v.title, index: i }))
-      : project.filters.length > 0
-        ? project.filters.map((f, i) => ({ label: f.label, index: i }))
-        : null;
+    : [
+        { label: "About the project", index: -1 },
+        ...(videos
+          ? videos.map((v, i) => ({ label: v.title, index: i }))
+          : project.filters.map((f, i) => ({ label: f.label, index: i }))),
+      ];
   const scoreSection = sections?.find((x) => x.kind === "scoreboard");
   const accActive = sections ? tab : active;
-  const accBody = sections ? stackEl : mediaPreview;
+  const scoreboardBlock = scoreSection ? (
+    <div className={`${styles.boardStack} ${styles.alwaysBoard}`}>
+      <BroadcastScoreboard active={open} />
+      {scoreSection.loops && (
+        <div className={styles.loopsGrid}>
+          {scoreSection.loops.map((base) => (
+            <div key={base} className={styles.loopCell}>
+              <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  ) : null;
+  const accBody = sections ? stackEl : active === -1 ? aboutEl : mediaPreview;
 
   return (
     <div className={styles.panel}>
@@ -532,24 +600,9 @@ export default function BroadcastPanel({
 
       {/* Tabs (sections), the video selector, or plain filters. */}
       {compact ? (
-        // Phones: the Index first, then the choices as vertical tabs; tap to open / close.
+        // Phones: vertical tabs (About first); the Paulistão scoreboard is always
+        // on, right after the About tab.
         <>
-          {index}
-          {scoreSection && (
-            // Always on: the interactive scoreboard and its live loops.
-            <div className={styles.boardStack}>
-              <BroadcastScoreboard active={open} />
-              {scoreSection.loops && (
-                <div className={styles.loopsGrid}>
-                  {scoreSection.loops.map((base) => (
-                    <div key={base} className={styles.loopCell}>
-                      <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
           {accItems ? (
             <div className={styles.accordion}>
               {accItems.map(({ label, index: i }, n) => {
@@ -588,6 +641,7 @@ export default function BroadcastPanel({
                         {accBody}
                       </AccBody>
                     )}
+                    {scoreSection && sections?.[i]?.kind === "about" && scoreboardBlock}
                   </div>
                 );
               })}
@@ -604,31 +658,24 @@ export default function BroadcastPanel({
           active={tab}
           onSelect={setTab}
         />
-      ) : videos ? (
-        <PillBar
-          label={`${project.title} videos`}
-          items={videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + 1)}]` }))}
-          active={active}
-          onSelect={setActive}
-        />
       ) : (
-        project.filters.length > 0 && (
-          <PillBar
-            label={`${project.title} categories`}
-            items={project.filters.map((f, i) => ({ key: String(i), label: f.label, count: f.count }))}
-            active={active}
-            onSelect={setActive}
-          />
-        )
+        <PillBar
+          label={`${project.title} tabs`}
+          items={[
+            { key: "about", label: "About the project", count: "[01]" },
+            ...(videos
+              ? videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + 2)}]` }))
+              : project.filters.map((f, i) => ({ key: String(i), label: f.label, count: f.count }))),
+          ]}
+          active={active + 1}
+          onSelect={(i) => setActive(i - 1)}
+        />
       )}
 
       {compact ? null : sections ? (
         stackEl
       ) : (
-        <div className={styles.mediaGrid}>
-          {mediaPreview}
-          {index}
-        </div>
+        active === -1 ? aboutEl : mediaPreview
       )}
 
       {/* How it looked live. */}

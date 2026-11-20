@@ -2233,3 +2233,205 @@
     aspect-ratio: 3 / 4;
   }
 }
+
+/* Row thumbnail with the card's loop: phones only, gone once the row is open. */
+.rowThumb {
+  display: none;
+}
+
+@media (max-width: 767px), (hover: none) {
+  .rowThumb {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: block;
+    width: 34%;
+    height: auto !important; /* a generic row-span rule sets 0 */
+    overflow: hidden;
+    border-radius: 4px;
+    background: #000;
+    transform: translateY(-50%);
+    transition: opacity 0.3s ease;
+  }
+
+  /* The video sets the box height (16:9). */
+  .rowThumb video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  /* Text keeps clear of the thumbnail. */
+  .row:has(.rowThumb) .content {
+    padding-right: calc(34% + 20px);
+  }
+
+  .row[data-open] .rowThumb {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .row[data-open]:has(.rowThumb) .content {
+    padding-right: 14px;
+  }
+}
+
+/* ---------- "About the project" tab ---------- */
+.about {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: calc(var(--s) * 24);
+  margin-top: calc(var(--s) * 20);
+}
+
+.aboutMain {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--s) * 20);
+}
+
+.aboutLead {
+  margin: 0;
+  max-width: 24ch;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 40);
+  font-weight: 700;
+  line-height: 1.02;
+  color: var(--ink);
+}
+
+.aboutPoints {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.aboutPoints li {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+}
+
+.aboutPointTitle {
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 18);
+  font-weight: 700;
+}
+
+.aboutPointText {
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 14);
+  line-height: 1.4;
+  color: rgb(239 238 238 / 0.7);
+}
+
+.aboutLoops {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.aboutSide {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aboutStats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+  margin: 0;
+}
+
+.aboutStats > div {
+  display: flex;
+  flex-direction: column-reverse;
+  padding: 10px 12px;
+  border-radius: 5px;
+  background: #111;
+}
+
+.aboutStats dd {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 34);
+  font-weight: 700;
+  line-height: 1;
+  color: #efeeee;
+}
+
+.aboutStats dt {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.55);
+}
+
+.aboutChannels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.aboutChannels .sideLabel {
+  grid-column: 1 / -1;
+  margin: 4px 0 2px;
+  color: #111;
+}
+
+.aboutChannels .processChannel {
+  text-align: center;
+}
+
+.aboutOutro {
+  grid-column: 1 / -1;
+  margin: calc(var(--s) * 8) 0 0;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s) * 22);
+  font-weight: 900;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+/* Scoreboard loops without the Index beside them: one row of four. */
+.loopsFull {
+  display: grid;
+}
+
+.loopsFull > .loopsGrid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .about {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .aboutLead {
+    font-size: 28px;
+  }
+
+  .aboutPoints {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .loopsFull > .loopsGrid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* The always-on scoreboard sits between the About tab and the next tabs. */
+  .alwaysBoard {
+    margin: 8px 0 0;
+  }
+}

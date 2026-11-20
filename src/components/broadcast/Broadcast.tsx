@@ -414,6 +414,12 @@ export default function Broadcast() {
                 onClick={() => toggle(project)}
               >
                 <RowContent project={project} />
+                {/* Phones: the card's loop on the right of the row (hidden once it's open). */}
+                {project.preview && (
+                  <span className={styles.rowThumb} aria-hidden="true">
+                    <video src={project.preview} poster={project.img ?? undefined} muted loop playsInline autoPlay preload="metadata" />
+                  </span>
+                )}
                 <span className={styles.bar} data-bar="top" aria-hidden="true">
                   <RowContent project={project} black />
                 </span>
