@@ -36,15 +36,17 @@ const PIN_DISTANCE = "+=110%";
 const DRAG_DISTANCE = 600;
 /**
  * Desktop mouse zones. PLAY_FPS: playback speed (the sequence's own frame
- * rate). FOLLOW_DEAD_ZONE: half-width of the centre (rest) zone, in screen
- * units where −1 = left edge and 1 = right edge.
+ * rate).
  */
 const PLAY_FPS = 30;
 /** Playing back to rest runs this many times faster than PLAY_FPS. */
-const RETURN_SPEED = 1.6;
-const FOLLOW_DEAD_ZONE = 0.12;
-/** Where the centre rest zone sits: −1 = left edge, 0 = middle, 1 = right edge. */
-const FOLLOW_CENTER = 0;
+const RETURN_SPEED = 2.6;
+/**
+ * Centre (rest) zone = the character's width on screen: its horizontal extent
+ * in the rest frame, as fractions of the head canvas (measured 0.247 → 0.771).
+ * Lower `from` / higher `to` widens it.
+ */
+const REST_ZONE = { from: 0.247, to: 0.771 };
 /**
  * "Look" sequence (/sequence/hero-look and hero-look-720): one render, files
  * 000–098 = the source frames 023–121. rest = the rest pose (source frame 72);
@@ -224,10 +226,15 @@ export default function Hero() {
       // to rest. Own frame rate forward, RETURN_SPEED× back. Going straight to
       // the other side passes through rest, so it never jumps.
       const followMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-      /** −1 (left edge) … 0 (centre / mouse away) … 1 (right edge). */
+      /** Mouse zone: −1 left of the character, 0 over it (or away), 1 right of it. */
       let mouseX = 0;
       const onWindowMove = (e: PointerEvent) => {
-        if (e.pointerType === "mouse") mouseX = (e.clientX / window.innerWidth) * 2 - 1;
+        if (e.pointerType !== "mouse") return;
+        // −1 left of the character, 0 over it, 1 right of it.
+        const r = headCanvas.current?.getBoundingClientRect();
+        if (!r) return;
+        const t = (e.clientX - r.left) / r.width;
+        mouseX = t < REST_ZONE.from ? -1 : t > REST_ZONE.to ? 1 : 0;
       };
       const onWindowLeave = () => (mouseX = 0);
 
@@ -242,8 +249,7 @@ export default function Hero() {
           offset = offset < target ? Math.min(target, offset + s) : Math.max(target, offset - s);
         };
         if (followMouse) {
-          const d = mouseX - FOLLOW_CENTER;
-          const zone = d > FOLLOW_DEAD_ZONE ? 1 : d < -FOLLOW_DEAD_ZONE ? -1 : 0;
+          const zone = mouseX;
           const target = zone === 1 ? -maxRight : zone === -1 ? maxLeft : 0;
           // Switching sides: back to rest first (same sign rule as toward()).
           toward(Math.sign(target) !== Math.sign(offset) && offset !== 0 ? 0 : target);
