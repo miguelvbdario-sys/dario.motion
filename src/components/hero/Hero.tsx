@@ -37,7 +37,11 @@ const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /** Scroll distance the hero stays pinned for, relative to the viewport height. */
 const PIN_DISTANCE = "+=110%";
 /** Drag this many px sideways to run through the whole head animation. */
-const DRAG_DISTANCE = 300;
+const DRAG_DISTANCE = 600;
+/** Drag this many px RIGHT to run through the whole look-right sequence. */
+const DRAG_DISTANCE_RIGHT = 300;
+/** "Look right" sequence (/sequence/hero-right and hero-right-720), drag right only. */
+const RIGHT_FRAMES = { first: 0, last: 37 };
 /** How quickly the head rewinds to the scroll frame after a drag (per second). */
 const RETURN_RATE = 4.5;
 
@@ -71,6 +75,7 @@ export default function Hero() {
   const root = useRef<HTMLElement>(null);
   const headCanvas = useRef<HTMLCanvasElement>(null);
   const arrowCanvas = useRef<HTMLCanvasElement>(null);
+  const rightCanvas = useRef<HTMLCanvasElement>(null);
   const title = useRef<HTMLHeadingElement>(null);
   const headSequence = useRef<FrameSequence | null>(null);
   const scanCanvas = useRef<HTMLCanvasElement>(null);
@@ -121,12 +126,29 @@ export default function Hero() {
         url: (frame) => `/sequence/arrow/SETA_${pad(frame)}.webp`,
       });
 
+      // "Look right" sequence (drag right only), on its own canvas over the head.
+      const rightEl = rightCanvas.current;
+      const right = rightEl
+        ? new FrameSequence({
+            canvas: rightEl,
+            ...RIGHT_FRAMES,
+            url: (frame) => `/sequence/${headFolder.replace(HEAD.folder, "hero-right")}/HEAD-RIGHT_${pad(frame)}.webp`,
+          })
+        : null;
+      const rightSpan = RIGHT_FRAMES.last - RIGHT_FRAMES.first;
+
       // ---------- Drag the character to scrub its frames ----------
-      // A short horizontal drag runs through the whole animation (left =
-      // forward, right = back, bouncing endlessly at both ends). On release
-      // the figure rewinds (or fast-forwards) to the frame that matches the
-      // page scroll.
-      const view = { scroll: HEAD_FRAMES.first, display: HEAD_FRAMES.first, mode: "scroll" as "scroll" | "drag" | "return" };
+      // Drag LEFT: the main head animation plays forward from where it is.
+      // Drag RIGHT: the "look right" sequence plays instead (never on scroll).
+      // On release both ease back: the look-right rewinds to its start, then
+      // the head returns to the frame that matches the page scroll.
+      const view = {
+        scroll: HEAD_FRAMES.first,
+        display: HEAD_FRAMES.first,
+        mode: "scroll" as "scroll" | "drag" | "return",
+        /** Frame of the look-right sequence; > 0 means it is on screen. */
+        right: 0,
+      };
       const span = HEAD_FRAMES.last - HEAD_FRAMES.first;
       let dragStartX = 0;
       let dragStartY = 0;
@@ -189,13 +211,18 @@ export default function Hero() {
           startDrag(e);
         }
         if (e.pointerId !== dragId) return;
-        // Drag LEFT plays forward, RIGHT rewinds.
-        const raw = dragStartFrame - HEAD_FRAMES.first - ((e.clientX - dragStartX) / DRAG_DISTANCE) * span;
-        // Ping-pong, endless: past the last frame it plays back, past the first
-        // it plays forward again (a triangle wave over the frame range).
-        const period = span * 2;
-        const p = ((raw % period) + period) % period;
-        view.display = HEAD_FRAMES.first + (p > span ? period - p : p);
+        const dx = e.clientX - dragStartX;
+        if (dx <= 0) {
+          // LEFT: main animation forward; past the end it resists a little.
+          view.right = 0;
+          let frame = dragStartFrame + (-dx / DRAG_DISTANCE) * span;
+          if (frame > HEAD_FRAMES.last) frame = HEAD_FRAMES.last + (frame - HEAD_FRAMES.last) * 0.15;
+          view.display = frame;
+        } else {
+          // RIGHT: the look-right sequence, held on its last frame at the end.
+          view.display = dragStartFrame;
+          view.right = Math.min(rightSpan, (dx / DRAG_DISTANCE_RIGHT) * rightSpan);
+        }
       };
       const onUp = (e: PointerEvent) => {
         if (e.pointerId === pendingId) pendingId = -1;
@@ -209,11 +236,22 @@ export default function Hero() {
         const dt = Math.min(deltaMs / 1000, 0.1);
         if (view.mode === "scroll") view.display = view.scroll;
         else if (view.mode === "return") {
-          // Rewind toward the scroll frame: fast at first, settling at the end.
-          view.display += (view.scroll - view.display) * (1 - Math.exp(-dt * RETURN_RATE));
-          if (Math.abs(view.scroll - view.display) < 0.4) view.mode = "scroll";
+          const k = 1 - Math.exp(-dt * RETURN_RATE);
+          if (view.right > 0) {
+            // First the look-right rewinds to its start…
+            view.right -= view.right * k + dt * 6;
+            if (view.right < 0.5) view.right = 0;
+          } else {
+            // …then the head eases to the scroll frame.
+            view.display += (view.scroll - view.display) * k;
+            if (Math.abs(view.scroll - view.display) < 0.4) view.mode = "scroll";
+          }
         }
-        head.draw(Math.min(HEAD_FRAMES.last, Math.max(HEAD_FRAMES.first, view.display)));
+        const showRight = !!right && view.right > 0;
+        if (showRight) right.draw(Math.round(RIGHT_FRAMES.first + view.right));
+        else head.draw(Math.min(HEAD_FRAMES.last, Math.max(HEAD_FRAMES.first, view.display)));
+        if (rightEl) rightEl.style.visibility = showRight ? "visible" : "hidden";
+        if (headCanvas.current) headCanvas.current.style.visibility = showRight ? "hidden" : "visible";
       };
 
       stage.addEventListener("pointerdown", onDown);
@@ -281,6 +319,7 @@ export default function Hero() {
         head.destroy();
         headSequence.current = null;
         arrow.destroy();
+        right?.destroy();
       };
     },
     { scope: root },
@@ -336,6 +375,9 @@ export default function Hero() {
             aria-label="Pixel-art portrait of Miguel Dario that turns as you scroll"
             data-head
           />
+          {/* "Look right" sequence: only shown while dragging the character to the right. */}
+          <canvas ref={rightCanvas} className={styles.head} aria-hidden="true" style={{ visibility: "hidden" }} />
+
 
           <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal>
             <Emblem id="left" src="/3d/emblem-left.gltf" label="Chrome 3D pig emblem" speed={0.75} />
