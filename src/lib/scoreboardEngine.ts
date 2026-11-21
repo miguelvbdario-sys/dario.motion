@@ -156,12 +156,20 @@ export class ScoreboardEngine {
       this.outAfterShield = false;
       this.shieldDir = 1;
     }
+    this.outQueued = false;
     this.direction = 1;
     this.setStatus("in");
   }
 
+  /** OUT pressed during a goal: it runs once the goal animation has finished. */
+  private outQueued = false;
+
   playOut() {
     if (this.status === "hidden" || this.status === "out") return;
+    if (this.goal) {
+      this.outQueued = true;
+      return;
+    }
     this.setStatus("out");
     if (this.shieldFrame > 0) {
       // Shield first, reversed; the base starts its out when it reaches frame 0.
@@ -183,6 +191,7 @@ export class ScoreboardEngine {
     this.shieldFrame = 0;
     this.shieldDir = 0;
     this.outAfterShield = false;
+    this.outQueued = false;
     this.dirty = true;
     this.setStatus("hidden");
   }
@@ -303,7 +312,13 @@ export class ScoreboardEngine {
         this.goal.scored = true;
         this.score[this.goal.side] += 1;
       }
-      if (this.goal.frame >= this.goal.last) this.goal = null;
+      if (this.goal.frame >= this.goal.last) {
+        this.goal = null;
+        if (this.outQueued) {
+          this.outQueued = false;
+          this.playOut();
+        }
+      }
       this.dirty = true;
     }
 
