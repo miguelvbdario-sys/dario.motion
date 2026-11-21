@@ -191,10 +191,21 @@
 /* Phones: the close button stays on screen (fixed top-right), and a 9:16 video
    is sized to fit the screen height instead of running past it. */
 @media (max-width: 899px) {
+  /* The close button sits in its own row above the video (a fixed button
+     would follow the animated, transformed frame and land on the video). The
+     player scrolls when video + Index are taller than the screen. */
+  .player[open] {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding: max(12px, env(safe-area-inset-top)) 0 24px;
+  }
+
+  .playerHeader {
+    justify-content: flex-end;
+  }
+
   .playerClose {
-    position: fixed;
-    top: max(12px, env(safe-area-inset-top));
-    right: 12px;
+    position: relative;
     z-index: 10;
   }
 
