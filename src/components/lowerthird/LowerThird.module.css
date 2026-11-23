@@ -41,7 +41,8 @@
 .tag {
   gap: 7px;
   padding: 6px 10px;
-  background: #e60000;
+  /* A shade deeper than the site red so the small white text passes AA (5:1). */
+  background: #c20000;
   color: #efeeee;
   font-family: var(--font-jetbrains), ui-monospace, monospace;
   font-size: 11px;
