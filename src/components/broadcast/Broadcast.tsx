@@ -9,7 +9,7 @@ import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
 import Marquee from "@/components/marquee/Marquee";
 import ScrollType from "@/components/effects/ScrollType";
-import { onScrollFrame, progress } from "@/components/effects/scrollFx";
+import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -177,12 +177,22 @@ export default function Broadcast() {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const easeOut = (t: number) => 1 - (1 - t) ** 3;
     const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+    // Phones: a longer range and a short glide, so finger jumps don't stutter.
+    const touch = isTouchLayout();
+    const SPAN = touch ? 0.5 : 0.36;
+    const K = touch ? SMOOTH_TOUCH : 1;
+    const cur = new Map<HTMLElement, number>();
     return onScrollFrame((vh) => {
+      let moving = false;
       rows.current.forEach((row) => {
         if (!row) return;
         const top = row.getBoundingClientRect().top;
-        // 0 when the row's top is at 98% of the screen, 1 at 62%.
-        const t = row.dataset.open !== undefined ? 1 : progress(vh * 0.98 - top, 0, vh * 0.36);
+        // 0 when the row's top is at 98% of the screen, 1 at 98% − SPAN.
+        const target = row.dataset.open !== undefined ? 1 : progress(vh * 0.98 - top, 0, vh * SPAN);
+        // An open row shows at once (no glide).
+        const t = row.dataset.open !== undefined ? 1 : glide(cur.get(row) ?? target, target, K);
+        cur.set(row, t);
+        if (t !== target) moving = true;
         if (t >= 1) {
           if (row.dataset.rv !== undefined) {
             delete row.dataset.rv;
@@ -195,6 +205,7 @@ export default function Broadcast() {
         row.style.setProperty("--a", easeOut(progress(t, 0, 0.55)).toFixed(4));
         row.style.setProperty("--b", easeInOut(progress(t, 0.45, 1)).toFixed(4));
       });
+      return moving;
     });
   }, []);
 

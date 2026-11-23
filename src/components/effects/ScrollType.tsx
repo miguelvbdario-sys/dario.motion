@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { onScrollFrame, progress } from "./scrollFx";
+import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "./scrollFx";
 import styles from "./ScrollType.module.css";
 
 /*
@@ -24,20 +24,34 @@ export default function ScrollType({ text, index, dir = 1 }: { text: string; ind
     const el = root.current;
     if (!el) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.style.setProperty("--p", "0.5");
+      el.setAttribute("data-lit", "");
       return;
     }
-    let last = -1;
+    const track = el.querySelector<HTMLElement>("[data-track]");
+    const line = el.querySelector<HTMLElement>("[data-line]");
+    // Phones: a short glide so finger jumps don't stutter (desktop copies the scroll).
+    const K = isTouchLayout() ? SMOOTH_TOUCH : 1;
+    let cur = -1;
+    let lit = false;
     return onScrollFrame((vh) => {
       const r = el.getBoundingClientRect();
-      if (r.bottom < -200 || r.top > vh + 200) return;
+      if (r.bottom < -200 || r.top > vh + 200) {
+        cur = -1;
+        return;
+      }
       // 0 when its top enters at the bottom of the screen, 1 when its bottom leaves at the top.
-      const p = progress(vh - r.top, 0, vh + r.height);
-      if (Math.abs(p - last) < 0.0005) return;
-      last = p;
-      el.style.setProperty("--p", p.toFixed(4));
-      el.style.setProperty("--x", `${((0.5 - p) * SHIFT * dir).toFixed(3)}vw`);
-      el.toggleAttribute("data-lit", p > 0.32);
+      const target = progress(vh - r.top, 0, vh + r.height);
+      const p = cur < 0 ? target : glide(cur, target, K);
+      if (p === cur) return false;
+      cur = p;
+      // Written straight to transform (no CSS variables): only the compositor works.
+      if (track) track.style.transform = `translate3d(calc(-25% + ${((0.5 - p) * SHIFT * dir).toFixed(3)}vw), 0, 0)`;
+      if (line) line.style.transform = `scaleX(${p.toFixed(4)})`;
+      if (p > 0.32 !== lit) {
+        lit = p > 0.32;
+        el.toggleAttribute("data-lit", lit);
+      }
+      return p !== target;
     });
   }, [dir]);
 
@@ -47,14 +61,14 @@ export default function ScrollType({ text, index, dir = 1 }: { text: string; ind
         <span className={styles.dot} />
         {index} — {text}
       </span>
-      <div className={styles.track}>
+      <div className={styles.track} data-track>
         {Array.from({ length: COPIES }, (_, i) => (
           <span key={i} className={styles.word}>
             {text}
           </span>
         ))}
       </div>
-      <span className={styles.line} />
+      <span className={styles.line} data-line />
     </div>
   );
 }

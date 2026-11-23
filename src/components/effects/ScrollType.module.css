@@ -13,9 +13,10 @@
 .track {
   display: flex;
   width: max-content;
-  /* One copy to the left, so there is always text on both sides; --x is the scroll travel. */
-  translate: calc(-25% + var(--x, 0vw)) 0;
-  will-change: translate;
+  /* One copy to the left, so there is always text on both sides (ScrollType.tsx adds the travel). */
+  transform: translate3d(-25%, 0, 0);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
 .word {
@@ -81,7 +82,8 @@
   height: 2px;
   background: #e60000;
   transform-origin: left;
-  scale: var(--p, 0) 1;
+  transform: scaleX(0);
+  will-change: transform;
 }
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
