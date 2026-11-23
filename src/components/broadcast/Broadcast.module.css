@@ -41,6 +41,10 @@
   display: flex;
   flex-direction: column;
   gap: 6px;
+  /* The rows stop growing at --s 1.25: past that the list keeps the 1440
+     composition (1312 wide) and centres, with more room at the sides. */
+  max-width: calc(var(--s) * 1312);
+  margin-inline: auto;
 }
 
 .row {
@@ -62,7 +66,8 @@
 
 .row[data-align="left"] {
   align-self: flex-start;
-  margin-left: calc(var(--u) * var(--offset, 0));
+  /* Same scale as the rows (--s), so the zig-zag keeps its shape on wide screens. */
+  margin-left: calc(var(--s) * var(--offset, 0) * 0.75);
 }
 
 .row[data-align="right"] {
