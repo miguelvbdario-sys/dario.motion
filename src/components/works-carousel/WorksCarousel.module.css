@@ -11,7 +11,7 @@
   /* Space above / below the carousel (between sections). */
   /* Top: the wall keeps room above the panels (hover zoom); pulled up under the giant title. */
   padding: 0 0 clamp(96px, 10vw, 200px);
-  margin-block-start: calc(clamp(200px, 22vw, 520px) * -0.3);
+  margin-block-start: calc(clamp(200px, 22vw, 520px) * -0.1);
   overflow: hidden;
   background: transparent;
 }
