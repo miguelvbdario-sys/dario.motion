@@ -2743,6 +2743,6 @@
 /* Phones: the character hangs over the strip into the black, so more room before the first card. */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .marqueeWrap {
-    margin-bottom: 84px;
+    margin-bottom: 110px;
   }
 }

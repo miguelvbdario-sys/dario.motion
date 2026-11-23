@@ -739,5 +739,7 @@
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .head {
     pointer-events: auto;
+    /* The empty bottom of the square canvas must not catch taps meant for the cards below. */
+    clip-path: inset(0 0 22% 0);
   }
 }
