@@ -624,3 +624,45 @@
 .nav {
   translate: 0 calc(var(--p, 0) * var(--shift) * -0.12);
 }
+
+/*
+ * Red hero: the site red (#E60000, the Broadcast cards / About sheet) as the
+ * background, the name in black, black pills (white on hover) and a black
+ * flashlight following the mouse instead of the lit room.
+ */
+.bg {
+  background: #e60000;
+}
+
+/* The breathing core becomes a soft shadow that swells and drifts. */
+.bgCore {
+  background: radial-gradient(48% 58% at 34% 64%, rgb(0 0 0 / 0.18) 0%, rgb(0 0 0 / 0.06) 55%, transparent 100%);
+}
+
+/* Flashlight: a black beam following the mouse. */
+.bgFollow {
+  background: radial-gradient(24vmax 24vmax at var(--gx, 34%) var(--gy, 64%), rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.25) 45%, transparent 100%);
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.title {
+  color: #000;
+}
+
+/* Hovered letter: bone instead of the old orange (which vanished on red). */
+.letter[data-active] {
+  color: var(--color-bone);
+}
+
+.pill {
+  background: #000;
+  color: var(--color-bone);
+}
+
+@media (hover: hover) {
+  .pill:hover {
+    background: var(--color-bone);
+    color: #000;
+  }
+}
