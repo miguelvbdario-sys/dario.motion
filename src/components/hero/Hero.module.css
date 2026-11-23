@@ -604,8 +604,19 @@
  *   pills     slightly faster
  * Reduced motion: no scrub, so --p stays 0 and nothing moves.
  */
+.stage {
+  /* Parallax depth: the old travel distance (the hero is no longer pinned, so --shift is 0). */
+  --para: calc(var(--u) * 430);
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .stage {
+    --para: calc(var(--u) * 330);
+  }
+}
+
 .title {
-  translate: 0 calc(var(--p, 0) * var(--shift) * 0.28);
+  translate: 0 calc(var(--p, 0) * var(--para) * 0.28);
 }
 
 .title > span:first-child {
@@ -617,12 +628,12 @@
 }
 
 .emblem {
-  translate: 0 calc(var(--p, 0) * var(--shift) * -0.35);
+  translate: 0 calc(var(--p, 0) * var(--para) * -0.35);
   scale: calc(1 + var(--p, 0) * 0.14);
 }
 
 .nav {
-  translate: 0 calc(var(--p, 0) * var(--shift) * -0.12);
+  translate: 0 calc(var(--p, 0) * var(--para) * -0.12);
 }
 
 /*
@@ -746,7 +757,7 @@
 
 /*
  * Desktop, same idea as phones: the hero is no longer pinned and is shorter.
- * The pills sit in one row at the top, above the name; the red ends a little
+ * The pills stay where they were (left, stacked); the red ends a little
  * above the character's hands, so the character hangs over the white strip
  * below (as if coming out of the screen). Design px at 1920.
  */
@@ -764,18 +775,6 @@
     clip-path: inset(7.4% 0);
   }
 
-  .nav {
-    top: calc(var(--u) * 96);
-    left: 0;
-    right: 0;
-    flex-direction: row;
-    justify-content: center;
-    gap: calc(var(--u) * 14);
-  }
-
-  .arrow {
-    display: none;
-  }
 
   /* Truly black flashlight on desktop. */
   .bgFollow {
