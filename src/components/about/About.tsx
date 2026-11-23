@@ -23,10 +23,10 @@ export default function About() {
 
       {/* The name as a frame: MIGUEL cut by the top edge, DARIO by the bottom
           one, inside the section's padding so it never reaches the text. */}
-      <p className={`${styles.frame} ${styles.frameTop}`} aria-hidden="true">
+      <p className={`${styles.frame} ${styles.frameTop}`} data-frame aria-hidden="true">
         Miguel
       </p>
-      <p className={`${styles.frame} ${styles.frameBot}`} aria-hidden="true">
+      <p className={`${styles.frame} ${styles.frameBot}`} data-frame aria-hidden="true">
         Dario
       </p>
 

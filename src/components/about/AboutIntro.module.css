@@ -3,12 +3,18 @@
 .track {
   position: relative;
   z-index: 2;
-  /* One screen + a short hold (20vh); the cuts also run while it comes up. */
-  height: 120vh;
+  /* One screen + the hold (60vh); the cuts already run while it comes up. */
+  height: 160vh;
   /* The last screen overlaps ABOUT: when the screen lets go it sits exactly
      on top of it, so the transition can hand over without a gap. */
   margin-bottom: -100vh;
   pointer-events: none;
+}
+
+/* After the hand-over: the part of the track above ABOUT (not the screen
+   that overlaps it) is red, so no black band shows above the section. */
+.track[data-red] {
+  background: linear-gradient(#e60000, #e60000) top / 100% calc(100% - 100vh) no-repeat;
 }
 
 .stage {
@@ -65,8 +71,12 @@
   will-change: transform;
 }
 
+/* Placed by AboutIntro.tsx (translate + scale from the top-left corner). */
 .half {
   z-index: 4;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
   color: var(--color-bone);
   visibility: hidden;
   will-change: transform;

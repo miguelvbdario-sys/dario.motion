@@ -280,45 +280,7 @@
 }
 
 /*
- * Entrance (AboutIntro sets data-armed, then data-in when its transition
- * ends): label, photo and text slide in from the right and fade in, one after
- * the other; the name frame slides in from the edges.
+ * Entrance: AboutIntro.tsx drives it with the scroll (the photo and texts
+ * slide in from the right, the frame lines take over from the transition's
+ * MIGUEL / DARIO). Nothing here, so without JS everything simply shows.
  */
-.section[data-armed] [data-enter],
-.section[data-armed] .frame {
-  opacity: 0;
-  transition:
-    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
-    translate 1.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.section[data-armed] [data-enter] {
-  /* Distance they travel from the right. */
-  translate: 180px 0;
-  transition-delay: calc(var(--i, 0) * 0.1s);
-}
-
-.section[data-armed] .frameTop {
-  translate: -50% -100%;
-}
-
-.section[data-armed] .frameBot {
-  translate: -50% 100%;
-}
-
-.section[data-armed][data-in] [data-enter] {
-  opacity: 1;
-  translate: 0 0;
-}
-
-.section[data-armed][data-in] .frame {
-  opacity: 1;
-}
-
-.section[data-armed][data-in] .frameTop {
-  translate: -50% calc(var(--frame-y) * -1);
-}
-
-.section[data-armed][data-in] .frameBot {
-  translate: -50% var(--frame-y);
-}
