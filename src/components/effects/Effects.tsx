@@ -85,11 +85,24 @@ export default function Effects() {
     // ([data-scramble], plus the mono side labels): random glyphs that settle
     // left to right in SCRAMBLE_MS.
     const running = new WeakSet<Element>();
-    const scramble = (el: HTMLElement) => {
-      if (running.has(el) || el.childElementCount > 0) return;
-      const final = el.textContent ?? "";
-      if (!final.trim()) return;
-      running.add(el);
+    // Each element keeps its width while it scrambles (the random glyphs are
+    // wider or narrower than the real letters and would shake the layout).
+    // Copies with the same text (the white and black row titles) share one
+    // animation, so they always show the same glyphs.
+    const scramble = (els: HTMLElement[]) => {
+      els = els.filter((el) => !running.has(el) && el.childElementCount === 0 && el.textContent?.trim());
+      if (!els.length) return;
+      const final = els[0].textContent ?? "";
+      const saved = els.map((el) => {
+        const w = el.getBoundingClientRect().width;
+        const prev = { display: el.style.display, width: el.style.width, whiteSpace: el.style.whiteSpace, overflow: el.style.overflow };
+        if (getComputedStyle(el).display === "inline") el.style.display = "inline-block";
+        el.style.width = w + "px";
+        el.style.whiteSpace = "nowrap";
+        el.style.overflow = "hidden";
+        running.add(el);
+        return prev;
+      });
       const start = performance.now();
       const step = (t: number) => {
         const p = Math.min(1, (t - start) / SCRAMBLE_MS);
@@ -99,12 +112,13 @@ export default function Effects() {
           const c = final[i];
           out += " []:·/".includes(c) ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
         }
-        el.textContent = out;
+        els.forEach((el) => (el.textContent = p < 1 ? out : final));
         if (p < 1) requestAnimationFrame(step);
-        else {
-          el.textContent = final;
-          running.delete(el);
-        }
+        else
+          els.forEach((el, i) => {
+            Object.assign(el.style, saved[i]);
+            running.delete(el);
+          });
       };
       requestAnimationFrame(step);
     };
@@ -117,7 +131,13 @@ export default function Effects() {
       const targets = host.matches(SCRAMBLE_SELECTOR)
         ? [host]
         : [...host.querySelectorAll<HTMLElement>(SCRAMBLE_SELECTOR)];
-      targets.forEach(scramble);
+      // Group by text, so identical copies scramble together.
+      const groups = new Map<string, HTMLElement[]>();
+      targets.forEach((el) => {
+        const k = el.textContent ?? "";
+        groups.set(k, [...(groups.get(k) ?? []), el]);
+      });
+      groups.forEach(scramble);
     };
     const onOut = (e: PointerEvent) => {
       if (lastHost && !(e.relatedTarget instanceof Node && lastHost.contains(e.relatedTarget))) lastHost = null;
