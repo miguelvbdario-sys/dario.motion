@@ -9,7 +9,10 @@ import styles from "./About.module.css";
  */
 export default function About() {
   return (
-    <section id="about" className={styles.section} aria-labelledby="about-lead">
+    <section id="about" className={styles.section} aria-labelledby="about-title">
+      <h2 id="about-title" className={styles.srOnly}>
+        About
+      </h2>
       <div className={styles.guides} aria-hidden="true">
         <span />
         <span />

@@ -59,11 +59,9 @@
 .script {
   --script-size: calc(var(--s) * 380);
   --script-x: -54%;
-  /* Black on the left fading to 0% on the right (where the text sits). */
-  background: linear-gradient(to right, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.4) 45%, rgb(0 0 0 / 0) 90%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  /* Solid black, faded out towards the text on the right with a mask (no gradient text). */
+  -webkit-mask-image: linear-gradient(to right, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.4) 45%, transparent 90%);
+  mask-image: linear-gradient(to right, rgb(0 0 0 / 0.9) 0%, rgb(0 0 0 / 0.4) 45%, transparent 90%);
   position: absolute;
   z-index: 0;
   top: 95%;
@@ -205,4 +203,14 @@
   .body {
     font-size: 17px;
   }
+}
+
+/* Section title for screen readers (the page shows no visible title here). */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
