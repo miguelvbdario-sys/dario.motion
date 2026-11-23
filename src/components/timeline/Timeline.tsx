@@ -55,18 +55,35 @@ export default function Timeline() {
 
   useEffect(() => {
     let max = 1;
+    let lastAts = "";
+    let shownNow = false;
+    let pastNow = false;
     // Section positions as a fraction of the scrollable height (the hero pin
-    // adds a spacer, so they are measured from the live layout).
+    // adds a spacer, so they are measured from the live layout). Only re-renders
+    // when a marker really moved.
     const measure = () => {
       max = Math.max(1, document.documentElement.scrollHeight - window.innerHeight);
-      setMarks(
-        SECTIONS.flatMap((s) => {
-          const el = document.getElementById(s.id);
-          if (!el) return [];
-          const top = el.getBoundingClientRect().top + window.scrollY;
-          return [{ ...s, at: Math.min(1, Math.max(0, top / max)) }];
-        }),
-      );
+      const next = SECTIONS.flatMap((s) => {
+        const el = document.getElementById(s.id);
+        if (!el) return [];
+        const top = el.getBoundingClientRect().top + window.scrollY;
+        return [{ ...s, at: Math.round(Math.min(1, Math.max(0, top / max)) * 1000) / 1000 }];
+      });
+      const key = next.map((m) => m.at).join();
+      if (key !== lastAts) {
+        lastAts = key;
+        setMarks(next);
+      }
+    };
+    // Height tweens (cards, accordions) resize the body every frame: measure at most once a frame.
+    let measureRaf = 0;
+    const measureSoon = () => {
+      if (measureRaf) return;
+      measureRaf = requestAnimationFrame(() => {
+        measureRaf = 0;
+        measure();
+        update();
+      });
     };
     const update = () => {
       const y = window.scrollY;
@@ -74,21 +91,21 @@ export default function Timeline() {
       if (head.current) head.current.style.setProperty("--p", String(p));
       if (fill.current) fill.current.style.setProperty("--p", String(p));
       if (tc.current) tc.current.textContent = timecode(y / FRAME_PX);
-      setShown(y > SHOW_AFTER);
-      setPast(y > window.innerHeight * 1.2);
+      const s = y > SHOW_AFTER;
+      const pa = y > window.innerHeight * 1.2;
+      if (s !== shownNow) setShown((shownNow = s));
+      if (pa !== pastNow) setPast((pastNow = pa));
     };
     measure();
     update();
-    const ro = new ResizeObserver(() => {
-      measure();
-      update();
-    });
+    const ro = new ResizeObserver(measureSoon);
     ro.observe(document.body);
     window.addEventListener("scroll", update, { passive: true });
     // Late layout changes (fonts, the hero pin) settle after load.
     const t = setTimeout(measure, 1500);
     return () => {
       ro.disconnect();
+      cancelAnimationFrame(measureRaf);
       window.removeEventListener("scroll", update);
       clearTimeout(t);
     };
@@ -99,7 +116,7 @@ export default function Timeline() {
     if (!el) return;
     const l = lenis();
     if (l) l.scrollTo(id === "hero" ? 0 : el, { duration: 1.4 });
-    else el.scrollIntoView({ behavior: "smooth" });
+    else el.scrollIntoView({ behavior: "auto" });
   };
 
   return (

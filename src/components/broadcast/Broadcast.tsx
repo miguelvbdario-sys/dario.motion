@@ -110,8 +110,27 @@ export default function Broadcast() {
   const [mounted, setMounted] = useState<Set<string>>(() => new Set());
   const [playing, setPlaying] = useState<Work | null>(null);
   const opener = useRef<HTMLElement | null>(null);
+  /** Pending glitch timeouts, per card (cleared when it closes or reopens). */
+  const glitchTimers = useRef<number[]>([]);
   /** Row thumbnails (phones): not rendered on desktop, so their videos never download there. */
   const thumbs = useThumbs();
+  // Thumbnails load and play only while their row is on screen (they used to
+  // download with the page and hold up the first paint on phones).
+  useEffect(() => {
+    if (!thumbs || !list.current) return;
+    const vids = list.current.querySelectorAll<HTMLVideoElement>(`.${styles.rowThumb} video`);
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          const v = e.target as HTMLVideoElement;
+          if (e.isIntersecting) v.play().catch(() => {});
+          else v.pause();
+        }),
+      { rootMargin: "100px 0px" },
+    );
+    vids.forEach((v) => io.observe(v));
+    return () => io.disconnect();
+  }, [thumbs]);
 
   const openRef = useRef<string | null>(null);
   const hovered = useRef(-1);
@@ -328,21 +347,28 @@ export default function Broadcast() {
         if (inner) gsap.fromTo(inner, { opacity: isOpen ? 0 : 1 }, { opacity: isOpen ? 1 : 0, duration: 0.3 });
         return;
       }
+      // Interruptible: a card reopened while it is still closing (or the other
+      // way round) carries on from where it is, never snapping back to 0.
+      const timers = glitchTimers.current;
+      clearTimeout(timers[i]);
+      delete wrap.dataset.glitch;
       if (isOpen) {
-        gsap.fromTo(wrap, { height: 0 }, { height: "auto", duration: OPEN_TIME, ease: EASE_OPEN, overwrite: true });
+        const fromClosed = wrap.offsetHeight < 2;
+        gsap.to(wrap, { height: "auto", duration: OPEN_TIME, ease: EASE_OPEN, overwrite: true });
         openSound();
         // A short signal glitch as the content comes in, like a camera cut (< 300ms).
-        setTimeout(() => {
+        timers[i] = window.setTimeout(() => {
           wrap.dataset.glitch = "";
-          setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
+          timers[i] = window.setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
         }, 280);
         if (inner) {
-          gsap.fromTo(inner, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: OPEN_TIME, delay: 0.2, ease: EASE_OPEN });
+          if (fromClosed) gsap.set(inner, { opacity: 0, y: -24 });
+          gsap.to(inner, { opacity: 1, y: 0, duration: OPEN_TIME, delay: fromClosed ? 0.2 : 0, ease: EASE_OPEN, overwrite: true });
         }
       } else {
         // Closing runs faster than opening (fast closing: the visitor is done with it).
         gsap.to(wrap, { height: 0, duration: OPEN_TIME * 0.55, ease: EASE_OPEN, overwrite: true });
-        if (inner) gsap.to(inner, { opacity: 0, duration: 0.18 });
+        if (inner) gsap.to(inner, { opacity: 0, duration: 0.18, overwrite: true });
       }
     });
     // The card never sits over the open row.
@@ -374,7 +400,7 @@ export default function Broadcast() {
         // The clicked row's centre ends up at FOCUS_AT of the screen height.
         const y = row.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + row.offsetHeight / 2;
         if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
-        else window.scrollTo({ top: y, behavior: "smooth" });
+        else window.scrollTo({ top: y, behavior: "auto" });
       }
     }
   }, [openId, setBars, targetFor, transition]);
@@ -440,6 +466,7 @@ export default function Broadcast() {
                 className={styles.row}
                 data-row={i}
                 data-align={project.align}
+                data-thumb={project.preview ? "" : undefined}
                 data-open={isOpen || undefined}
                 style={{ "--offset": project.offset } as React.CSSProperties}
                 aria-expanded={isOpen}
@@ -450,7 +477,7 @@ export default function Broadcast() {
                 {/* Phones: the card's loop on the right of the row (hidden once it's open). */}
                 {thumbs && project.preview && (
                   <span className={styles.rowThumb} aria-hidden="true">
-                    <video src={project.preview} poster={project.img ?? undefined} muted loop playsInline autoPlay preload="metadata" />
+                    <video src={project.preview} poster={project.img ?? undefined} muted loop playsInline preload="none" />
                   </span>
                 )}
                 <span className={styles.bar} data-bar="top" aria-hidden="true">

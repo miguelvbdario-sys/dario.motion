@@ -44,6 +44,7 @@
   position: relative;
   flex: 1;
   height: 22px;
+  container-type: inline-size;
 }
 
 .track::before,
@@ -58,8 +59,8 @@
 }
 
 .fill {
-  right: auto;
-  width: calc(var(--p, 0) * 100%);
+  transform-origin: left;
+  scale: var(--p, 0) 1;
   background: rgb(239 238 238 / 0.7);
 }
 
@@ -130,10 +131,10 @@
   position: absolute;
   top: -3px;
   bottom: -3px;
-  left: calc(var(--p, 0) * 100%);
+  left: 0;
   width: 2px;
   background: #e60000;
-  translate: -50% 0;
+  translate: calc(var(--p, 0) * 100cqw - 50%) 0;
   pointer-events: none;
 }
 

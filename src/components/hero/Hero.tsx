@@ -81,7 +81,7 @@ const goTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
   e.preventDefault();
   const lenis = (window as unknown as { lenis?: { scrollTo: (t: Element, o?: object) => void } }).lenis;
   if (lenis) lenis.scrollTo(target, { duration: 1.6 });
-  else target.scrollIntoView({ behavior: "smooth" });
+  else target.scrollIntoView({ behavior: "auto" });
 };
 
 const pad = (frame: number) => String(frame).padStart(3, "0");

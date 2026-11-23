@@ -18,6 +18,9 @@ const pad = (n: number) => String(n).padStart(2, "0");
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
+const reducedMotion = () =>
+  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
 /**
  * Accordion body (phones): unfolds from 0 to its height when it mounts and
  * folds back to 0 when `closing` turns on, then calls onClosed.
@@ -25,7 +28,7 @@ const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 function AccBody({ closing, onClosed, children }: { closing: boolean; onClosed: () => void; children: React.ReactNode }) {
   const el = useRef<HTMLDivElement>(null);
   useLayoutEffect(() => {
-    if (!el.current) return;
+    if (!el.current || reducedMotion()) return;
     gsap.fromTo(
       el.current,
       { height: 0, opacity: 0 },
@@ -34,6 +37,10 @@ function AccBody({ closing, onClosed, children }: { closing: boolean; onClosed: 
   }, []);
   useEffect(() => {
     if (!closing || !el.current) return;
+    if (reducedMotion()) {
+      onClosed();
+      return;
+    }
     gsap.to(el.current, { height: 0, opacity: 0, duration: 0.24, ease: "power3.in", onComplete: onClosed });
   }, [closing, onClosed]);
   return (
@@ -120,7 +127,7 @@ function ScreenSwipe({
   const wrap = (i: number) => (i + n) % n;
   const [moving, setMoving] = useState(false);
   const busy = useRef(false);
-  const drag = useRef<{ x: number; y: number; t: number; lock: "x" | "y" | null; id: number } | null>(null);
+  const drag = useRef<{ x: number; y: number; x0: number; t: number; lock: "x" | "y" | null; id: number } | null>(null);
 
   // New screen in place: the track goes back to the centre without animating,
   // and the title under it swaps in.
@@ -137,6 +144,10 @@ function ScreenSwipe({
     const el = track.current;
     const w = view.current?.offsetWidth ?? 0;
     if (!el || !w || busy.current) return;
+    if (reducedMotion()) {
+      onChange(wrap(index + d));
+      return;
+    }
     busy.current = true;
     setMoving(true);
     gsap.to(el, {
@@ -149,8 +160,10 @@ function ScreenSwipe({
   };
 
   const onDown = (e: React.PointerEvent) => {
-    if (busy.current) return;
-    drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), lock: null, id: e.pointerId };
+    if (busy.current || !track.current) return;
+    gsap.killTweensOf(track.current);
+    const x0 = Number(gsap.getProperty(track.current, "x")) || 0;
+    drag.current = { x: e.clientX, y: e.clientY, x0, t: performance.now(), lock: null, id: e.pointerId };
   };
   const onMove = (e: React.PointerEvent) => {
     const d = drag.current;
@@ -169,17 +182,17 @@ function ScreenSwipe({
         }
       }
     }
-    if (d.lock === "x" && track.current) gsap.set(track.current, { x: dx });
+    if (d.lock === "x" && track.current) gsap.set(track.current, { x: d.x0 + dx });
   };
   const onUp = (e: React.PointerEvent) => {
     const d = drag.current;
     drag.current = null;
     if (!d || d.lock !== "x" || !track.current) return;
     const w = view.current?.offsetWidth ?? 1;
-    const dx = e.clientX - d.x;
-    const v = dx / Math.max(1, performance.now() - d.t); // px per ms
+    const dx = d.x0 + e.clientX - d.x;
+    const v = (e.clientX - d.x) / Math.max(1, performance.now() - d.t); // px per ms
     if (Math.abs(dx) > w * 0.2 || Math.abs(v) > 0.5) step(dx < 0 ? 1 : -1);
-    else gsap.to(track.current, { x: 0, duration: 0.3, ease: "power3.out", onComplete: () => setMoving(false) });
+    else gsap.to(track.current, { x: 0, duration: 0.3, ease: "power3.out", overwrite: true, onComplete: () => setMoving(false) });
   };
 
   const slide = (i: number, offset: number) => {
@@ -187,7 +200,7 @@ function ScreenSwipe({
     const center = offset === 0;
     return (
       <div
-        key={`${i}-${offset}`}
+        key={n > 2 ? i : `${i}-${offset}`}
         className={styles.swipeSlide}
         style={{ left: `calc(${offset * 100}% + ${offset * SWIPE_GAP}px)` }}
         aria-hidden={!center || undefined}
@@ -200,7 +213,7 @@ function ScreenSwipe({
           )
         ) : sc.video ? (
           // Neighbours show their first frame (#t) and only play while sliding.
-          <Loop src={center ? sc.video : `${sc.video}#t=0.1`} active={live && (center || moving)} />
+          <Loop src={`${sc.video}#t=0.1`} active={live && (center || moving)} />
         ) : (
           <Placeholder169 />
         )}
@@ -340,7 +353,7 @@ export default function BroadcastPanel({
       const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + h / 2;
       const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
       if (lenis) lenis.scrollTo(y, { duration: 0.7 });
-      else window.scrollTo({ top: y, behavior: "smooth" });
+      else window.scrollTo({ top: y, behavior: "auto" });
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, active]);
@@ -359,11 +372,12 @@ export default function BroadcastPanel({
       return;
     }
     gsap.killTweensOf(el);
+    const shown = el.style.height ? el.offsetHeight : stackH.current;
     el.style.height = "";
     const next = el.offsetHeight;
-    const prev = stackH.current;
+    const prev = shown;
     stackH.current = next;
-    if (!prev || Math.abs(prev - next) < 2) return;
+    if (!prev || Math.abs(prev - next) < 2 || reducedMotion()) return;
     gsap.fromTo(
       el,
       { height: prev, overflow: "hidden" },
@@ -478,7 +492,7 @@ export default function BroadcastPanel({
     const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.2;
     const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
     if (lenis) lenis.scrollTo(y, { duration: 0.9 });
-    else window.scrollTo({ top: y, behavior: "smooth" });
+    else window.scrollTo({ top: y, behavior: "auto" });
   };
   const aboutEl = (
     <div ref={aboutRef} className={styles.about}>

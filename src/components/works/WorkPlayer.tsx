@@ -90,6 +90,9 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
     closing.current = true;
     video.current?.pause();
     const box = inner.current;
+    // Closing while still opening: the open tweens stop where they are.
+    gsap.killTweensOf(el);
+    if (box) gsap.killTweensOf(box);
     const done = () => el.close();
     if (reduced.current || !box) {
       gsap.to(el, { opacity: 0, duration: 0.2, onComplete: done });

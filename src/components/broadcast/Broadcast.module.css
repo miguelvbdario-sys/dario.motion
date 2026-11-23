@@ -2275,7 +2275,7 @@
   }
 
   /* Text keeps clear of the thumbnail. */
-  .row:has(.rowThumb) .content {
+  .row[data-thumb] .content {
     padding-right: calc(34% + 20px);
   }
 
@@ -2284,7 +2284,7 @@
     pointer-events: none;
   }
 
-  .row[data-open]:has(.rowThumb) .content {
+  .row[data-open][data-thumb] .content {
     padding-right: 14px;
   }
 }
@@ -2467,7 +2467,7 @@
 
 /* Phones: rows with a thumbnail get a smaller title so it never runs under it. */
 @media (max-width: 767px), (hover: none) {
-  .row:has(.rowThumb) .title {
+  .row[data-thumb] .title {
     font-size: min(30px, 7.6vw);
   }
 }

@@ -77,6 +77,8 @@ export default function WorksCarousel() {
     focus: new Array<number>(N).fill(0), // eased 0–1 "this is the centre panel" amount
     dragging: false,
     tweening: false,
+    /** Where the current arrow step is heading (so quick clicks add up). */
+    target: 0,
   });
 
   const [active, setActive] = useState(0); // panel at the centre
@@ -227,10 +229,14 @@ export default function WorksCarousel() {
   const turn = useCallback((direction: 1 | -1) => {
     const m = motion.current;
     m.flick = 0;
+    // A click during a step goes one further from that step's target.
+    const target = (m.tweening ? m.target : Math.round(m.offset)) + direction;
+    m.target = target;
     m.tweening = true;
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     gsap.to(m, {
-      offset: Math.round(m.offset) + direction,
-      duration: 0.9,
+      offset: target,
+      duration: still ? 0 : 0.9,
       ease: "power3.inOut",
       overwrite: true,
       onComplete: () => {
@@ -336,11 +342,11 @@ export default function WorksCarousel() {
 
   // Hover tilt (mouse): the card leans toward the cursor, up to TILT degrees.
   const tilt = (e: React.PointerEvent<HTMLElement>) => {
-    if (e.pointerType !== "mouse") return;
+    if (e.pointerType !== "mouse" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const el = e.currentTarget;
-    const r = el.getBoundingClientRect();
-    const nx = (e.clientX - r.left) / r.width - 0.5;
-    const ny = (e.clientY - r.top) / r.height - 0.5;
+    if (e.target !== el && !(e.target instanceof HTMLVideoElement)) return;
+    const nx = e.nativeEvent.offsetX / el.offsetWidth - 0.5;
+    const ny = e.nativeEvent.offsetY / el.offsetHeight - 0.5;
     // One rotation around the axis perpendicular to the cursor offset (the CSS `rotate`
     // property, so it never fights the zoom on `transform`).
     const deg = Math.min(1, Math.hypot(nx, ny) * 2) * TILT;

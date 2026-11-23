@@ -11,16 +11,15 @@ import styles from "./Loader.module.css";
  * of the hero "look" render on a loop), then "Miguel Dario" and "motion
  * designer" with a "..." that fills while the page loads. No counter.
  *
- * It lifts once the page has loaded (window load + fonts), never before
- * MIN_MS (so it doesn't flash) and never after MAX_MS (a slow video can't hold
- * the visitor). Then the hero intro plays.
+ * It lifts once the fonts and the hero's rest frame are in, never before
+ * MIN_MS (so it doesn't flash) and never after MAX_MS. Then the hero intro plays.
  */
 
 /** Frames of /sequence/hero-look-720 used for the turning face (also warm the hero's cache). */
 const FACE_FRAMES = [49, 42, 34, 26, 18, 12, 18, 26, 34, 42, 49, 58, 68, 78, 88, 78, 68, 58];
 const FACE_FPS = 10;
-const MIN_MS = 900;
-const MAX_MS = 6000;
+const MIN_MS = 700;
+const MAX_MS = 3000;
 
 const pad = (n: number) => String(n).padStart(3, "0");
 const lenis = () => (window as unknown as { lenis?: Lenis }).lenis;
@@ -66,10 +65,12 @@ export default function Loader() {
     raf = requestAnimationFrame(draw);
 
     const started = performance.now();
-    const loaded = new Promise<void>((res) => {
-      if (document.readyState === "complete") res();
-      else window.addEventListener("load", () => res(), { once: true });
-    });
+    // Ready = fonts + the hero's rest frame (what the visitor sees first). Not
+    // window load: that waits for every video and held phones back for seconds.
+    const compact = window.matchMedia("(max-width: 767px), (max-aspect-ratio: 3/4)").matches;
+    const rest = new Image();
+    rest.src = `/sequence/${compact ? "hero-look-720" : "hero-look"}/LOOK_049.webp`;
+    const loaded = rest.decode().catch(() => {});
     let done = false;
     const lift = () => {
       if (done) return;
