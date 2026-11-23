@@ -47,7 +47,7 @@ export const SHIELD_FRAMES = 43;
  * x / y are the centre of the text; size is the height of the digits.
  * Edit here to nudge them.
  */
-export const SCORE_FONT = { family: "Kuunari", url: "/fonts/Kuunari-Bold.otf" };
+export const SCORE_FONT = { family: "Kuunari", url: "/fonts/Kuunari-Bold.woff2" };
 export const SCORE_LAYOUT = {
   home: { x: 522, y: 489, size: 165 },
   away: { x: 802, y: 489, size: 165 },

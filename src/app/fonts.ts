@@ -3,7 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 
 // Display — Tusker Grotesk 6800 Super
 export const tusker = localFont({
-  src: "../../public/fonts/TuskerGrotesk-6800Super.otf",
+  src: "../../public/fonts/TuskerGrotesk-6800Super.woff2",
   variable: "--font-tusker",
   weight: "800",
   display: "swap",
@@ -12,7 +12,7 @@ export const tusker = localFont({
 
 // Handwritten accents — Wildest Metallo Brush (Persona). NOTE: demo build, check license before launch.
 export const wildest = localFont({
-  src: "../../public/fonts/WildestMetalloBrushDEMO.otf",
+  src: "../../public/fonts/WildestMetalloBrushDEMO.woff2",
   variable: "--font-wildest",
   weight: "400",
   display: "swap",

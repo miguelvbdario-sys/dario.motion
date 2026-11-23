@@ -415,10 +415,10 @@ export default function Hero() {
 
 
           <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal data-nodrag>
-            <Emblem id="left" src="/3d/emblem-left.gltf" label="Chrome 3D pig emblem" speed={0.75} />
+            <Emblem id="left" src="/3d/emblem-left.glb" label="Chrome 3D pig emblem" speed={0.75} />
           </div>
           <div className={`${styles.emblem} ${styles.emblemRight}`} data-reveal data-nodrag>
-            <Emblem id="right" src="/3d/emblem-right.gltf" label="Chrome 3D vulture emblem" speed={-0.6} />
+            <Emblem id="right" src="/3d/emblem-right.glb" label="Chrome 3D vulture emblem" speed={-0.6} />
           </div>
 
           <p className={`${styles.script} ${styles.senior}`} data-reveal data-vector>

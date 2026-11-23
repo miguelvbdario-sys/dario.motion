@@ -333,7 +333,7 @@ export default function WorksCarousel() {
   return (
     <section ref={root} id="works-carousel" className={styles.section} aria-labelledby="works-carousel-title">
       <h2 id="works-carousel-title" className={styles.heading}>
-        Another projects
+        More projects
       </h2>
 
       <div ref={stage} className={styles.stage}>

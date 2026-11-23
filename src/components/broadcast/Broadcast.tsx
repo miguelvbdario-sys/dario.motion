@@ -75,6 +75,20 @@ function fillFace(face: HTMLDivElement | null, project: BroadcastProject | null)
   }
 }
 
+/** Same query as .rowThumb in the CSS: the row thumbnails only exist there. */
+const THUMB_QUERY = "(max-width: 767px), (hover: none)";
+function useThumbs() {
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(THUMB_QUERY);
+    const set = () => setOn(mq.matches);
+    set();
+    mq.addEventListener("change", set);
+    return () => mq.removeEventListener("change", set);
+  }, []);
+  return on;
+}
+
 export default function Broadcast() {
   const section = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
@@ -90,6 +104,8 @@ export default function Broadcast() {
   const [mounted, setMounted] = useState<Set<string>>(() => new Set());
   const [playing, setPlaying] = useState<Work | null>(null);
   const opener = useRef<HTMLElement | null>(null);
+  /** Row thumbnails (phones): not rendered on desktop, so their videos never download there. */
+  const thumbs = useThumbs();
 
   const openRef = useRef<string | null>(null);
   const hovered = useRef(-1);
@@ -416,7 +432,7 @@ export default function Broadcast() {
               >
                 <RowContent project={project} />
                 {/* Phones: the card's loop on the right of the row (hidden once it's open). */}
-                {project.preview && (
+                {thumbs && project.preview && (
                   <span className={styles.rowThumb} aria-hidden="true">
                     <video src={project.preview} poster={project.img ?? undefined} muted loop playsInline autoPlay preload="metadata" />
                   </span>
