@@ -25,7 +25,7 @@
    * --pull-at: raise it to start lower, lower it to start closer.
    */
   margin-top: calc(
-    var(--u) * var(--pull-at, 985) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) -
+    var(--u) * var(--pull-at, 845) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) -
       min(100lvh, calc(var(--u) * 1235))
   );
   /* Bottom: space before the next section. */
@@ -1738,7 +1738,7 @@
 /* Phones/portrait tablets: the hero has its own height there (see Hero.module.css). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .section {
-    margin-top: calc(var(--u) * -1300);
+    margin-top: calc(var(--u) * -1600);
   }
 }
 
