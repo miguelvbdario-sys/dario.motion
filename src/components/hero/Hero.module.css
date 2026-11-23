@@ -764,8 +764,9 @@
 @media (min-width: 768px) and (min-aspect-ratio: 751/1000) {
   .stage {
     --shift: 0px;
-    --lift: 0px;
-    height: calc(var(--u) * 950);
+    /* Everything sits 70 design px higher (less red above the name). */
+    --lift: calc(var(--u) * 70);
+    height: calc(var(--u) * 840);
     z-index: 2;
     overflow-x: clip;
     overflow-y: visible;
