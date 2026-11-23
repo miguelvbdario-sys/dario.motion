@@ -647,12 +647,12 @@
 }
 
 .title {
-  color: #000;
+  color: var(--color-bone);
 }
 
-/* Hovered letter: bone instead of the old orange (which vanished on red). */
+/* Hovered letter: black (the old orange vanished on red). */
 .letter[data-active] {
-  color: var(--color-bone);
+  color: #000;
 }
 
 .pill {
