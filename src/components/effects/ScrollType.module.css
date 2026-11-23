@@ -5,7 +5,7 @@
   /* Full width even inside a padded section. */
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  padding: clamp(28px, 4vw, 72px) 0 clamp(36px, 5vw, 96px);
+  padding: clamp(24px, 2.5vw, 48px) 0 clamp(32px, 3.5vw, 64px);
   overflow: hidden;
   pointer-events: none;
 }
@@ -24,7 +24,7 @@
   padding-right: 0.22em;
   font-family: var(--font-display);
   /* Size of the giant title. */
-  font-size: clamp(104px, 22vw, 420px);
+  font-size: clamp(96px, 11vw, 220px);
   font-weight: 800;
   line-height: 0.82;
   letter-spacing: 0.01em;
