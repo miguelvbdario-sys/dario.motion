@@ -5,44 +5,80 @@ import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "@/c
 import styles from "./AboutIntro.module.css";
 
 /*
- * Scroll sequence right before ABOUT (scrub, ~1.4 screens of scroll while the
- * screen holds still):
+ * Sequence right before ABOUT. The screen holds still for a short stretch of
+ * scroll (about 0.8 screen) that drives three video cuts, full screen, with
+ * "MIGUEL DARIO" over them as a red outline.
  *
- *   0 – 45%   three video cuts, full screen, with "MIGUEL DARIO" over them as
- *             a red outline (the cuts switch with the scroll; a quick inverted
- *             frame now and then).
- *   45 – 100% MIGUEL rises and DARIO sinks out of the screen while a red
- *             circle grows from the middle until the screen is red, which
- *             runs straight into the ABOUT section (unchanged).
+ * Near the end of that stretch (TRIGGER) a screen transition plays on its own
+ * (TRANSITION_MS, no extra scrolling needed): MIGUEL rises and DARIO sinks out
+ * of the screen while a red circle fills it. The ABOUT section already sits
+ * right under this screen (the track overlaps it by one screen), so when the
+ * transition ends the screen simply disappears and ABOUT is there, with its
+ * photo and text rising in (data-in on #about). Scrolling back up undoes it.
  *
- * Where to change the videos: CLIPS (files in /public). Swap in your own clips
- * here; they load only when the section gets close.
+ * Where to change the videos: CLIPS (files in /public). They load only when
+ * the section gets close.
  */
 const CLIPS = ["/projects/palmeiras.mp4", "/projects/copazona.mp4", "/projects/flamengo.mp4"];
-const CUTS_END = 0.45;
+/** Share of the stretch at which the transition starts. */
+const TRIGGER = 0.85;
+const TRANSITION_MS = 750;
 
 export default function AboutIntro() {
   const track = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const root = track.current;
-    if (!root) return;
+    const about = document.getElementById("about");
+    if (!root || !about) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
+    const stage = q("[data-stage]");
     const vids = [...root.querySelectorAll<HTMLVideoElement>("video")];
     const outline = q("[data-outline]");
     const circle = q("[data-circle]");
     const top = q("[data-top]");
     const bot = q("[data-bot]");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const K = isTouchLayout() ? SMOOTH_TOUCH : 1;
     const eio = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+
+    about.dataset.armed = "";
     let loaded = false;
     let shown = -2;
     let cur = -1;
+    /** Transition: null = not started; otherwise its start time. */
+    let tStart: number | null = null;
+    let done = false;
 
-    return onScrollFrame((vh) => {
+    const setCut = (idx: number) => {
+      if (idx === shown) return;
+      vids.forEach((v, i) => {
+        v.hidden = i !== idx;
+        if (i === idx) v.play().catch(() => {});
+        else v.pause();
+      });
+      shown = idx;
+    };
+
+    const drawTransition = (x: number, vh: number) => {
+      const s = eio(x);
+      const go = (s * vh * 0.5).toFixed(1);
+      top.style.transform = `translate3d(-50%, calc(-100% - ${go}px - ${(s * 20).toFixed(2)}%), 0)`;
+      bot.style.transform = `translate3d(-50%, calc(0% + ${go}px + ${(s * 20).toFixed(2)}%), 0)`;
+      circle.style.transform = `translate3d(-50%, -50%, 0) scale(${(0.15 + s * 9).toFixed(3)})`;
+    };
+
+    const reset = () => {
+      tStart = null;
+      done = false;
+      stage.style.visibility = "";
+      top.style.visibility = bot.style.visibility = circle.style.visibility = "hidden";
+      outline.style.visibility = "";
+      delete about.dataset.in;
+    };
+
+    const unsub = onScrollFrame((vh) => {
       const r = root.getBoundingClientRect();
-      // Load the clips a screen and a half before the section arrives.
       if (!loaded && r.top < vh * 2.5) {
         loaded = true;
         vids.forEach((v, i) => {
@@ -50,51 +86,58 @@ export default function AboutIntro() {
           v.load();
         });
       }
-      if (r.bottom < -vh || r.top > vh * 1.5) {
-        if (shown !== -2) {
-          vids.forEach((v) => v.pause());
-          shown = -2;
-        }
+      // Far away: pause and rest. Already past (page opened lower): show ABOUT as it ends.
+      if (r.top > vh * 1.5) {
+        setCut(-1);
+        if (tStart !== null) reset();
         cur = -1;
         return;
       }
-      // 0 when the track's top reaches the top of the screen, 1 when the sticky screen lets go.
       const target = progress(-r.top, 0, r.height - vh);
-      const p = reduced ? (target < 0.5 ? 0 : 1) : cur < 0 ? target : glide(cur, target, K);
+      const p = cur < 0 ? target : glide(cur, target, K);
       cur = p;
 
-      // Cuts: which clip shows (-1 = none, once the circle stage starts).
-      const c = progress(p, 0, CUTS_END);
-      const idx = p < CUTS_END ? Math.min(CLIPS.length - 1, Math.floor(c * CLIPS.length)) : -1;
-      if (idx !== shown) {
-        vids.forEach((v, i) => {
-          v.hidden = i !== idx;
-          if (i === idx) v.play().catch(() => {});
-          else v.pause();
-        });
-        shown = idx;
-      }
-      outline.style.visibility = p < CUTS_END ? "visible" : "hidden";
-      const blink = idx >= 0 && Math.floor(c * 60) % 9 === 0;
-      vids.forEach((v) => (v.style.filter = blink ? "invert(1) hue-rotate(180deg)" : ""));
+      if (p < TRIGGER - 0.05 && tStart !== null) reset();
 
-      // Open: halves leave through the edges, circle fills the screen.
-      const s = eio(progress(p, CUTS_END, 0.95));
-      const on = p >= CUTS_END;
-      top.style.visibility = bot.style.visibility = on ? "visible" : "hidden";
-      // Each half travels half a screen plus its own height: fully out at the end.
-      const go = (s * vh * 0.5).toFixed(1);
-      top.style.transform = `translate3d(-50%, calc(-100% - ${go}px - ${(s * 20).toFixed(2)}%), 0)`;
-      bot.style.transform = `translate3d(-50%, calc(0% + ${go}px + ${(s * 20).toFixed(2)}%), 0)`;
-      circle.style.visibility = on ? "visible" : "hidden";
-      circle.style.transform = `translate3d(-50%, -50%, 0) scale(${(0.15 + eio(progress(p, CUTS_END, 1)) * 9).toFixed(3)})`;
+      if (tStart === null) {
+        // Cuts, driven by the scroll.
+        const c = progress(p, 0, TRIGGER);
+        const idx = Math.min(CLIPS.length - 1, Math.floor(c * CLIPS.length));
+        setCut(idx);
+        const blink = Math.floor(c * 60) % 9 === 0;
+        vids.forEach((v) => (v.style.filter = blink ? "invert(1) hue-rotate(180deg)" : ""));
+        if (p >= TRIGGER) {
+          tStart = performance.now();
+          top.style.visibility = bot.style.visibility = circle.style.visibility = "visible";
+          outline.style.visibility = "hidden";
+        }
+      }
+
+      if (tStart !== null && !done) {
+        const x = Math.min(1, (performance.now() - tStart) / TRANSITION_MS);
+        drawTransition(x, vh);
+        if (x >= 1) {
+          done = true;
+          setCut(-1);
+          stage.style.visibility = "hidden";
+          // (children set to visible would still show inside a hidden parent)
+          top.style.visibility = bot.style.visibility = circle.style.visibility = "hidden";
+          about.dataset.in = "";
+        }
+        return true; // keep frames coming while it plays
+      }
       return p !== target;
     });
+    return () => {
+      unsub();
+      delete about.dataset.armed;
+      delete about.dataset.in;
+    };
   }, []);
 
   return (
     <div ref={track} className={styles.track} aria-hidden="true">
-      <div className={styles.stage}>
+      <div className={styles.stage} data-stage>
         {CLIPS.map((_, i) => (
           <video key={i} className={styles.clip} muted loop playsInline preload="none" hidden />
         ))}

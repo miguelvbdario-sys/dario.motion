@@ -2,18 +2,22 @@
 
 .track {
   position: relative;
-  /* Scroll length: 100vh of screen + 140vh of animation. */
-  height: 240vh;
-  background: #000;
+  z-index: 2;
+  /* One screen + the stretch of scroll that drives the cuts (80vh). */
+  height: 180vh;
+  /* The last screen overlaps ABOUT: when the screen lets go it sits exactly
+     on top of it, so the transition can hand over without a gap. */
+  margin-bottom: -100vh;
+  pointer-events: none;
 }
 
 .stage {
   position: sticky;
   top: 0;
   height: 100vh;
-  height: 100svh;
   overflow: hidden;
   isolation: isolate;
+  background: #000;
 }
 
 .clip {
@@ -77,6 +81,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .track {
-    height: 100vh;
+    display: none;
   }
 }

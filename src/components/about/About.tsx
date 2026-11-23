@@ -5,8 +5,8 @@ import styles from "./About.module.css";
 
 /*
  * ABOUT (#about): red sheet (site red + scanlines + guide columns, like the
- * BROADCAST cards). A 3:4 portrait covers a big "Miguel Dario" in the Wildest
- * script, tilted −20°; the intro text and two buttons sit on the right.
+ * BROADCAST cards). The portrait, with the intro text and buttons on the right.
+ * Photo and text rise in when the scroll transition before it (AboutIntro) ends.
  */
 export default function About() {
   return (
@@ -22,16 +22,10 @@ export default function About() {
       </div>
 
       <div className={styles.grid}>
-        <p className={styles.label}>{ABOUT.label}</p>
+        <p className={styles.label} data-enter style={{ "--i": 0 } as React.CSSProperties}>{ABOUT.label}</p>
 
         <div className={styles.portrait}>
-          {/* Two stacked lines ("Miguel" / "Dario"), half hidden behind the photo. */}
-          <span className={styles.script} aria-hidden="true">
-            {ABOUT.name.split(" ").map((word) => (
-              <span key={word}>{word}</span>
-            ))}
-          </span>
-          <div className={styles.photo}>
+          <div className={styles.photo} data-enter style={{ "--i": 1 } as React.CSSProperties}>
             <Image
               src={ABOUT.photo.src}
               alt={ABOUT.photo.alt}
@@ -42,7 +36,7 @@ export default function About() {
           </div>
         </div>
 
-        <div className={styles.text}>
+        <div className={styles.text} data-enter style={{ "--i": 2 } as React.CSSProperties}>
           <p id="about-lead" className={styles.lead}>
             {/* Words light up one by one as the lead crosses the screen. */}
             <WordReveal text={ABOUT.lead} />
