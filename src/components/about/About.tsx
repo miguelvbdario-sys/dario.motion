@@ -36,17 +36,17 @@ export default function About() {
           </div>
         </div>
 
-        <div className={styles.text} data-enter style={{ "--i": 2 } as React.CSSProperties}>
-          <p id="about-lead" className={styles.lead}>
+        <div className={styles.text}>
+          <p id="about-lead" className={styles.lead} data-enter style={{ "--i": 2 } as React.CSSProperties}>
             {/* Words light up one by one as the lead crosses the screen. */}
             <WordReveal text={ABOUT.lead} />
           </p>
           {ABOUT.paragraphs.map((p) => (
-            <p key={p} className={styles.body}>
+            <p key={p} className={styles.body} data-enter style={{ "--i": 3 } as React.CSSProperties}>
               {p}
             </p>
           ))}
-          <div className={styles.buttons}>
+          <div className={styles.buttons} data-enter style={{ "--i": 4 } as React.CSSProperties}>
             {ABOUT.buttons.map((b) => {
               const external = b.href.startsWith("http");
               return (

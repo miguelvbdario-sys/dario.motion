@@ -5,11 +5,11 @@ import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "@/c
 import styles from "./AboutIntro.module.css";
 
 /*
- * Sequence right before ABOUT. The screen holds still for a short stretch of
- * scroll (about 0.8 screen) that drives three video cuts, full screen, with
- * "MIGUEL DARIO" over them as a red outline.
+ * Sequence right before ABOUT. Three video cuts, full screen, with "MIGUEL
+ * DARIO" over them as a red outline, driven by the scroll while the screen
+ * comes up from the bottom (it holds still only for a short stretch).
  *
- * Near the end of that stretch (TRIGGER) a screen transition plays on its own
+ * Before it even fills the screen (TRIGGER) a screen transition plays on its own
  * (TRANSITION_MS, no extra scrolling needed): MIGUEL rises and DARIO sinks out
  * of the screen while a red circle fills it. The ABOUT section already sits
  * right under this screen (the track overlaps it by one screen), so when the
@@ -21,8 +21,10 @@ import styles from "./AboutIntro.module.css";
  */
 const CLIPS = ["/projects/palmeiras.mp4", "/projects/copazona.mp4", "/projects/flamengo.mp4"];
 /** Share of the stretch at which the transition starts. */
-const TRIGGER = 0.85;
-const TRANSITION_MS = 750;
+const TRIGGER = 0.6;
+const TRANSITION_MS = 600;
+/** Share of the transition after which the screen hands over to ABOUT (the circle already covers it). */
+const HANDOVER = 0.7;
 
 export default function AboutIntro() {
   const track = useRef<HTMLDivElement>(null);
@@ -93,7 +95,9 @@ export default function AboutIntro() {
         cur = -1;
         return;
       }
-      const target = progress(-r.top, 0, r.height - vh);
+      // 0 when the screen starts to come up from the bottom, 1 when it lets go:
+      // the cuts already run while it is still entering.
+      const target = progress(vh - r.top, 0, r.height);
       const p = cur < 0 ? target : glide(cur, target, K);
       cur = p;
 
@@ -116,7 +120,7 @@ export default function AboutIntro() {
       if (tStart !== null && !done) {
         const x = Math.min(1, (performance.now() - tStart) / TRANSITION_MS);
         drawTransition(x, vh);
-        if (x >= 1) {
+        if (x >= HANDOVER) {
           done = true;
           setCut(-1);
           stage.style.visibility = "hidden";

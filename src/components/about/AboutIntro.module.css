@@ -3,8 +3,8 @@
 .track {
   position: relative;
   z-index: 2;
-  /* One screen + the stretch of scroll that drives the cuts (80vh). */
-  height: 180vh;
+  /* One screen + a short hold (20vh); the cuts also run while it comes up. */
+  height: 120vh;
   /* The last screen overlaps ABOUT: when the screen lets go it sits exactly
      on top of it, so the transition can hand over without a gap. */
   margin-bottom: -100vh;
