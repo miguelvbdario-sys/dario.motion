@@ -1,0 +1,102 @@
+/* Section title as a TV lower third (LowerThird.tsx). */
+
+.lt {
+  display: flex;
+  align-items: stretch;
+  flex-wrap: wrap;
+  gap: 0;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+
+.lt[data-align="center"] {
+  justify-content: center;
+}
+
+.tag,
+.title,
+.sub {
+  display: inline-flex;
+  align-items: center;
+  /* Hidden until the title comes on screen, then wiped in left to right. */
+  clip-path: inset(0 100% 0 0);
+  transition: clip-path 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.lt[data-in] .tag,
+.lt[data-in] .title,
+.lt[data-in] .sub {
+  clip-path: inset(0 0 0 0);
+}
+
+.lt[data-in] .title {
+  transition-delay: 0.08s;
+}
+
+.lt[data-in] .sub {
+  transition-delay: 0.16s;
+}
+
+.tag {
+  gap: 7px;
+  padding: 6px 10px;
+  background: #e60000;
+  color: #efeeee;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #efeeee;
+  animation: ltBlink 1.2s steps(1, end) infinite;
+}
+
+@keyframes ltBlink {
+  0%,
+  60% {
+    opacity: 1;
+  }
+  61%,
+  100% {
+    opacity: 0.15;
+  }
+}
+
+.title {
+  padding: 6px 12px;
+  background: #efeeee;
+  color: #000;
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.sub {
+  padding: 6px 10px;
+  background: #111;
+  color: rgb(239 238 238 / 0.7);
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tag,
+  .title,
+  .sub {
+    transition: none;
+  }
+
+  .dot {
+    animation: none;
+  }
+}

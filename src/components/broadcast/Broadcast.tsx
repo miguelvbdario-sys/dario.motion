@@ -6,7 +6,9 @@ import { CustomEase } from "gsap/CustomEase";
 import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
+import { open as openSound } from "@/lib/sound";
 import BroadcastPanel from "./BroadcastPanel";
+import LowerThird from "@/components/lowerthird/LowerThird";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -33,6 +35,8 @@ const FLIP_TIME = 0.6;
 /** A flip in progress blocks media swaps and other flips for this long. */
 const FLIP_LOCK_MS = 620;
 const OPEN_TIME = 0.85;
+/** Length of the glitch burst when a card opens (ms). */
+const GLITCH_MS = 280;
 /** Floating card offset from the cursor (px). */
 const CARD_OFFSET_X = 200;
 /** Card size (320×180, 16:9): centred vertically on the cursor. */
@@ -324,6 +328,12 @@ export default function Broadcast() {
       }
       if (isOpen) {
         gsap.fromTo(wrap, { height: 0 }, { height: "auto", duration: OPEN_TIME, ease: EASE_OPEN, overwrite: true });
+        openSound();
+        // A short signal glitch as the content comes in, like a camera cut (< 300ms).
+        setTimeout(() => {
+          wrap.dataset.glitch = "";
+          setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
+        }, 280);
         if (inner) {
           gsap.fromTo(inner, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: OPEN_TIME, delay: 0.2, ease: EASE_OPEN });
         }
@@ -410,6 +420,10 @@ export default function Broadcast() {
       <h2 id="broadcast-title" className={styles.srOnly}>
         Broadcast
       </h2>
+      {/* Visible title: a TV lower third with a live dot. */}
+      <div className={styles.lowerThird} aria-hidden="true">
+        <LowerThird tag="On air" live title="Broadcast" sub={`${String(BROADCAST.length).padStart(2, "0")} projects`} />
+      </div>
 
       <div ref={list} className={styles.list} onMouseMove={onMove} onMouseLeave={onLeave}>
         {BROADCAST.map((project, i) => {

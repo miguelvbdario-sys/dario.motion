@@ -3,6 +3,7 @@ import Broadcast from "@/components/broadcast/Broadcast";
 import WorksCarousel from "@/components/works-carousel/WorksCarousel";
 import About from "@/components/about/About";
 import Timeline from "@/components/timeline/Timeline";
+import Loader from "@/components/loader/Loader";
 
 export default function Home() {
   return (
@@ -22,6 +23,9 @@ export default function Home() {
         media="(max-width: 767px), (max-aspect-ratio: 3/4)"
         fetchPriority="high"
       />
+
+      {/* Loading screen: small face, name and "..."; the hero intro plays once it lifts. */}
+      <Loader />
 
       <Hero />
       {/* Broadcast projects (the interactive scoreboard lives in the Paulistão card). */}

@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
@@ -201,10 +200,10 @@ export default function Course() {
 
       {/* ---------- Top bar ---------- */}
       <header className={styles.top}>
-        <Link href="/" className={styles.back}>
+        <a href="/" className={styles.back}>
           <ArrowLeft aria-hidden="true" strokeWidth={2} />
           dario.motion
-        </Link>
+        </a>
         <Image src={COURSE.logo.src} alt="Motion Pro" width={COURSE.logo.width} height={COURSE.logo.height} className={styles.topLogo} priority />
         <a href={COURSE.checkout} target="_blank" rel="noopener noreferrer" className={styles.topCta}>
           Garantir vaga
@@ -478,10 +477,10 @@ export default function Course() {
             {pitch.cta}
           </Cta>
         </div>
-        <Link href="/" className={styles.footBack}>
+        <a href="/" className={styles.footBack}>
           <ArrowLeft aria-hidden="true" strokeWidth={2} />
           Voltar ao portfólio
-        </Link>
+        </a>
       </section>
 
       <WorkPlayer work={playing} onClose={closePlayer} origin={opener} />

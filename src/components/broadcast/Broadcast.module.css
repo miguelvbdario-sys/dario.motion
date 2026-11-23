@@ -2680,3 +2680,35 @@
   justify-content: center;
   padding: 12px 0 4px;
 }
+
+/* Card opening: a short signal glitch (Broadcast.tsx toggles data-glitch, 280ms). */
+.panelWrap[data-glitch] > * {
+  animation: bcGlitch 0.28s steps(1, end);
+}
+
+@keyframes bcGlitch {
+  0% { clip-path: inset(8% 0 72% 0); translate: -8px 0; }
+  16% { clip-path: inset(58% 0 18% 0); translate: 6px 0; }
+  33% { clip-path: inset(28% 0 46% 0); translate: -4px 0; }
+  50% { clip-path: inset(78% 0 6% 0); translate: 5px 0; }
+  66% { clip-path: inset(0 0 84% 0); translate: -3px 0; }
+  83% { clip-path: inset(40% 0 30% 0); translate: 2px 0; }
+  100% { clip-path: none; translate: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panelWrap[data-glitch] > * {
+    animation: none;
+  }
+}
+
+/* Lower third above the list ("● ON AIR · BROADCAST · 04 PROJECTS"). */
+.lowerThird {
+  margin: 0 0 calc(var(--s) * 18);
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .lowerThird {
+    margin-bottom: 12px;
+  }
+}

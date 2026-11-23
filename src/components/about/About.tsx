@@ -55,6 +55,7 @@ export default function About() {
                   key={b.label}
                   href={b.href}
                   className={styles.button}
+                  data-magnetic
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                 >

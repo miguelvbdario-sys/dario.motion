@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WORKS, type Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
+import LowerThird from "@/components/lowerthird/LowerThird";
 import styles from "./WorksCarousel.module.css";
 
 /*
@@ -53,6 +54,9 @@ const smoothstep = (a: number, b: number, v: number) => {
   const t = Math.min(1, Math.max(0, (v - a) / (b - a)));
   return t * t * (3 - 2 * t);
 };
+
+/** Hover tilt of a card toward the cursor, max degrees. */
+const TILT = 8;
 
 export default function WorksCarousel() {
   const root = useRef<HTMLElement>(null);
@@ -330,11 +334,27 @@ export default function WorksCarousel() {
 
   const realIndex = (active % WORKS.length) + 1;
 
+  // Hover tilt (mouse): the card leans toward the cursor, up to TILT degrees.
+  const tilt = (e: React.PointerEvent<HTMLElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const el = e.currentTarget;
+    const r = el.getBoundingClientRect();
+    const nx = (e.clientX - r.left) / r.width - 0.5;
+    const ny = (e.clientY - r.top) / r.height - 0.5;
+    // One rotation around the axis perpendicular to the cursor offset (the CSS `rotate`
+    // property, so it never fights the zoom on `transform`).
+    const deg = Math.min(1, Math.hypot(nx, ny) * 2) * TILT;
+    el.style.rotate = `${(-ny).toFixed(3)} ${nx.toFixed(3)} 0 ${deg.toFixed(2)}deg`;
+  };
+  const untilt = (e: React.PointerEvent<HTMLElement>) => {
+    e.currentTarget.style.rotate = "";
+  };
+
   return (
     <section ref={root} id="works-carousel" className={styles.section} aria-labelledby="works-carousel-title">
-      <h2 id="works-carousel-title" className={styles.heading}>
-        More projects
-      </h2>
+      <div className={styles.heading}>
+        <LowerThird as="h2" id="works-carousel-title" tag="Standalones" title="More projects" align="center" />
+      </div>
 
       <div ref={stage} className={styles.stage}>
         <div ref={ring} className={styles.ring}>
@@ -362,6 +382,8 @@ export default function WorksCarousel() {
                 onClick={(e) => open(item, e.currentTarget)}
                 aria-label={`Play ${item.title}`}
                 data-cursor="view"
+                onPointerMove={tilt}
+                onPointerLeave={untilt}
               >
                 <video
                   ref={(node) => {

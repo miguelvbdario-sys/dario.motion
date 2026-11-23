@@ -5,6 +5,7 @@ import { inter, mono, tusker, wildest } from "./fonts";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import CustomCursor from "@/components/cursor/CustomCursor";
 import CrtScreen from "@/components/crt/CrtScreen";
+import Effects from "@/components/effects/Effects";
 import { SITE, SITE_URL } from "@/lib/site";
 
 export const metadata: Metadata = {
@@ -48,6 +49,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll>{children}</SmoothScroll>
         <CrtScreen />
         <CustomCursor />
+        {/* Magnetic buttons, decoding labels and the optional UI sounds. */}
+        <Effects />
       </body>
     </html>
   );

@@ -210,3 +210,48 @@
     scale: none;
   }
 }
+
+/* Sound toggle at the end of the bar (interface sounds, off by default). */
+.sound {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 8px;
+  border: 1px solid rgb(239 238 238 / 0.25);
+  border-radius: 4px;
+  background: transparent;
+  color: rgb(239 238 238 / 0.7);
+  cursor: pointer;
+  transition: color 0.15s ease-out, border-color 0.15s ease-out;
+}
+
+.sound[aria-pressed="true"] {
+  border-color: #fbcb09;
+  color: #fbcb09;
+}
+
+.sound:hover {
+  color: var(--color-bone);
+  border-color: var(--color-bone);
+}
+
+.soundLabel {
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .soundLabel {
+    display: none;
+  }
+
+  .sound {
+    min-width: 32px;
+    padding: 0;
+    justify-content: center;
+  }
+}

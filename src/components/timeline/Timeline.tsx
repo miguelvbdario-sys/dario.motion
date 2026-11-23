@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import type Lenis from "lenis";
+import { onSoundChange, setSound, soundOn } from "@/lib/sound";
 import styles from "./Timeline.module.css";
 
 /*
@@ -44,6 +45,13 @@ export default function Timeline() {
   const [marks, setMarks] = useState<{ id: string; label: string; at: number }[]>([]);
   const [shown, setShown] = useState(false);
   const [past, setPast] = useState(false);
+  const [sound, setSoundState] = useState(false);
+
+  // Sound toggle: starts off; remembers the choice on this device.
+  useEffect(() => {
+    setSoundState(soundOn());
+    return onSoundChange(setSoundState);
+  }, []);
 
   useEffect(() => {
     let max = 1;
@@ -116,6 +124,23 @@ export default function Timeline() {
           ))}
           <div ref={head} className={styles.playhead} aria-hidden="true" />
         </nav>
+        <button
+          type="button"
+          className={styles.sound}
+          onClick={() => setSound(!sound)}
+          aria-pressed={sound}
+          aria-label={sound ? "Turn interface sounds off" : "Turn interface sounds on"}
+        >
+          <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+            <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" />
+            {sound ? (
+              <path d="M16 8.5a5 5 0 0 1 0 7M18.5 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" strokeWidth="1.6" />
+            ) : (
+              <path d="M16 9l5 6M21 9l-5 6" fill="none" stroke="currentColor" strokeWidth="1.6" />
+            )}
+          </svg>
+          <span className={styles.soundLabel}>{sound ? "Sound on" : "Sound off"}</span>
+        </button>
       </div>
       {/* Phones: back to the top, once the hero is behind. */}
       <button

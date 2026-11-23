@@ -9,6 +9,7 @@ import { FrameSequence } from "@/lib/frameSequence";
 import VectorOverlay from "./VectorOverlay";
 import { ScanlineField } from "@/lib/scanlineField";
 import { ABOUT } from "@/content/about";
+import { onLoaded } from "@/lib/loader";
 import styles from "./Hero.module.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -324,9 +325,9 @@ export default function Hero() {
           // --p moves the whole composition up; the distance lives in the CSS.
           .to(stage, { "--p": 1 }, 0);
 
-        // Intro, played once on load.
-        gsap
-          .timeline({ defaults: { ease: "expo.out" } })
+        // Intro, played once the loading screen has lifted.
+        const intro = gsap
+          .timeline({ paused: true, defaults: { ease: "expo.out" } })
           .fromTo(q("[data-vline]"), { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 1.6, stagger: 0.07 }, 0)
           .fromTo(q("[data-hline]"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 1.6, stagger: 0.07 }, 0.1)
           .fromTo(q("[data-mark]"), { opacity: 0 }, { opacity: 1, duration: 0.8, stagger: 0.025 }, 0.9)
@@ -343,6 +344,8 @@ export default function Hero() {
             { opacity: 1, y: 0, duration: 1, stagger: 0.07 },
             0.75,
           );
+        const stopWaiting = onLoaded(() => intro.play());
+        return () => stopWaiting();
       });
 
       return () => {
@@ -437,6 +440,7 @@ export default function Hero() {
                   key={pill.label}
                   href={pill.href}
                   className={styles.pill}
+                  data-magnetic
                   data-reveal
                   data-vector
                   data-cursor="link"

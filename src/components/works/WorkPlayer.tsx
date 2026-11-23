@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { X } from "lucide-react";
 import type Lenis from "lenis";
 import type { Work } from "@/content/works";
+import { open as openSound } from "@/lib/sound";
 import styles from "./WorkPlayer.module.css";
 
 type WorkPlayerProps = {
@@ -57,6 +58,7 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
     if (!el) return;
     if (work && !el.open) {
       el.showModal();
+      openSound();
       lenis()?.stop();
       document.documentElement.style.overflow = "hidden";
       // Opened by a click, so the browser allows sound.

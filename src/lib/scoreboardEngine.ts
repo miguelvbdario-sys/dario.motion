@@ -1,3 +1,4 @@
+import { goal as goalSound } from "@/lib/sound";
 import {
   BASE_FRAMES,
   GOAL_SCORE_FRAME,
@@ -311,6 +312,7 @@ export class ScoreboardEngine {
       if (!this.goal.scored && this.goal.frame >= GOAL_SCORE_FRAME) {
         this.goal.scored = true;
         this.score[this.goal.side] += 1;
+        goalSound();
       }
       if (this.goal.frame >= this.goal.last) {
         this.goal = null;

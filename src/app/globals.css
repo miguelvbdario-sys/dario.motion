@@ -76,3 +76,42 @@ body {
     scale: none;
   }
 }
+
+/*
+ * Page change (portfolio <-> /course): a cross-document view transition. The
+ * old page leaves fast (ease-in), the new one settles in (ease-out), like a
+ * quick cut with a dip. Browsers without support just navigate.
+ */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root) {
+  animation: vt-out 0.22s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+::view-transition-new(root) {
+  animation: vt-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes vt-out {
+  to {
+    opacity: 0;
+    scale: 0.98;
+    filter: blur(4px);
+  }
+}
+
+@keyframes vt-in {
+  from {
+    opacity: 0;
+    scale: 1.02;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01s;
+  }
+}
