@@ -782,3 +782,9 @@
     background: radial-gradient(22vmax 22vmax at var(--gx, 34%) var(--gy, 64%), rgb(0 0 0 / 0.95) 0%, rgb(0 0 0 / 0.7) 35%, rgb(0 0 0 / 0.25) 70%, transparent 100%);
   }
 }
+
+/* Mouse trail canvas (PixelTrail.tsx), over the background, under the content. */
+.bgTrail {
+  width: 100%;
+  height: 100%;
+}

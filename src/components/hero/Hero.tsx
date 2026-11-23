@@ -10,6 +10,7 @@ import VectorOverlay from "./VectorOverlay";
 import { ScanlineField } from "@/lib/scanlineField";
 import { ABOUT } from "@/content/about";
 import { onLoaded } from "@/lib/loader";
+import PixelTrail from "./PixelTrail";
 import styles from "./Hero.module.css";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
@@ -377,7 +378,8 @@ export default function Hero() {
     <section id="hero" ref={root} className={styles.stage}>
       <div className={styles.bg} aria-hidden="true">
         <div className={styles.bgCore} />
-        <div className={styles.bgFollow} />
+        {/* Mouse trail: pixel squares split into RGB, fading out (desktop). */}
+        <PixelTrail className={styles.bgTrail} />
         <canvas ref={scanCanvas} className={styles.bgScan} />
       </div>
 
