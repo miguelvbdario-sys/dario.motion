@@ -674,37 +674,37 @@
 
 /*
  * Phones: a shorter hero. More red above the name, a smaller character, the
- * pills in one horizontal row under it (no hand-drawn arrow, which pointed at
+ * pills in one horizontal row at the very top, above the name (no hand-drawn arrow, which pointed at
  * the old vertical stack). Values in phone design px (--u, 390 wide).
  */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .stage {
-    height: calc(var(--u) * 540);
+    height: calc(var(--u) * 490);
   }
 
   .title {
-    top: calc(var(--u) * 100);
+    top: calc(var(--u) * 62);
   }
 
   .head {
-    top: calc(var(--u) * 168);
+    top: calc(var(--u) * 130);
     left: calc(var(--u) * -5);
     width: calc(var(--u) * 400);
   }
 
   .emblemLeft {
-    top: calc(var(--u) * 190);
+    top: calc(var(--u) * 152);
     width: calc(var(--u) * 100);
   }
 
   .emblemRight {
-    top: calc(var(--u) * 265);
+    top: calc(var(--u) * 227);
     left: calc(var(--u) * 292);
     width: calc(var(--u) * 100);
   }
 
   .nav {
-    top: calc(var(--u) * 470);
+    top: calc(var(--u) * 22);
     left: 0;
     right: 0;
     flex-direction: row;
