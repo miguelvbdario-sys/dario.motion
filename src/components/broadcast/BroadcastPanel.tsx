@@ -792,7 +792,7 @@ export default function BroadcastPanel({
       </div>
 
       <span className={styles.dot} aria-hidden="true" />
-      <h3 className={styles.bigTitle} data-scramble>{project.title}</h3>
+      <h3 className={styles.bigTitle}>{project.title}</h3>
       <p className={styles.desc}>{project.desc}</p>
 
       {/* Tabs (sections), the video selector, or plain filters. */}

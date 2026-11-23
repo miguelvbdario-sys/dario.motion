@@ -48,7 +48,7 @@ const BAR_FULL = "calc(50% + 1px)";
 function RowContent({ project, black }: { project: BroadcastProject; black?: boolean }) {
   return (
     <span className={styles.content} data-meta-first={project.metaFirst || undefined} data-black={black || undefined}>
-      <span className={styles.title} data-scramble>{project.title}</span>
+      <span className={styles.title}>{project.title}</span>
       <span className={styles.meta} data-scramble>{project.meta}</span>
     </span>
   );

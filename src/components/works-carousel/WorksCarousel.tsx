@@ -429,7 +429,7 @@ export default function WorksCarousel() {
                 className={styles.caption}
                 aria-hidden="true"
               >
-                <p className={styles.title} data-scramble>{item.title}</p>
+                <p className={styles.title}>{item.title}</p>
                 {item.meta && <p className={styles.meta} data-scramble>{item.meta}</p>}
               </div>
             </div>
