@@ -240,20 +240,85 @@
 }
 
 /*
- * Entrance (AboutIntro sets data-armed, then data-in when its transition
- * ends): label, photo and text rise and fade in, one after the other.
+ * Name frame: MIGUEL cut by the top edge, DARIO by the bottom one. Only about
+ * half of each line shows, which stays inside the section's top / bottom
+ * padding, so it never touches the text.
  */
-.section[data-armed] [data-enter] {
+.frame {
+  position: absolute;
+  left: 50%;
+  z-index: -1;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(72px, 15vw, 280px);
+  font-weight: 800;
+  line-height: 0.84;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--ink);
+  pointer-events: none;
+  /* How far each line hides past its edge (more = less of it shows). */
+  --frame-y: 52%;
+}
+
+.frameTop {
+  top: 0;
+  translate: -50% calc(var(--frame-y) * -1);
+}
+
+.frameBot {
+  bottom: 0;
+  translate: -50% var(--frame-y);
+}
+
+@media (max-width: 767px) {
+  .frame {
+    font-size: 26vw;
+    --frame-y: 64%;
+  }
+}
+
+/*
+ * Entrance (AboutIntro sets data-armed, then data-in when its transition
+ * ends): label, photo and text slide in from the right and fade in, one after
+ * the other; the name frame slides in from the edges.
+ */
+.section[data-armed] [data-enter],
+.section[data-armed] .frame {
   opacity: 0;
-  translate: 0 60px;
-  /* Ease-in, short, each item 0.08s after the one before. */
   transition:
-    opacity 0.45s cubic-bezier(0.55, 0, 1, 0.45),
-    translate 0.45s cubic-bezier(0.55, 0, 1, 0.45);
-  transition-delay: calc(var(--i, 0) * 0.08s);
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 1.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section[data-armed] [data-enter] {
+  /* Distance they travel from the right. */
+  translate: 180px 0;
+  transition-delay: calc(var(--i, 0) * 0.1s);
+}
+
+.section[data-armed] .frameTop {
+  translate: -50% -100%;
+}
+
+.section[data-armed] .frameBot {
+  translate: -50% 100%;
 }
 
 .section[data-armed][data-in] [data-enter] {
   opacity: 1;
   translate: 0 0;
+}
+
+.section[data-armed][data-in] .frame {
+  opacity: 1;
+}
+
+.section[data-armed][data-in] .frameTop {
+  translate: -50% calc(var(--frame-y) * -1);
+}
+
+.section[data-armed][data-in] .frameBot {
+  translate: -50% var(--frame-y);
 }

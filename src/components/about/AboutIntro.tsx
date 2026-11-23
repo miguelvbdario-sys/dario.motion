@@ -21,7 +21,7 @@ import styles from "./AboutIntro.module.css";
  */
 const CLIPS = ["/projects/palmeiras.mp4", "/projects/copazona.mp4", "/projects/flamengo.mp4"];
 /** Share of the stretch at which the transition starts. */
-const TRIGGER = 0.6;
+const TRIGGER = 0.8;
 const TRANSITION_MS = 600;
 /** Share of the transition after which the screen hands over to ABOUT (the circle already covers it). */
 const HANDOVER = 0.7;

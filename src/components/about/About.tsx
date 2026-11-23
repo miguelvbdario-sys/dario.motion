@@ -21,6 +21,15 @@ export default function About() {
         <span />
       </div>
 
+      {/* The name as a frame: MIGUEL cut by the top edge, DARIO by the bottom
+          one, inside the section's padding so it never reaches the text. */}
+      <p className={`${styles.frame} ${styles.frameTop}`} aria-hidden="true">
+        Miguel
+      </p>
+      <p className={`${styles.frame} ${styles.frameBot}`} aria-hidden="true">
+        Dario
+      </p>
+
       <div className={styles.grid}>
         <p className={styles.label} data-enter style={{ "--i": 0 } as React.CSSProperties}>{ABOUT.label}</p>
 
