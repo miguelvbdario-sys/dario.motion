@@ -743,3 +743,42 @@
     clip-path: inset(0 0 23.5% 0);
   }
 }
+
+/*
+ * Desktop, same idea as phones: the hero is no longer pinned and is shorter.
+ * The pills sit in one row at the top, above the name; the red ends a little
+ * above the character's hands, so the character hangs over the white strip
+ * below (as if coming out of the screen). Design px at 1920.
+ */
+@media (min-width: 768px) and (min-aspect-ratio: 751/1000) {
+  .stage {
+    --shift: 0px;
+    --lift: 0px;
+    height: calc(var(--u) * 950);
+    z-index: 2;
+    overflow-x: clip;
+    overflow-y: visible;
+  }
+
+  .grain {
+    clip-path: inset(7.4% 0);
+  }
+
+  .nav {
+    top: calc(var(--u) * 96);
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    justify-content: center;
+    gap: calc(var(--u) * 14);
+  }
+
+  .arrow {
+    display: none;
+  }
+
+  /* Truly black flashlight on desktop. */
+  .bgFollow {
+    background: radial-gradient(22vmax 22vmax at var(--gx, 34%) var(--gy, 64%), rgb(0 0 0 / 0.95) 0%, rgb(0 0 0 / 0.7) 35%, rgb(0 0 0 / 0.25) 70%, transparent 100%);
+  }
+}

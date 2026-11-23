@@ -16,18 +16,8 @@
   /* We scroll to the opened card ourselves; the browser's scroll anchoring
      would fight it while cards collapse/expand. */
   overflow-anchor: none;
-  /*
-   * Starts where the hero's glow has turned fully black at the end of the
-   * pin, whatever the window shape. Same terms as the hero: its fade (fade-top
-   * 1020 + 215 to full black − the 430 it travels = 805 design px), minus the
-   * hero's --lift on wide short windows, minus the hero height (screen
-   * height, capped at 1235 design px on tall windows).
-   * --pull-at: raise it to start lower, lower it to start closer.
-   */
-  margin-top: calc(
-    var(--u) * var(--pull-at, 845) - clamp(0px, calc(var(--u) * 860 - 100lvh), calc(var(--u) * 110)) -
-      min(100lvh, calc(var(--u) * 1235))
-  );
+  /* The hero is not pinned: the strip follows it directly. */
+  margin-top: 0;
   /* Bottom: space before the next section. */
   padding: 0 calc(var(--s) * 64) calc(var(--s) * 150);
   background: #000;
@@ -2737,7 +2727,8 @@
 
 /* Marquee strip at the top of the section, with room before the list. */
 .marqueeWrap {
-  margin-bottom: calc(var(--s) * 48);
+  /* Room for the character's hands hanging below the strip. */
+  margin-bottom: calc(var(--s) * 110);
 }
 
 /* Phones: the character hangs over the strip into the black, so more room before the first card. */
