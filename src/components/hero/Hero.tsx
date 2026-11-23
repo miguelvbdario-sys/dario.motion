@@ -320,7 +320,9 @@ export default function Hero() {
               start: "top top",
               end: pinDistance,
               invalidateOnRefresh: true,
-              pin: true,
+              // Phones: no pin; the hero scrolls with the page (the head still turns)
+              // and sits above the strip below it.
+              pin: !window.matchMedia(COMPACT_QUERY).matches,
               // No lag: the composition rises at exactly the scroll speed, so it moves
               // together with the Broadcast cards (a lag made one look pushed by the other).
               scrub: true,

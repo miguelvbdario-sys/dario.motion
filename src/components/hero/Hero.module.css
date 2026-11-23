@@ -679,32 +679,39 @@
  */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .stage {
-    height: calc(var(--u) * 490);
+    height: calc(var(--u) * 430);
+    /* Not pinned on phones: no travel, and the character can hang over the
+       white strip below (as if coming out of the screen). Sideways the name
+       still bleeds, so only that axis is clipped. */
+    --shift: 0px;
+    z-index: 2;
+    overflow-x: clip;
+    overflow-y: visible;
   }
 
   .title {
-    top: calc(var(--u) * 62);
+    top: calc(var(--u) * 92);
   }
 
   .head {
-    top: calc(var(--u) * 130);
+    top: calc(var(--u) * 175);
     left: calc(var(--u) * -5);
     width: calc(var(--u) * 400);
   }
 
   .emblemLeft {
-    top: calc(var(--u) * 152);
+    top: calc(var(--u) * 182);
     width: calc(var(--u) * 100);
   }
 
   .emblemRight {
-    top: calc(var(--u) * 227);
+    top: calc(var(--u) * 257);
     left: calc(var(--u) * 292);
     width: calc(var(--u) * 100);
   }
 
   .nav {
-    top: calc(var(--u) * 22);
+    top: calc(var(--u) * 46);
     left: 0;
     right: 0;
     flex-direction: row;
@@ -716,5 +723,12 @@
 
   .arrow {
     display: none;
+  }
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* The grain stays inside the red box even though the hero no longer clips vertically. */
+  .grain {
+    clip-path: inset(7.4% 0);
   }
 }

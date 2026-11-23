@@ -1738,8 +1738,8 @@
 /* Phones/portrait tablets: the hero has its own height there (see Hero.module.css). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .section {
-    /* Same as the hero pin on phones (330 phone design px): the strip sits right at the end of the red. */
-    margin-top: calc(min(100vw / 390, 100lvh / 720) * -330);
+    /* Phones: the hero is not pinned, so the strip follows it directly. */
+    margin-top: 0;
   }
 }
 
