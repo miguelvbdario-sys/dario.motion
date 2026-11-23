@@ -2762,3 +2762,8 @@
 .list[data-rows-wait] .row {
   rotate: x 28deg;
 }
+
+/* Marquee strip at the top of the section, with room before the list. */
+.marqueeWrap {
+  margin-bottom: calc(var(--s) * 48);
+}

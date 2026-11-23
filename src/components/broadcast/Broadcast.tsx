@@ -7,6 +7,7 @@ import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
+import Marquee from "@/components/marquee/Marquee";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -529,6 +530,10 @@ export default function Broadcast() {
       <h2 id="broadcast-title" className={styles.srOnly}>
         Broadcast
       </h2>
+      {/* White strip separating the hero from the rest of the site. */}
+      <div className={styles.marqueeWrap}>
+        <Marquee />
+      </div>
 
       <div ref={list} className={styles.list} onMouseMove={onMove} onMouseLeave={onLeave}>
         {BROADCAST.map((project, i) => {

@@ -1,0 +1,51 @@
+/* White marquee strip separating the hero from the rest of the site. */
+
+.marquee {
+  position: relative;
+  /* Full width even inside a padded section. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  background: var(--color-bone);
+  color: #000;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.half {
+  display: flex;
+  flex: none;
+}
+
+.item {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.35em 0;
+  font-family: var(--font-sans);
+  font-size: clamp(12px, 1vw, 16px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.sep {
+  margin: 0 1.1em;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}
