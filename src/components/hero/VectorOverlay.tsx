@@ -223,7 +223,8 @@ export default function VectorOverlay({
         if (gy !== written.gy) section.style.setProperty("--gy", (written.gy = gy));
         if (go !== written.go) section.style.setProperty("--go", (written.go = go));
         // The background scanlines bend like a lens under the same light.
-        scanlines.current?.draw(glow.x / 100, glow.y / 100, glow.on);
+        // Scanlines stay straight (the lens that bent them under the mouse is off).
+        scanlines.current?.draw(0.5, 0.5, 0);
 
         // ---- Tint: only the selected letter (CSS fades it over 0.5s) ----
         if (letter !== tinted) {
