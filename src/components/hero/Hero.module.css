@@ -797,15 +797,15 @@
 
 @keyframes headGlitch {
   0% { translate: 0 0; filter: none; }
-  4% { translate: -14px 0; filter: sepia(1) saturate(9) hue-rotate(-48deg) brightness(1.05); }
+  4% { translate: -14px 0; filter: grayscale(1) brightness(0.62) sepia(1) saturate(28) hue-rotate(-18deg); }
   10% { translate: 12px 0; }
-  16% { translate: -10px 0; filter: sepia(1) saturate(9) hue-rotate(-48deg) brightness(0.9); }
+  16% { translate: -10px 0; filter: grayscale(1) brightness(0.62) sepia(1) saturate(28) hue-rotate(-18deg); }
   22% { translate: 9px 0; }
-  30% { translate: -7px 0; filter: sepia(1) saturate(9) hue-rotate(-48deg) brightness(1.1); }
+  30% { translate: -7px 0; filter: grayscale(1) brightness(0.62) sepia(1) saturate(28) hue-rotate(-18deg); }
   40% { translate: 6px 0; }
   52% { translate: -4px 0; }
-  64% { translate: 3px 0; filter: sepia(1) saturate(9) hue-rotate(-48deg); }
+  64% { translate: 3px 0; filter: grayscale(1) brightness(0.62) sepia(1) saturate(28) hue-rotate(-18deg); }
   78% { translate: -2px 0; }
-  90% { translate: 1px 0; filter: sepia(0.5) saturate(4) hue-rotate(-48deg); }
+  90% { translate: 1px 0; filter: grayscale(0.5) sepia(0.5) saturate(8) hue-rotate(-18deg); }
   100% { translate: 0 0; filter: none; }
 }
