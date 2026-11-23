@@ -9,7 +9,9 @@
   /* Now follows the BROADCAST section (which took the spot under the feet). */
   margin-top: calc(100vw / 1920 * var(--pull, 0));
   /* Space above / below the carousel (between sections). */
-  padding: calc(clamp(64px, 7vw, 140px) - 25px) 0 clamp(96px, 10vw, 200px);
+  /* Top: the wall keeps room above the panels (hover zoom); pulled up under the giant title. */
+  padding: 0 0 clamp(96px, 10vw, 200px);
+  margin-block-start: calc(clamp(200px, 22vw, 520px) * -0.3);
   overflow: hidden;
   background: transparent;
 }
