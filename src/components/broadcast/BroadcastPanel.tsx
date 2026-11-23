@@ -71,7 +71,9 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    if (active) v.play().catch(() => {});
+    // Reduced motion: loops stay on their first frame / poster.
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (active && !reduced) v.play().catch(() => {});
     else v.pause();
   }, [active]);
   return (
@@ -880,7 +882,7 @@ export default function BroadcastPanel({
               >
                 <span className={styles.extraThumb}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={x.poster} alt="" loading="lazy" />
+                  <img src={x.poster} alt="" width={640} height={360} loading="lazy" />
                   <Play aria-hidden="true" className={styles.extraPlay} strokeWidth={2.5} />
                 </span>
                 <span className={styles.extraTitle}>{x.title}</span>

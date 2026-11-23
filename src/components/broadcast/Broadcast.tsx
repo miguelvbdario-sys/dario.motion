@@ -85,7 +85,9 @@ function useThumbs() {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia(THUMB_QUERY);
-    const set = () => setOn(mq.matches);
+    // Reduced motion: no thumbnails loops at all (the row reads fine without).
+    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const set = () => setOn(mq.matches && !still);
     set();
     mq.addEventListener("change", set);
     return () => mq.removeEventListener("change", set);

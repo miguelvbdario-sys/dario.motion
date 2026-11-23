@@ -395,7 +395,7 @@ export default function Hero() {
         </p>
 
         <div className={styles.comp}>
-          <h1 ref={title} className={styles.title}>
+          <h1 ref={title} className={styles.title} translate="no">
             {/* One span per letter, so the hovered letter can be tinted on its own. */}
             {["Miguel", "Dario"].map((word) => (
               <span key={word} data-word>

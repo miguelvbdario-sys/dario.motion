@@ -424,7 +424,7 @@ export default function Course() {
           }
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={lessons.video.poster} alt="" loading="lazy" />
+          <img src={lessons.video.poster} alt="" width={1280} height={720} loading="lazy" />
           <span className={styles.playBadge}>
             <Play aria-hidden="true" strokeWidth={2.5} />
             Assistir trechos

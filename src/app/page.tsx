@@ -7,7 +7,7 @@ import Loader from "@/components/loader/Loader";
 
 export default function Home() {
   return (
-    <main>
+    <main id="main">
       {/* First portrait frame, fetched before the scripts run. Queries mirror Hero.module.css. */}
       <link
         rel="preload"

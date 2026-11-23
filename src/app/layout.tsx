@@ -1,4 +1,4 @@
-﻿import type { Metadata } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import "lenis/dist/lenis.css";
 import "./globals.css";
 import { inter, mono, tusker, wildest } from "./fonts";
@@ -19,6 +19,12 @@ export const metadata: Metadata = {
     siteName: "Miguel Dario",
   },
   twitter: { card: "summary_large_image" },
+};
+
+/** Browser UI (address bar on phones) matches the black page. */
+export const viewport: Viewport = {
+  themeColor: "#000000",
+  colorScheme: "dark",
 };
 
 /** Structured data: tells search engines who the site is about. */
@@ -42,6 +48,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_LD).replace(/</g, "\\u003c") }}
         />
+        {/* Keyboard users can jump past the hero straight to the work. */}
+        <a href="#broadcast" className="skip-link">
+          Skip to the work
+        </a>
         {/* The hero intro starts hidden and is revealed by script; without scripts, show it as is. */}
         <noscript>
           <style>{`[data-reveal],[data-word],[data-head],[data-vline],[data-hline],[data-mark]{opacity:1!important}`}</style>

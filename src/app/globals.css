@@ -115,3 +115,28 @@ body {
     animation-duration: 0.01s;
   }
 }
+
+/* Skip link: hidden until focused with the keyboard. */
+.skip-link {
+  position: fixed;
+  z-index: 9500;
+  top: 12px;
+  left: 12px;
+  padding: 10px 16px;
+  border-radius: 4px;
+  background: var(--color-signal);
+  color: #140006;
+  font-weight: 900;
+  text-decoration: none;
+  translate: 0 -200%;
+}
+
+.skip-link:focus-visible {
+  translate: 0 0;
+}
+
+/* Touch: no double-tap zoom delay on controls, no grey tap flash. */
+:where(button, a, [role="tab"], [role="option"]) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+}

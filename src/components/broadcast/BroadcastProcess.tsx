@@ -122,7 +122,7 @@ function StepBody({ s, i }: { s: (typeof STEPS)[number]; i: number }) {
         <p className={styles.processText}>{s.text}</p>
         {"img" in s && s.img && (
           // eslint-disable-next-line @next/next/no-img-element
-          <img className={styles.processImg} src={s.img.src} alt={s.img.alt} loading="lazy" />
+          <img className={styles.processImg} src={s.img.src} alt={s.img.alt} width={640} height={360} loading="lazy" />
         )}
       </div>
     </>
