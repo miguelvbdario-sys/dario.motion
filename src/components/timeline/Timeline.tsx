@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import type Lenis from "lenis";
 import { onSoundChange, setSound, soundOn } from "@/lib/sound";
 import styles from "./Timeline.module.css";
@@ -45,13 +45,8 @@ export default function Timeline() {
   const [marks, setMarks] = useState<{ id: string; label: string; at: number }[]>([]);
   const [shown, setShown] = useState(false);
   const [past, setPast] = useState(false);
-  const [sound, setSoundState] = useState(false);
-
   // Sound toggle: starts off; remembers the choice on this device.
-  useEffect(() => {
-    setSoundState(soundOn());
-    return onSoundChange(setSoundState);
-  }, []);
+  const sound = useSyncExternalStore((cb) => onSoundChange(() => cb()), soundOn, () => false);
 
   useEffect(() => {
     let max = 1;

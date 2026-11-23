@@ -200,6 +200,8 @@ export default function Course() {
 
       {/* ---------- Top bar ---------- */}
       <header className={styles.top}>
+        {/* A full page load on purpose: it runs the cross-document view transition. */}
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className={styles.back}>
           <ArrowLeft aria-hidden="true" strokeWidth={2} />
           dario.motion
@@ -477,6 +479,7 @@ export default function Course() {
             {pitch.cta}
           </Cta>
         </div>
+        {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className={styles.footBack}>
           <ArrowLeft aria-hidden="true" strokeWidth={2} />
           Voltar ao portfólio

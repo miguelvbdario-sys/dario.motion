@@ -47,7 +47,11 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
   const video = useRef<HTMLVideoElement>(null);
   const closing = useRef(false);
   const reduced = useRef(false);
-  const originRef = { get current() { return origin?.current ?? null; } };
+  // Latest origin ref, read inside the open/close animations.
+  const originRef = useRef(origin);
+  useEffect(() => {
+    originRef.current = origin;
+  });
 
   useEffect(() => {
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -70,8 +74,8 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
       } else {
         gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" });
         if (box) {
-          const hasOrigin = !!originRef.current?.isConnected;
-          gsap.set(box, { transformOrigin: originOf(box, originRef.current) });
+          const hasOrigin = !!originRef.current?.current?.isConnected;
+          gsap.set(box, { transformOrigin: originOf(box, originRef.current?.current) });
           gsap.fromTo(
             box,
             { scale: hasOrigin ? FROM_SCALE : 0.86, opacity: 0 },
@@ -99,8 +103,8 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
       return;
     }
     // Back into what opened it (the page may have moved, so measure again).
-    const hasOrigin = !!originRef.current?.isConnected;
-    gsap.set(box, { transformOrigin: originOf(box, originRef.current) });
+    const hasOrigin = !!originRef.current?.current?.isConnected;
+    gsap.set(box, { transformOrigin: originOf(box, originRef.current?.current) });
     gsap.to(box, { scale: hasOrigin ? FROM_SCALE : 0.9, opacity: 0, ...OUT, overwrite: true });
     gsap.to(el, { opacity: 0, duration: OUT.duration, ease: "power2.in", onComplete: done });
   }, []);

@@ -134,7 +134,6 @@ function ScreenSwipe({
   useLayoutEffect(() => {
     if (track.current) gsap.set(track.current, { x: 0 });
     busy.current = false;
-    setMoving(false);
     if (title.current && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
       gsap.fromTo(title.current, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
     }
@@ -155,7 +154,10 @@ function ScreenSwipe({
       duration: 0.38,
       ease: "power3.out",
       overwrite: true,
-      onComplete: () => onChange(wrap(index + d)),
+      onComplete: () => {
+        setMoving(false);
+        onChange(wrap(index + d));
+      },
     });
   };
 
