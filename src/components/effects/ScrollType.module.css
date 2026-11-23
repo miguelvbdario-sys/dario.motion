@@ -1,0 +1,91 @@
+/* Giant section title crossing the screen (ScrollType.tsx). */
+
+.band {
+  position: relative;
+  /* Full width even inside a padded section. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: clamp(28px, 4vw, 72px) 0 clamp(36px, 5vw, 96px);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  /* One copy to the left, so there is always text on both sides; --x is the scroll travel. */
+  translate: calc(-25% + var(--x, 0vw)) 0;
+  will-change: translate;
+}
+
+.word {
+  flex: none;
+  padding-right: 0.22em;
+  font-family: var(--font-display);
+  /* Size of the giant title. */
+  font-size: clamp(104px, 22vw, 420px);
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #e60000;
+  white-space: nowrap;
+}
+
+/* The copies beside the main one are dimmer, so one word reads at a time. */
+.word:not(:nth-child(2)) {
+  color: transparent;
+  -webkit-text-stroke: 1px rgb(230 0 0 / 0.55);
+}
+
+/* Small index above the title: dim until the title reaches the middle. */
+.index {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 clamp(10px, 1.2vw, 20px) clamp(16px, 4.4vw, 64px);
+  font-family: var(--font-sans);
+  font-size: clamp(10px, 0.75vw, 12px);
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--color-bone);
+  opacity: 0.35;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgb(239 238 238 / 0.3);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.band[data-lit] .index {
+  opacity: 1;
+}
+
+/* "On air" light: turns red with a glow. */
+.band[data-lit] .dot {
+  background: #ff1a1a;
+  box-shadow: 0 0 10px 2px rgb(255 26 26 / 0.6);
+}
+
+/* Red hairline that fills up while the title crosses. */
+.line {
+  position: absolute;
+  left: clamp(16px, 4.4vw, 64px);
+  right: clamp(16px, 4.4vw, 64px);
+  bottom: clamp(18px, 2.5vw, 48px);
+  height: 2px;
+  background: #e60000;
+  transform-origin: left;
+  scale: var(--p, 0) 1;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .word {
+    font-size: 25vw;
+  }
+}

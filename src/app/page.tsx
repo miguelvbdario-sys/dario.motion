@@ -4,6 +4,7 @@ import WorksCarousel from "@/components/works-carousel/WorksCarousel";
 import About from "@/components/about/About";
 import Timeline from "@/components/timeline/Timeline";
 import Loader from "@/components/loader/Loader";
+import ScrollType from "@/components/effects/ScrollType";
 
 export default function Home() {
   return (
@@ -31,7 +32,9 @@ export default function Home() {
       {/* Broadcast projects (the interactive scoreboard lives in the Paulistão card). */}
       <Broadcast />
       {/* Works: the side-scrolling carousel of cards. */}
+      <ScrollType text="Works" index="02" dir={-1} />
       <WorksCarousel />
+      <ScrollType text="About" index="03" />
 
       {/* About: portrait, intro and contact buttons. */}
       <About />

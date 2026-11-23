@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { Fragment, useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
@@ -8,6 +8,8 @@ import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
 import Marquee from "@/components/marquee/Marquee";
+import ScrollType from "@/components/effects/ScrollType";
+import { onScrollFrame, progress } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -164,6 +166,36 @@ export default function Broadcast() {
       io.disconnect();
       cancelAnimationFrame(raf);
     };
+  }, []);
+
+  // Row entrance tied to the scroll (scrub): as a row comes up from the
+  // bottom of the screen a red slab sweeps over it from its side (--a), then
+  // pulls away the same way and uncovers the title (--b). Scrolling back
+  // plays it in reverse. Positions are read every frame, so an open card
+  // above can't leave a row stuck hidden; an open row is always shown.
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const easeOut = (t: number) => 1 - (1 - t) ** 3;
+    const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
+    return onScrollFrame((vh) => {
+      rows.current.forEach((row) => {
+        if (!row) return;
+        const top = row.getBoundingClientRect().top;
+        // 0 when the row's top is at 98% of the screen, 1 at 62%.
+        const t = row.dataset.open !== undefined ? 1 : progress(vh * 0.98 - top, 0, vh * 0.36);
+        if (t >= 1) {
+          if (row.dataset.rv !== undefined) {
+            delete row.dataset.rv;
+            row.style.removeProperty("--a");
+            row.style.removeProperty("--b");
+          }
+          return;
+        }
+        row.dataset.rv = "";
+        row.style.setProperty("--a", easeOut(progress(t, 0, 0.55)).toFixed(4));
+        row.style.setProperty("--b", easeInOut(progress(t, 0.45, 1)).toFixed(4));
+      });
+    });
   }, []);
 
   // Thumbnails load and play only while their row is on screen (they used to
@@ -504,6 +536,9 @@ export default function Broadcast() {
         <Marquee />
       </div>
 
+      {/* Giant section title crossing the screen with the scroll. */}
+      <ScrollType text="Broadcast" index="01" />
+
       <div ref={list} className={styles.list} onMouseMove={onMove} onMouseLeave={onLeave}>
         {BROADCAST.map((project, i) => {
           const isOpen = openId === project.id;
@@ -531,6 +566,8 @@ export default function Broadcast() {
                     <video src={project.preview} poster={project.img ?? undefined} muted loop playsInline preload="none" />
                   </span>
                 )}
+                {/* Scroll entrance: a red slab sweeps in over the row, then pulls away. */}
+                <span className={styles.wipe} aria-hidden="true" />
                 <span className={styles.bar} data-bar="top" aria-hidden="true">
                   <RowContent project={project} black />
                 </span>

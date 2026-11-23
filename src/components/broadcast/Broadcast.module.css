@@ -74,6 +74,46 @@
   align-self: flex-end;
 }
 
+/*
+ * Scroll entrance (Broadcast.tsx, scrub): while data-rv is on, --a (0→1)
+ * opens the row from its side and --b (0→1) pulls the red slab away the same
+ * way, uncovering the title, which slides in a little behind it. Rows on the
+ * right open from the right.
+ */
+.wipe {
+  display: none;
+}
+
+.row[data-rv] {
+  clip-path: inset(0 calc((1 - var(--a, 1)) * 100%) 0 0);
+}
+
+.row[data-rv][data-align="right"] {
+  clip-path: inset(0 0 0 calc((1 - var(--a, 1)) * 100%));
+}
+
+.row[data-rv] > .wipe {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: block;
+  background: var(--red);
+  clip-path: inset(0 0 0 calc(var(--b, 1) * 100%));
+  pointer-events: none;
+}
+
+.row[data-rv][data-align="right"] > .wipe {
+  clip-path: inset(0 calc(var(--b, 1) * 100%) 0 0);
+}
+
+.row[data-rv] > .content {
+  translate: calc((1 - var(--b, 1)) * -48px) 0;
+}
+
+.row[data-rv][data-align="right"] > .content {
+  translate: calc((1 - var(--b, 1)) * 48px) 0;
+}
+
 .row:focus-visible {
   outline: 2px solid var(--red);
   outline-offset: 3px;
