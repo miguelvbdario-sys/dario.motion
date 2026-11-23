@@ -592,3 +592,35 @@
     inset: -6px -8px;
   }
 }
+
+/*
+ * Parallax while the hero is pinned (--p goes 0 → 1 with the scroll; the
+ * whole composition already rises by --shift). On top of that, each layer
+ * gets its own depth, using the separate translate/scale properties so they
+ * never fight the GSAP intro transforms:
+ *   name      slower (lags behind) and its two words drift apart
+ *   head      the reference: moves with the composition
+ *   emblems   faster and a little bigger, as if coming toward the camera
+ *   pills     slightly faster
+ * Reduced motion: no scrub, so --p stays 0 and nothing moves.
+ */
+.title {
+  translate: 0 calc(var(--p, 0) * var(--shift) * 0.28);
+}
+
+.title > span:first-child {
+  translate: calc(var(--p, 0) * var(--u) * -70) 0;
+}
+
+.title > span:last-child {
+  translate: calc(var(--p, 0) * var(--u) * 70) 0;
+}
+
+.emblem {
+  translate: 0 calc(var(--p, 0) * var(--shift) * -0.35);
+  scale: calc(1 + var(--p, 0) * 0.14);
+}
+
+.nav {
+  translate: 0 calc(var(--p, 0) * var(--shift) * -0.12);
+}

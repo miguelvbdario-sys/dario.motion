@@ -214,3 +214,27 @@
   clip-path: inset(50%);
   white-space: nowrap;
 }
+
+/*
+ * Parallax: the big script name drifts against the scroll, so it moves slower
+ * than the photo and the text in front of it (scroll-driven, no JS; browsers
+ * without scroll timelines just keep it still).
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .script {
+      animation: aboutScriptDrift linear both;
+      animation-timeline: view();
+      animation-range: entry 0% exit 100%;
+    }
+  }
+}
+
+@keyframes aboutScriptDrift {
+  from {
+    translate: 0 calc(var(--s) * -120);
+  }
+  to {
+    translate: 0 calc(var(--s) * 120);
+  }
+}

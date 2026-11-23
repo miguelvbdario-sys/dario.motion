@@ -1,5 +1,6 @@
 import Image from "next/image";
 import { ABOUT } from "@/content/about";
+import WordReveal from "@/components/effects/WordReveal";
 import styles from "./About.module.css";
 
 /*
@@ -43,7 +44,8 @@ export default function About() {
 
         <div className={styles.text}>
           <p id="about-lead" className={styles.lead}>
-            {ABOUT.lead}
+            {/* Words light up one by one as the lead crosses the screen. */}
+            <WordReveal text={ABOUT.lead} />
           </p>
           {ABOUT.paragraphs.map((p) => (
             <p key={p} className={styles.body}>

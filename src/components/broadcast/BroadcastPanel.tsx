@@ -11,6 +11,7 @@ import BroadcastMascots from "./BroadcastMascots";
 import BroadcastProcess from "./BroadcastProcess";
 import { PAULISTAO_ASSETS, PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import { FOCUS_AT } from "./focus";
+import WordReveal from "@/components/effects/WordReveal";
 import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -508,7 +509,8 @@ export default function BroadcastPanel({
           {(ab?.lead ?? project.desc).split("\n").map((part, i) => (
             <span key={i} className={styles.aboutLeadPart}>
               {i > 0 && " "}
-              {part}
+              {/* Words light up one by one when the About opens. */}
+              <WordReveal text={part} mode="play" play={aboutShown} />
             </span>
           ))}
         </p>
