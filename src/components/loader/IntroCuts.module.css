@@ -1,0 +1,54 @@
+/* Opening sting (IntroCuts.tsx): full-screen cuts, then the name building up. */
+
+.intro {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #000;
+}
+
+.cut {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 15vw;
+  font-weight: 800;
+  line-height: 0.82;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--color-bone);
+}
+
+.name span {
+  display: inline-block;
+}
+
+.space {
+  width: 0.25em;
+}
+
+/* Phones: MIGUEL over DARIO. */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .name {
+    font-size: 27vw;
+    line-height: 0.84;
+  }
+
+  .space {
+    display: block;
+    width: auto;
+    height: 0;
+  }
+}

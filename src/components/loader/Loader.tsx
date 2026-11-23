@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import type Lenis from "lenis";
 import { markLoaded } from "@/lib/loader";
+import IntroCuts, { preloadCuts } from "./IntroCuts";
 import styles from "./Loader.module.css";
 
 /*
@@ -30,6 +31,8 @@ export default function Loader() {
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [gone, setGone] = useState(false);
+  /** The opening sting (IntroCuts) runs between the loader and the hero. */
+  const [sting, setSting] = useState(false);
 
   useEffect(() => {
     const el = root.current;
@@ -40,6 +43,7 @@ export default function Loader() {
     // Lenis is created by a parent effect, which runs after this one.
     const stopLenis = setTimeout(() => lenis()?.stop(), 0);
     document.documentElement.style.overflow = "hidden";
+    if (!reduced) preloadCuts();
 
     // Turning face: draw whichever frames have arrived, in order, on a loop.
     const imgs = FACE_FRAMES.map((f) => {
@@ -77,6 +81,13 @@ export default function Loader() {
     const lift = () => {
       if (done) return;
       done = true;
+      // Motion on: hard cut from the loader into the opening sting, which hands
+      // over to the hero when it ends (finish()).
+      if (!reduced) {
+        cancelAnimationFrame(raf);
+        setSting(true);
+        return;
+      }
       // Close fast (the visitor is waiting for the page, not for the loader).
       gsap.to(el, {
         opacity: 0,
@@ -103,6 +114,17 @@ export default function Loader() {
   }, []);
 
   if (gone) return null;
+  if (sting)
+    return (
+      <IntroCuts
+        onDone={() => {
+          document.documentElement.style.overflow = "";
+          lenis()?.start();
+          setGone(true);
+          markLoaded();
+        }}
+      />
+    );
   return (
     <div ref={root} className={styles.loader} role="status" aria-live="polite" aria-label="Loading">
       <canvas ref={canvas} className={styles.face} width={160} height={160} aria-hidden="true" />

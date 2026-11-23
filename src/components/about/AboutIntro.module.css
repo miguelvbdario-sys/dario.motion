@@ -1,0 +1,82 @@
+/* Scroll sequence before ABOUT (AboutIntro.tsx). */
+
+.track {
+  position: relative;
+  /* Scroll length: 100vh of screen + 140vh of animation. */
+  height: 240vh;
+  background: #000;
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.outline,
+.half {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  line-height: 0.84;
+  letter-spacing: 0.01em;
+  text-align: center;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-size: clamp(72px, 15vw, 280px);
+  pointer-events: none;
+}
+
+.outline {
+  z-index: 2;
+  transform: translate(-50%, -50%);
+  color: transparent;
+  -webkit-text-stroke: 2px #e60000;
+}
+
+.circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  width: 24vmax;
+  height: 24vmax;
+  border-radius: 50%;
+  background: #e60000;
+  visibility: hidden;
+  will-change: transform;
+}
+
+.half {
+  z-index: 4;
+  color: var(--color-bone);
+  visibility: hidden;
+  will-change: transform;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .outline,
+  .half {
+    font-size: 26vw;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    height: 100vh;
+  }
+}

@@ -2,6 +2,7 @@ import Hero from "@/components/hero/Hero";
 import Broadcast from "@/components/broadcast/Broadcast";
 import WorksCarousel from "@/components/works-carousel/WorksCarousel";
 import About from "@/components/about/About";
+import AboutIntro from "@/components/about/AboutIntro";
 import Timeline from "@/components/timeline/Timeline";
 import Loader from "@/components/loader/Loader";
 import ScrollType from "@/components/effects/ScrollType";
@@ -35,6 +36,8 @@ export default function Home() {
       <ScrollType outline="More" text="Works" index="02" dir={-1} />
       <WorksCarousel />
       <ScrollType text="About me" index="03" />
+      {/* Scroll sequence: video cuts, then the name opens into the red of ABOUT. */}
+      <AboutIntro />
 
       {/* About: portrait, intro and contact buttons. */}
       <About />
