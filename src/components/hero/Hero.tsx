@@ -424,13 +424,6 @@ export default function Hero() {
             <Emblem id="right" src="/3d/emblem-right.glb" label="Chrome 3D vulture emblem" speed={-0.6} />
           </div>
 
-          <p className={`${styles.script} ${styles.senior}`} data-reveal data-vector>
-            Senior
-          </p>
-          <p className={`${styles.script} ${styles.role}`} data-reveal data-vector>
-            <span>Motion</span> <span>Designer</span>
-          </p>
-
           {/* Navigation: each pill scrolls to its section (Course opens /course in the same tab). */}
           <nav className={styles.nav} aria-label="Sections">
             {PILLS.map((pill) => {

@@ -17,7 +17,7 @@
 .face {
   width: 64px;
   height: 64px;
-  margin-bottom: 12px;
+  margin-bottom: 4px;
   image-rendering: pixelated;
 }
 
@@ -32,16 +32,23 @@
 .role {
   margin: 0;
   font-family: var(--font-sans);
-  font-size: 12px;
+  font-size: 9px;
+  font-style: italic;
   font-weight: 400;
+  letter-spacing: 0.04em;
   color: rgb(239 238 238 / 0.6);
 }
 
 /* "..." filling in one dot at a time, on a loop. */
+/* Under the role, centred; each dot keeps its place so nothing shifts. */
 .dots {
-  display: inline-block;
-  width: 1.2em;
-  text-align: left;
+  margin: 6px 0 0;
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1;
+  letter-spacing: 0.15em;
+  padding-left: 0.15em; /* balances the tracking after the last dot */
+  color: rgb(239 238 238 / 0.6);
 }
 
 .dots span {

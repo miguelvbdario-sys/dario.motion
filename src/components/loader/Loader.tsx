@@ -11,15 +11,17 @@ import styles from "./Loader.module.css";
  * of the hero "look" render on a loop), then "Miguel Dario" and "motion
  * designer" with a "..." that fills while the page loads. No counter.
  *
- * It lifts once the fonts and the hero's rest frame are in, never before
- * MIN_MS (so it doesn't flash) and never after MAX_MS. Then the hero intro plays.
+ * It lifts once the fonts and the hero's rest frame are in, but never before
+ * MIN_MS (3s, even when the page is ready sooner) and never after MAX_MS.
+ * Then the hero intro plays.
  */
 
 /** Frames of /sequence/hero-look-720 used for the turning face (also warm the hero's cache). */
 const FACE_FRAMES = [49, 42, 34, 26, 18, 12, 18, 26, 34, 42, 49, 58, 68, 78, 88, 78, 68, 58];
-const FACE_FPS = 10;
-const MIN_MS = 700;
-const MAX_MS = 3000;
+const FACE_FPS = 6;
+/** The screen stays at least this long, even if the page is ready sooner. */
+const MIN_MS = 3000;
+const MAX_MS = 5000;
 
 const pad = (n: number) => String(n).padStart(3, "0");
 const lenis = () => (window as unknown as { lenis?: Lenis }).lenis;
@@ -105,13 +107,11 @@ export default function Loader() {
     <div ref={root} className={styles.loader} role="status" aria-live="polite" aria-label="Loading">
       <canvas ref={canvas} className={styles.face} width={160} height={160} aria-hidden="true" />
       <p className={styles.name}>Miguel Dario</p>
-      <p className={styles.role}>
-        motion designer
-        <span className={styles.dots} aria-hidden="true">
-          <span>.</span>
-          <span>.</span>
-          <span>.</span>
-        </span>
+      <p className={styles.role}>senior motion designer</p>
+      <p className={styles.dots} aria-hidden="true">
+        <span>.</span>
+        <span>.</span>
+        <span>.</span>
       </p>
     </div>
   );
