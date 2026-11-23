@@ -732,3 +732,12 @@
     clip-path: inset(7.4% 0);
   }
 }
+
+/* Phones: the character hangs below the red box, over the strip and the black;
+   it takes touches itself so dragging works on all of it (the box test in
+   Hero.tsx still decides what counts as the character). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .head {
+    pointer-events: auto;
+  }
+}

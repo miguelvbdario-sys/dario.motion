@@ -59,7 +59,7 @@ const RETURN_SPEED = 2.0;
  * in the rest frame, as fractions of the head canvas (measured 0.247 → 0.771).
  * Lower `from` / higher `to` widens it. top/bottom: its height (touch hit area).
  */
-const REST_ZONE = { from: 0.247, to: 0.771, top: 0.157, bottom: 0.69 };
+const REST_ZONE = { from: 0.247, to: 0.771, top: 0.157, bottom: 0.76 };
 /**
  * "Look" sequence (/sequence/hero-look and hero-look-720): one render, files
  * 000–098 = the source frames 023–121. rest = the rest pose (source frame 72);
