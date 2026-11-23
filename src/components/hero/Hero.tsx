@@ -34,11 +34,17 @@ const arrowFrame = (f: number) => (f / HEAD.last) * ARROW_FRAMES.last;
 /**
  * Scroll distance the hero stays pinned for. Desktop: exactly the distance the
  * composition travels (--shift, 430 design px), so when the pin starts the
- * Broadcast list already sits right under the hero. Phones: 60% of the screen.
+ * Broadcast list already sits right under the hero. Phones: the same idea with their own 330 design px.
  */
 const PIN_SHIFT = 430;
+/** Phones: the composition travels 330 phone design px (--shift in the CSS). */
+const PIN_SHIFT_PHONE = 330;
 const pinDistance = () =>
-  window.matchMedia(COMPACT_QUERY).matches ? "+=60%" : `+=${Math.round((window.innerWidth / 1920) * PIN_SHIFT)}`;
+  window.matchMedia(COMPACT_QUERY).matches
+    ? // Phones: pinned exactly as long as the composition rises, so it moves with the
+      // scroll (the head still turns) and the next section never slides over it.
+      `+=${Math.round(Math.min(window.innerWidth / 390, window.innerHeight / 720) * PIN_SHIFT_PHONE)}`
+    : `+=${Math.round((window.innerWidth / 1920) * PIN_SHIFT)}`;
 /** Touch: drag this many px sideways to run from rest to the left end. */
 const DRAG_DISTANCE = 200;
 /**

@@ -671,3 +671,50 @@
 .fade {
   display: none;
 }
+
+/*
+ * Phones: a shorter hero. More red above the name, a smaller character, the
+ * pills in one horizontal row under it (no hand-drawn arrow, which pointed at
+ * the old vertical stack). Values in phone design px (--u, 390 wide).
+ */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .stage {
+    height: calc(var(--u) * 540);
+  }
+
+  .title {
+    top: calc(var(--u) * 100);
+  }
+
+  .head {
+    top: calc(var(--u) * 168);
+    left: calc(var(--u) * -5);
+    width: calc(var(--u) * 400);
+  }
+
+  .emblemLeft {
+    top: calc(var(--u) * 190);
+    width: calc(var(--u) * 100);
+  }
+
+  .emblemRight {
+    top: calc(var(--u) * 265);
+    left: calc(var(--u) * 292);
+    width: calc(var(--u) * 100);
+  }
+
+  .nav {
+    top: calc(var(--u) * 470);
+    left: 0;
+    right: 0;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: calc(var(--u) * 5);
+    font-size: calc(var(--u) * 12.5);
+  }
+
+  .arrow {
+    display: none;
+  }
+}
