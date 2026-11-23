@@ -1,7 +1,7 @@
 import styles from "./Marquee.module.css";
 
 /*
- * White strip under the hero: "MIGUEL DARIO — SENIOR MOTION DESIGNER —
+ * White strip under the hero: "MIGUEL DARIO • SENIOR MOTION DESIGNER •
  * @DARIO.MOTION" repeated, sliding sideways forever (pure CSS). The track holds
  * two identical halves, so moving it by -50% loops without a seam.
  */
@@ -18,7 +18,7 @@ export default function Marquee() {
             {half.map((t, i) => (
               <span key={i} className={styles.item}>
                 {t}
-                <span className={styles.sep}>—</span>
+                <span className={styles.sep}>•</span>
               </span>
             ))}
           </span>

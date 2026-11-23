@@ -24,18 +24,18 @@
 .item {
   display: inline-flex;
   align-items: center;
-  padding: 0.35em 0;
+  padding: 1.1em 0;
   font-family: var(--font-sans);
-  font-size: clamp(12px, 1vw, 16px);
+  font-size: clamp(9px, 0.7vw, 12px);
   font-weight: 900;
   line-height: 1;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.9em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .sep {
-  margin: 0 1.1em;
+  margin: 0 1.6em 0 0.7em;
 }
 
 @keyframes marquee {

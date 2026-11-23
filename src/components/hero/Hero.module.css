@@ -666,3 +666,8 @@
     color: #000;
   }
 }
+
+/* No black gradient at the bottom: the red runs straight to the marquee strip. */
+.fade {
+  display: none;
+}
