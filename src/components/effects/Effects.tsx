@@ -18,7 +18,9 @@ const MAG_RADIUS = 20; // px around the element where the pull starts (reaches a
 const MAG_PULL = 0.3;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=<>/";
 const SCRAMBLE_SELECTOR = "[data-scramble], [class*='sideLabel'], [class*='playerIndexLabel']";
-const SCRAMBLE_MS = 320;
+const SCRAMBLE_MS = 520;
+/** Most letters scrambled at once (share of the text, at the middle of the effect). */
+const SCRAMBLE_PEAK = 0.35;
 
 export default function Effects() {
   useEffect(() => {
@@ -106,11 +108,13 @@ export default function Effects() {
       const start = performance.now();
       const step = (t: number) => {
         const p = Math.min(1, (t - start) / SCRAMBLE_MS);
-        const fixed = Math.floor(p * p * final.length);
-        let out = final.slice(0, fixed);
-        for (let i = fixed; i < final.length; i++) {
+        // Eases in and out: the share of scrambled letters rises from 0 to
+        // SCRAMBLE_PEAK in the middle and settles back to 0 (a sine bump).
+        const amount = Math.sin(Math.PI * p) * SCRAMBLE_PEAK;
+        let out = "";
+        for (let i = 0; i < final.length; i++) {
           const c = final[i];
-          out += " []:·/".includes(c) ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          out += " []:·/".includes(c) || Math.random() > amount ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
         }
         els.forEach((el) => (el.textContent = p < 1 ? out : final));
         if (p < 1) requestAnimationFrame(step);
