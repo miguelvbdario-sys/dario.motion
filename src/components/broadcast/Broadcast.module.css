@@ -2589,3 +2589,94 @@
     white-space: nowrap;
   }
 }
+
+/* ---------- Phones: Broadcast Screens swipe carousel (ScreenSwipe) ---------- */
+.swipe {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+}
+
+/* The 16:9 window; the track inside slides with the finger. */
+.swipeView {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  touch-action: pan-y;
+  border-radius: 5px;
+}
+
+.swipeView[data-assets] {
+  aspect-ratio: auto;
+  height: min(70vh, 460px);
+}
+
+.swipeTrack {
+  position: absolute;
+  inset: 0;
+  will-change: transform;
+}
+
+.swipeSlide {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #000;
+}
+
+.swipeSlide > video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.swipeSlide > .assetsList {
+  height: 100%;
+}
+
+.swipeAssetsCard {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  background: #111;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: 20px;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+/* Title right under the screen, left aligned like a player's track name. */
+.swipeMeta {
+  padding: 14px 2px 4px;
+}
+
+.swipeTitle {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 22px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+  color: #efeeee;
+}
+
+.swipeSub {
+  margin: 4px 0 0;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(239 238 238 / 0.6);
+}
+
+.swipe > .screenNavRow {
+  justify-content: center;
+  padding: 12px 0 4px;
+}

@@ -2,6 +2,7 @@ import Hero from "@/components/hero/Hero";
 import Broadcast from "@/components/broadcast/Broadcast";
 import WorksCarousel from "@/components/works-carousel/WorksCarousel";
 import About from "@/components/about/About";
+import Timeline from "@/components/timeline/Timeline";
 
 export default function Home() {
   return (
@@ -30,6 +31,9 @@ export default function Home() {
 
       {/* About: portrait, intro and contact buttons. */}
       <About />
+
+      {/* Scroll progress as an After Effects timeline, with section markers (and back to top on phones). */}
+      <Timeline />
     </main>
   );
 }

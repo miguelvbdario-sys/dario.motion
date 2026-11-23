@@ -16,7 +16,6 @@ import styles from "./Broadcast.module.css";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
-const SLIDE_MS = 450;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 /**
@@ -87,6 +86,161 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
       disablePictureInPicture
       aria-hidden="true"
     />
+  );
+}
+
+/** Gap between two screens while they slide (px), like a music player's covers. */
+const SWIPE_GAP = 16;
+
+/**
+ * Phones: Broadcast Screens as a swipe carousel. The track (previous, current,
+ * next) follows the finger; on release it glides to the next screen when the
+ * swipe passed 20% of the width (or was a quick flick), otherwise it springs
+ * back. The title sits right under the screen, then the arrows.
+ */
+function ScreenSwipe({
+  screens,
+  index,
+  onChange,
+  live,
+  assets,
+}: {
+  screens: { label: string; video: string | null; assets?: boolean }[];
+  index: number;
+  onChange: (i: number) => void;
+  live: boolean;
+  assets: React.ReactNode;
+}) {
+  const view = useRef<HTMLDivElement>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const title = useRef<HTMLDivElement>(null);
+  const n = screens.length;
+  const wrap = (i: number) => (i + n) % n;
+  const [moving, setMoving] = useState(false);
+  const busy = useRef(false);
+  const drag = useRef<{ x: number; y: number; t: number; lock: "x" | "y" | null; id: number } | null>(null);
+
+  // New screen in place: the track goes back to the centre without animating,
+  // and the title under it swaps in.
+  useLayoutEffect(() => {
+    if (track.current) gsap.set(track.current, { x: 0 });
+    busy.current = false;
+    setMoving(false);
+    if (title.current && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      gsap.fromTo(title.current, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
+    }
+  }, [index]);
+
+  const step = (d: 1 | -1) => {
+    const el = track.current;
+    const w = view.current?.offsetWidth ?? 0;
+    if (!el || !w || busy.current) return;
+    busy.current = true;
+    setMoving(true);
+    gsap.to(el, {
+      x: -d * (w + SWIPE_GAP),
+      duration: 0.38,
+      ease: "power3.out",
+      overwrite: true,
+      onComplete: () => onChange(wrap(index + d)),
+    });
+  };
+
+  const onDown = (e: React.PointerEvent) => {
+    if (busy.current) return;
+    drag.current = { x: e.clientX, y: e.clientY, t: performance.now(), lock: null, id: e.pointerId };
+  };
+  const onMove = (e: React.PointerEvent) => {
+    const d = drag.current;
+    if (!d || e.pointerId !== d.id) return;
+    const dx = e.clientX - d.x;
+    const dy = e.clientY - d.y;
+    if (!d.lock) {
+      if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+      d.lock = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+      if (d.lock === "x") {
+        setMoving(true);
+        try {
+          (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+        } catch {
+          // Pointer already gone.
+        }
+      }
+    }
+    if (d.lock === "x" && track.current) gsap.set(track.current, { x: dx });
+  };
+  const onUp = (e: React.PointerEvent) => {
+    const d = drag.current;
+    drag.current = null;
+    if (!d || d.lock !== "x" || !track.current) return;
+    const w = view.current?.offsetWidth ?? 1;
+    const dx = e.clientX - d.x;
+    const v = dx / Math.max(1, performance.now() - d.t); // px per ms
+    if (Math.abs(dx) > w * 0.2 || Math.abs(v) > 0.5) step(dx < 0 ? 1 : -1);
+    else gsap.to(track.current, { x: 0, duration: 0.3, ease: "power3.out", onComplete: () => setMoving(false) });
+  };
+
+  const slide = (i: number, offset: number) => {
+    const sc = screens[i];
+    const center = offset === 0;
+    return (
+      <div
+        key={`${i}-${offset}`}
+        className={styles.swipeSlide}
+        style={{ left: `calc(${offset * 100}% + ${offset * SWIPE_GAP}px)` }}
+        aria-hidden={!center || undefined}
+      >
+        {sc.assets ? (
+          center ? (
+            assets
+          ) : (
+            <div className={styles.swipeAssetsCard}>All assets &gt;</div>
+          )
+        ) : sc.video ? (
+          // Neighbours show their first frame (#t) and only play while sliding.
+          <Loop src={center ? sc.video : `${sc.video}#t=0.1`} active={live && (center || moving)} />
+        ) : (
+          <Placeholder169 />
+        )}
+      </div>
+    );
+  };
+
+  return (
+    <div className={styles.swipe}>
+      <div
+        ref={view}
+        className={styles.swipeView}
+        data-assets={screens[index]?.assets || undefined}
+        onPointerDown={onDown}
+        onPointerMove={onMove}
+        onPointerUp={onUp}
+        onPointerCancel={onUp}
+      >
+        <div ref={track} className={styles.swipeTrack}>
+          {n > 1 && slide(wrap(index - 1), -1)}
+          {slide(index, 0)}
+          {n > 1 && slide(wrap(index + 1), 1)}
+        </div>
+      </div>
+      <div ref={title} className={styles.swipeMeta} aria-live="polite">
+        <p className={styles.swipeTitle}>{screens[index]?.label}</p>
+        <p className={styles.swipeSub}>
+          Broadcast screen · {pad(index + 1)} / {pad(n)}
+        </p>
+      </div>
+      <div className={styles.screenNavRow}>
+        <button type="button" className={styles.screenArrow} onClick={() => step(-1)} aria-label="Previous screen">
+          ‹
+        </button>
+        <span className={styles.screenCount}>
+          {pad(index + 1)} <span>/</span> {pad(n)}
+        </span>
+        <button type="button" className={styles.screenArrow} onClick={() => step(1)} aria-label="Next screen">
+          ›
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -168,14 +322,6 @@ export default function BroadcastPanel({
   /** Phones: accordion items, and whether the next open should scroll to it. */
   const accRefs = useRef<(HTMLDivElement | null)[]>([]);
   const accJump = useRef(false);
-  /** Screens carousel: the screen sliding out, and the slide direction. */
-  const [leaving, setLeaving] = useState<{ index: number; dir: 1 | -1 } | null>(null);
-  const screenCount = screens?.length ?? 0;
-  const stepScreen = (d: number) => {
-    if (!screenCount) return;
-    setLeaving({ index: screen, dir: d > 0 ? 1 : -1 });
-    setScreen((i) => (i + d + screenCount) % screenCount);
-  };
 
 
   // Phones: opening a tab scrolls its header to the middle of the screen (the
@@ -197,25 +343,6 @@ export default function BroadcastPanel({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, active]);
 
-  // The screen sliding out is dropped once the slide is over.
-  useEffect(() => {
-    if (!leaving) return;
-    const t = setTimeout(() => setLeaving(null), SLIDE_MS);
-    return () => clearTimeout(t);
-  }, [leaving]);
-
-  // Swipe the stage left/right to change screen (touch).
-  const swipe = useRef<{ x: number; y: number } | null>(null);
-  const onStageDown = (e: React.PointerEvent) => {
-    if (compact) swipe.current = { x: e.clientX, y: e.clientY };
-  };
-  const onStageUp = (e: React.PointerEvent) => {
-    const st = swipe.current;
-    swipe.current = null;
-    if (!st) return;
-    const dx = e.clientX - st.x;
-    if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(e.clientY - st.y)) stepScreen(dx < 0 ? 1 : -1);
-  };
 
   // Switching tab or screen: animate the content from its old height to the new
   // one, so the red card stretches/shrinks instead of jumping.
@@ -425,6 +552,36 @@ export default function BroadcastPanel({
     </div>
   );
 
+  /** "All assets": the whole package list, scrolling inside the 16:9 stage. */
+  const assetsList = (
+                  <div className={styles.assetsList} data-lenis-prevent>
+                    <p className={styles.assetsTitle}>
+                      All assets <span aria-hidden="true">&gt;</span>
+                      <span className={styles.assetsCount}>[{PAULISTAO_ASSET_COUNT}]</span>
+                    </p>
+                    {PAULISTAO_ASSETS.map((s) => (
+                      <section key={s.title}>
+                        <h4 className={styles.assetsSection}>{s.title}</h4>
+                        {s.groups.map((g) => (
+                          <div key={g.title} className={styles.assetsGroup}>
+                            <p className={styles.assetsGroupTitle}>{g.title}</p>
+                            {g.items.length > 0 && (
+                              <ul>
+                                {g.items.map((it) => (
+                                  <li key={it.name}>
+                                    {it.name}
+                                    {it.sub && <span className={styles.assetsSub}> · {it.sub.join(" / ")}</span>}
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </section>
+                    ))}
+                  </div>
+  );
+
   const stackEl = sections ? (
         <div ref={stack} className={styles.boardStack}>
           {/* The scoreboard stays mounted (hidden) so its state survives tab
@@ -476,92 +633,36 @@ export default function BroadcastPanel({
                   ))}
                 </div>
               </div>}
+              {compact ? (
+                // Phones: swipe carousel (the screen follows the finger), its title right
+                // under it, then the arrows, then the live examples.
+                <ScreenSwipe screens={screens} index={screen} onChange={setScreen} live={live} assets={assetsList} />
+              ) : (
               <div
                 className={`${styles.preview} ${styles.screenStage}`}
                 data-assets={screens[screen]?.assets || undefined}
-                onPointerDown={onStageDown}
-                onPointerUp={onStageUp}
-                onPointerCancel={() => (swipe.current = null)}
               >
                 {screens[screen]?.assets ? (
-                  // The whole package list, scrolling inside the 16:9 stage.
-                  <div className={styles.assetsList} data-lenis-prevent>
-                    <p className={styles.assetsTitle}>
-                      All assets <span aria-hidden="true">&gt;</span>
-                      <span className={styles.assetsCount}>[{PAULISTAO_ASSET_COUNT}]</span>
-                    </p>
-                    {PAULISTAO_ASSETS.map((s) => (
-                      <section key={s.title}>
-                        <h4 className={styles.assetsSection}>{s.title}</h4>
-                        {s.groups.map((g) => (
-                          <div key={g.title} className={styles.assetsGroup}>
-                            <p className={styles.assetsGroupTitle}>{g.title}</p>
-                            {g.items.length > 0 && (
-                              <ul>
-                                {g.items.map((it) => (
-                                  <li key={it.name}>
-                                    {it.name}
-                                    {it.sub && <span className={styles.assetsSub}> · {it.sub.join(" / ")}</span>}
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ))}
-                      </section>
-                    ))}
-                  </div>
+                  assetsList
                 ) : screens[screen]?.video ? (
-                  // Phones: the incoming screen slides in while the old one slides out.
-                  <div
-                    key={screen}
-                    className={styles.slideLayer}
-                    data-in={compact && leaving ? (leaving.dir > 0 ? "right" : "left") : undefined}
-                  >
+                  <div key={screen} className={styles.slideLayer}>
                     <Loop src={screens[screen].video!} active={live} />
                   </div>
                 ) : (
                   <Placeholder169 />
                 )}
-                {compact && leaving && screens[leaving.index]?.video && (
-                  <div
-                    key={`out-${leaving.index}`}
-                    className={styles.slideLayer}
-                    data-out={leaving.dir > 0 ? "left" : "right"}
-                    aria-hidden="true"
-                  >
-                    <Loop src={screens[leaving.index].video!} active={live} />
-                  </div>
-                )}
                 {!screens[screen]?.assets && (
                   <span className={styles.previewLabel}>Screen · {screens[screen]?.label}</span>
                 )}
               </div>
+              )}
               {compact && loops && (
-                // Phones: the screen's live examples, centred, above the carousel control.
                 <div className={styles.screenLoopsMobile}>
                   {loops.map((base) => (
                     <div key={base} className={styles.loopCell}>
                       <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
                     </div>
                   ))}
-                </div>
-              )}
-              {compact && (
-                // Phones: carousel control (arrows + counter), the screen's title under it.
-                <div className={styles.screenNav}>
-                  <div className={styles.screenNavRow}>
-                    <button type="button" className={styles.screenArrow} onClick={() => stepScreen(-1)} aria-label="Previous screen">
-                      ‹
-                    </button>
-                    <span className={styles.screenCount}>
-                      {pad(screen + 1)} <span>/</span> {pad(screenCount)}
-                    </span>
-                    <button type="button" className={styles.screenArrow} onClick={() => stepScreen(1)} aria-label="Next screen">
-                      ›
-                    </button>
-                  </div>
-                  <p className={styles.screenTitle}>{screens[screen]?.label}</p>
                 </div>
               )}
             </div>
@@ -773,6 +874,7 @@ export default function BroadcastPanel({
                 key={x.video}
                 type="button"
                 className={styles.extra}
+                data-cursor="view"
                 onClick={(e) => onPlay(toWork({ id: x.video, title: x.title, poster: x.poster, video: x.video }), e.currentTarget)}
                 aria-label={`Play ${x.title} (with sound)`}
               >

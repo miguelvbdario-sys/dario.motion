@@ -235,6 +235,7 @@ export default function Course() {
         <button
           type="button"
           className={styles.heroVideo}
+          data-cursor="view"
           data-rise
           aria-label="Assistir o vídeo do curso com som"
           onClick={(e) =>
@@ -413,6 +414,7 @@ export default function Course() {
         <button
           type="button"
           className={styles.bigVideo}
+          data-cursor="view"
           data-rise
           aria-label="Assistir trechos das aulas"
           onClick={(e) =>

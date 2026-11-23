@@ -9,7 +9,7 @@ import styles from "./CustomCursor.module.css";
  * Kaltenegger for Codrops (https://tympanus.net/codrops/?p=37356).
  *
  * A small dot follows the mouse. What it turns into depends on what it is over:
- *   data-cursor="view"   → 40px ring with a "+" (video tiles)
+ *   data-cursor="view"   → 40px ring with a "+" and a PLAY label (video tiles)
  *   data-cursor="drag"   → 40px ring with a "+" (3D emblems)
  *   data-cursor="close"  → ring whose "+" turns into "–", blended (player backdrop)
  *   other links/buttons → soft translucent disc
@@ -160,6 +160,8 @@ export default function CustomCursor() {
       <div ref={outer} className={styles.outer}>
         <div ref={inner} className={styles.inner} />
       </div>
+      {/* Over a playable video: says what a click does. */}
+      <span className={styles.label}>Play</span>
     </div>
   );
 }

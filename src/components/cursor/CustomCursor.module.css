@@ -74,3 +74,31 @@
 .wrapper[data-state="close"] .inner::after {
   transform: translateX(-50%) rotate(0deg);
 }
+
+/* "PLAY" beside the ring over playable videos (data-cursor="view"). */
+.label {
+  position: absolute;
+  left: calc(50% + 28px);
+  top: 50%;
+  translate: -6px -50%;
+  padding: 3px 7px;
+  border-radius: 3px;
+  background: var(--color-bone);
+  color: #000;
+  font-family: var(--font-jetbrains), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  transition:
+    opacity 0.15s cubic-bezier(0.7, 0, 0.84, 0),
+    translate 0.15s cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+.wrapper[data-state="view"] .label {
+  translate: 0 -50%;
+  opacity: 1;
+  transition-duration: 0.25s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
