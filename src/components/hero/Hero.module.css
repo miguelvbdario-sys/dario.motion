@@ -740,6 +740,6 @@
   .head {
     pointer-events: auto;
     /* The empty bottom of the square canvas must not catch taps meant for the cards below. */
-    clip-path: inset(0 0 22% 0);
+    clip-path: inset(0 0 23.5% 0);
   }
 }
