@@ -26,16 +26,16 @@
   align-items: center;
   padding: 1.1em 0;
   font-family: var(--font-sans);
-  font-size: clamp(9px, 0.7vw, 12px);
+  font-size: clamp(8px, 0.6vw, 10px);
   font-weight: 900;
   line-height: 1;
-  letter-spacing: 0.9em;
+  letter-spacing: 0.7em;
   text-transform: uppercase;
   white-space: nowrap;
 }
 
 .sep {
-  margin: 0 5em 0 4.1em;
+  margin: 0 3.5em 0 2.6em;
 }
 
 @keyframes marquee {
