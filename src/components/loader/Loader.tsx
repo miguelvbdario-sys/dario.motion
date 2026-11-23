@@ -12,7 +12,7 @@ import styles from "./Loader.module.css";
  * designer" with a "..." that fills while the page loads. No counter.
  *
  * It lifts once the fonts and the hero's rest frame are in, but never before
- * MIN_MS (3s, even when the page is ready sooner) and never after MAX_MS.
+ * MIN_MS (2s, even when the page is ready sooner) and never after MAX_MS.
  * Then the hero intro plays.
  */
 
@@ -20,7 +20,7 @@ import styles from "./Loader.module.css";
 const FACE_FRAMES = [49, 42, 34, 26, 18, 12, 18, 26, 34, 42, 49, 58, 68, 78, 88, 78, 68, 58];
 const FACE_FPS = 6;
 /** The screen stays at least this long, even if the page is ready sooner. */
-const MIN_MS = 3000;
+const MIN_MS = 2000;
 const MAX_MS = 5000;
 
 const pad = (n: number) => String(n).padStart(3, "0");

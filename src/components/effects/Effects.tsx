@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { tick } from "@/lib/sound";
+import { channel, swoosh, tick } from "@/lib/sound";
 
 /*
  * Small site-wide interaction effects, attached by attribute/selector so the
@@ -26,8 +26,15 @@ const SCRAMBLE_MS = 380;
 export default function Effects() {
   // Sounds: a tick on presses.
   useEffect(() => {
+    // One sound per kind of control (players and cards have their own, see their components).
     const onDown = (e: PointerEvent) => {
-      if (e.target instanceof Element && e.target.closest("button, a, [role='tab']")) tick();
+      if (!(e.target instanceof Element)) return;
+      const el = e.target.closest<HTMLElement>("button, a, [role='tab'], [role='radio'], [role='option']");
+      if (!el || el.dataset.cursor === "view" || el.hasAttribute("aria-expanded")) return;
+      const label = el.getAttribute("aria-label") ?? "";
+      if (/^(previous|next)/i.test(label)) swoosh(/^next/i.test(label) ? 1 : -1);
+      else if (el.matches("[role='tab'], [role='radio'], [role='option']") || el.closest("[role='tablist'], [role='radiogroup'], [role='listbox']")) channel();
+      else tick();
     };
     window.addEventListener("pointerdown", onDown, { passive: true });
     return () => window.removeEventListener("pointerdown", onDown);

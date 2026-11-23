@@ -11,6 +11,7 @@ import BroadcastMascots from "./BroadcastMascots";
 import BroadcastProcess from "./BroadcastProcess";
 import { PAULISTAO_ASSETS, PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import { FOCUS_AT } from "./focus";
+import { swoosh } from "@/lib/sound";
 import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -113,12 +114,15 @@ function ScreenSwipe({
   onChange,
   live,
   assets,
+  extras,
 }: {
   screens: { label: string; video: string | null; assets?: boolean }[];
   index: number;
   onChange: (i: number) => void;
   live: boolean;
   assets: React.ReactNode;
+  /** The screen's live examples: always between the screen and its title. */
+  extras?: React.ReactNode;
 }) {
   const view = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
@@ -149,6 +153,7 @@ function ScreenSwipe({
     }
     busy.current = true;
     setMoving(true);
+    swoosh(d);
     gsap.to(el, {
       x: -d * (w + SWIPE_GAP),
       duration: 0.38,
@@ -240,6 +245,7 @@ function ScreenSwipe({
           {n > 1 && slide(wrap(index + 1), 1)}
         </div>
       </div>
+      {extras}
       <div ref={title} className={styles.swipeMeta} aria-live="polite">
         <p className={styles.swipeTitle}>{screens[index]?.label}</p>
         <p className={styles.swipeSub}>
@@ -654,7 +660,24 @@ export default function BroadcastPanel({
               {compact ? (
                 // Phones: swipe carousel (the screen follows the finger), its title right
                 // under it, then the arrows, then the live examples.
-                <ScreenSwipe screens={screens} index={screen} onChange={setScreen} live={live} assets={assetsList} />
+                <ScreenSwipe
+                  screens={screens}
+                  index={screen}
+                  onChange={setScreen}
+                  live={live}
+                  assets={assetsList}
+                  extras={
+                    loops && (
+                      <div className={styles.screenLoopsMobile}>
+                        {loops.map((base) => (
+                          <div key={base} className={styles.loopCell}>
+                            <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
+                          </div>
+                        ))}
+                      </div>
+                    )
+                  }
+                />
               ) : (
               <div
                 className={`${styles.preview} ${styles.screenStage}`}
@@ -673,15 +696,6 @@ export default function BroadcastPanel({
                   <span className={styles.previewLabel}>Screen · {screens[screen]?.label}</span>
                 )}
               </div>
-              )}
-              {compact && loops && (
-                <div className={styles.screenLoopsMobile}>
-                  {loops.map((base) => (
-                    <div key={base} className={styles.loopCell}>
-                      <Loop src={`${base}.mp4`} poster={`${base}.jpg`} active={live} />
-                    </div>
-                  ))}
-                </div>
               )}
             </div>
           )}

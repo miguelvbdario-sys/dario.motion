@@ -6,7 +6,7 @@ import { CustomEase } from "gsap/CustomEase";
 import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
-import { open as openSound } from "@/lib/sound";
+import { crtOff, glitch as glitchSound, open as openSound } from "@/lib/sound";
 import BroadcastPanel from "./BroadcastPanel";
 import LowerThird from "@/components/lowerthird/LowerThird";
 import { FOCUS_AT } from "./focus";
@@ -359,6 +359,7 @@ export default function Broadcast() {
         // A short signal glitch as the content comes in, like a camera cut (< 300ms).
         timers[i] = window.setTimeout(() => {
           wrap.dataset.glitch = "";
+          glitchSound();
           timers[i] = window.setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
         }, 280);
         if (inner) {
@@ -367,6 +368,7 @@ export default function Broadcast() {
         }
       } else {
         // Closing runs faster than opening (fast closing: the visitor is done with it).
+        crtOff();
         gsap.to(wrap, { height: 0, duration: OPEN_TIME * 0.55, ease: EASE_OPEN, overwrite: true });
         if (inner) gsap.to(inner, { opacity: 0, duration: 0.18, overwrite: true });
       }
