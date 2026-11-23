@@ -2725,3 +2725,50 @@
   opacity: 0;
   translate: 0 28px;
 }
+
+/*
+ * Scroll reveal (Broadcast.tsx sets data-sr): a block below the screen waits
+ * faded, lower and tipped back; entering, it fades in while rolling up into
+ * place (pivot at its bottom edge). Separate translate/rotate properties, so
+ * GSAP transforms on the same elements are untouched.
+ */
+.section [data-sr] {
+  transform-origin: 50% 100%;
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    rotate 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.section [data-sr="wait"] {
+  opacity: 0;
+  translate: 0 48px;
+  rotate: x 22deg;
+}
+
+/* Depth for the roll: perspective on the containers the blocks sit in. */
+.aboutPoints,
+.aboutStats,
+.aboutChannels,
+.boardStack,
+.panel {
+  perspective: 1100px;
+}
+
+/* The list rows roll up the same way as they land (one after another). */
+.list {
+  perspective: 1100px;
+}
+
+.list .row {
+  transform-origin: 50% 100%;
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    translate 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    rotate 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+.list[data-rows-wait] .row {
+  rotate: x 28deg;
+}

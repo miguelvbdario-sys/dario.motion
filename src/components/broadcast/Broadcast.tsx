@@ -113,6 +113,59 @@ export default function Broadcast() {
   const glitchTimers = useRef<number[]>([]);
   /** Row thumbnails (phones): not rendered on desktop, so their videos never download there. */
   const thumbs = useThumbs();
+  // Scroll reveal inside the cards: blocks below the screen wait hidden and,
+  // as each one enters, fade in while rolling up into place (CSS: [data-sr]).
+  // New content (a card or tab that opens) is picked up as it mounts.
+  useEffect(() => {
+    const root = section.current;
+    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const SELECTOR = [
+      `.${styles.aboutPoints} > li`,
+      `.${styles.aboutStats} > div`,
+      `.${styles.aboutChannels} > *`,
+      `.${styles.aboutOutroRow}`,
+      `.${styles.loopCell}`,
+      `.${styles.preview}`,
+      `.${styles.index}`,
+      `.${styles.extra}`,
+      `.${styles.swipe}`,
+      `.${styles.accItem}`,
+    ].join(", ");
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (!e.isIntersecting) return;
+          const el = e.target as HTMLElement;
+          el.dataset.sr = "in";
+          io.unobserve(el);
+        }),
+      { rootMargin: "0px 0px -8% 0px" },
+    );
+    const scan = () => {
+      root.querySelectorAll<HTMLElement>(SELECTOR).forEach((el) => {
+        if (el.dataset.sr) return;
+        // Only what is still below the screen waits; what is already visible stays.
+        if (el.getBoundingClientRect().top < window.innerHeight) {
+          el.dataset.sr = "in";
+          return;
+        }
+        el.dataset.sr = "wait";
+        io.observe(el);
+      });
+    };
+    let raf = 0;
+    const mo = new MutationObserver(() => {
+      if (!raf) raf = requestAnimationFrame(() => ((raf = 0), scan()));
+    });
+    mo.observe(root, { childList: true, subtree: true });
+    scan();
+    return () => {
+      mo.disconnect();
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   // Rows land one after another (fade up + stagger) the first time the list comes on screen.
   useEffect(() => {
     const el = list.current;
