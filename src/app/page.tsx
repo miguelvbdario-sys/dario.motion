@@ -34,7 +34,7 @@ export default function Home() {
       {/* Works: the side-scrolling carousel of cards. */}
       <ScrollType outline="More" text="Works" index="02" dir={-1} />
       <WorksCarousel />
-      <ScrollType text="About" index="03" />
+      <ScrollType text="About me" index="03" />
 
       {/* About: portrait, intro and contact buttons. */}
       <About />
