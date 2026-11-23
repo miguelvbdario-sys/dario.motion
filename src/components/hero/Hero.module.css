@@ -406,8 +406,8 @@
   white-space: nowrap;
   text-decoration: none;
   transition:
-    background-color 0.3s ease,
-    color 0.3s ease;
+    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .pill:focus-visible {
@@ -574,5 +574,21 @@
     top: calc(var(--u) * 434);
     left: calc(var(--u) * -59);
     width: calc(var(--u) * 180);
+  }
+}
+
+/*
+ * Fitts's law: on touch screens the pills look small (about 21px tall), so an
+ * invisible hit area grows them to the gap between them (no overlap).
+ */
+@media (pointer: coarse) {
+  .pill {
+    position: relative;
+  }
+
+  .pill::after {
+    content: "";
+    position: absolute;
+    inset: -6px -8px;
   }
 }

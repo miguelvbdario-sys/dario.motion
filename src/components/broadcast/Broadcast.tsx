@@ -312,8 +312,9 @@ export default function Broadcast() {
           gsap.fromTo(inner, { opacity: 0, y: -24 }, { opacity: 1, y: 0, duration: OPEN_TIME, delay: 0.2, ease: EASE_OPEN });
         }
       } else {
-        gsap.to(wrap, { height: 0, duration: OPEN_TIME * 0.8, ease: EASE_OPEN, overwrite: true });
-        if (inner) gsap.to(inner, { opacity: 0, duration: 0.3 });
+        // Closing runs faster than opening (fast closing: the visitor is done with it).
+        gsap.to(wrap, { height: 0, duration: OPEN_TIME * 0.55, ease: EASE_OPEN, overwrite: true });
+        if (inner) gsap.to(inner, { opacity: 0, duration: 0.18 });
       }
     });
     // The card never sits over the open row.
@@ -473,7 +474,7 @@ export default function Broadcast() {
         </div>
       </div>
 
-      <WorkPlayer work={playing} onClose={closePlayer} />
+      <WorkPlayer work={playing} onClose={closePlayer} origin={opener} />
     </section>
   );
 }

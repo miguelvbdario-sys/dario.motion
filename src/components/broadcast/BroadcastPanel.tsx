@@ -35,7 +35,7 @@ function AccBody({ closing, onClosed, children }: { closing: boolean; onClosed: 
   }, []);
   useEffect(() => {
     if (!closing || !el.current) return;
-    gsap.to(el.current, { height: 0, opacity: 0, duration: 0.35, ease: "power3.in", onComplete: onClosed });
+    gsap.to(el.current, { height: 0, opacity: 0, duration: 0.24, ease: "power3.in", onComplete: onClosed });
   }, [closing, onClosed]);
   return (
     <div ref={el} className={styles.accBody}>
@@ -242,6 +242,36 @@ export default function BroadcastPanel({
     );
   }, [tab, screen]);
 
+  // About: its blocks cascade in (stagger) each time it comes on screen: when
+  // the card opens (after the card's own unfold has started) or the tab is picked.
+  const aboutRef = useRef<HTMLDivElement>(null);
+  const aboutShown = open && (sections ? kind === "about" : active === -1) && (!compact || tabOpen);
+  const aboutWasShown = useRef(false);
+  useLayoutEffect(() => {
+    const el = aboutRef.current;
+    const was = aboutWasShown.current;
+    aboutWasShown.current = aboutShown;
+    if (!el || !aboutShown || was) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const items = el.querySelectorAll<HTMLElement>(
+      `.${styles.aboutLead}, .${styles.aboutPoints} > li, .${styles.aboutStats} > div, .${styles.aboutChannels} > *, .${styles.aboutOutroRow}, .${styles.aboutLoops} > *`,
+    );
+    // 45ms apart; past the 7th item the rest arrive together (long lists don't make people wait).
+    gsap.fromTo(
+      items,
+      { opacity: 0, y: 14 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.45,
+        ease: "expo.out",
+        delay: (i: number) => (open && !was ? 0.25 : 0) + Math.min(i, 7) * 0.045,
+        clearProps: "opacity,transform",
+        overwrite: true,
+      },
+    );
+  }, [aboutShown, open]);
+
   /** A player entry carrying this project's Index. */
   const toWork = (w: Pick<Work, "id" | "title" | "video"> & Partial<Work>): Work => ({
     meta: project.title,
@@ -322,7 +352,7 @@ export default function BroadcastPanel({
     else window.scrollTo({ top: y, behavior: "smooth" });
   };
   const aboutEl = (
-    <div className={styles.about}>
+    <div ref={aboutRef} className={styles.about}>
       <div className={styles.aboutMain}>
         {/* "\n" in the lead: a paragraph break on desktop, a plain space on phones. */}
         <p className={styles.aboutLead}>

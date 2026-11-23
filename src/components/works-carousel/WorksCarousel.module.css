@@ -215,10 +215,10 @@
   background: transparent;
   color: var(--color-bone);
   transition:
-    background-color 0.35s ease,
-    border-color 0.35s ease,
-    color 0.35s ease,
-    transform 0.25s ease;
+    background-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    border-color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    color 0.18s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.12s ease-out;
 }
 
 .arrow svg {
@@ -261,4 +261,15 @@
   .shade {
     transition-duration: 0.2s;
   }
+}
+
+/* Fitts's law: a 48px touch area around the 38px arrow (looks the same). */
+.arrow {
+  position: relative;
+}
+
+.arrow::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
 }

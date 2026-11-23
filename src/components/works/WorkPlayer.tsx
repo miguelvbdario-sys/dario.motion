@@ -10,25 +10,43 @@ import styles from "./WorkPlayer.module.css";
 type WorkPlayerProps = {
   work: Work | null;
   onClose: () => void;
+  /** The thumbnail / button that opened it: the player grows out of it and shrinks back into it. */
+  origin?: React.RefObject<HTMLElement | null>;
 };
 
 const lenis = () => (window as unknown as { lenis?: Lenis }).lenis;
 
-/** Open / close: a quick grow, fast at the start and settling (ease-out both ways). */
-const IN = { duration: 0.6, ease: "expo.out" };
-const OUT = { duration: 0.42, ease: "expo.out" };
+/**
+ * Open: grows out of what was clicked, fast then settling (ease-out).
+ * Close: about a third of the open, accelerating away (ease-in): the visitor
+ * is done with it, so it gets out of the way.
+ */
+const IN = { duration: 0.55, ease: "expo.out" };
+const OUT = { duration: 0.22, ease: "power3.in" };
+/** Scale the player starts from / shrinks to when it has an origin. */
+const FROM_SCALE = 0.35;
+
+/** transform-origin on the player box that points at the centre of `origin`. */
+const originOf = (box: HTMLElement, origin: HTMLElement | null | undefined) => {
+  if (!origin || !origin.isConnected) return "50% 50%";
+  const b = box.getBoundingClientRect();
+  const o = origin.getBoundingClientRect();
+  if (!o.width || !b.width) return "50% 50%";
+  return `${o.left + o.width / 2 - b.left}px ${o.top + o.height / 2 - b.top}px`;
+};
 
 /**
  * Fullscreen player on black, with an Index panel on the right. A native
  * <dialog>: Esc closes it and focus stays inside. Opening and closing grow /
  * shrink the content instead of cutting.
  */
-export default function WorkPlayer({ work, onClose }: WorkPlayerProps) {
+export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
   const dialog = useRef<HTMLDialogElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
   const closing = useRef(false);
   const reduced = useRef(false);
+  const originRef = { get current() { return origin?.current ?? null; } };
 
   useEffect(() => {
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -49,7 +67,15 @@ export default function WorkPlayer({ work, onClose }: WorkPlayerProps) {
         gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.25 });
       } else {
         gsap.fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.35, ease: "power2.out" });
-        if (box) gsap.fromTo(box, { scale: 0.86, opacity: 0 }, { scale: 1, opacity: 1, ...IN });
+        if (box) {
+          const hasOrigin = !!originRef.current?.isConnected;
+          gsap.set(box, { transformOrigin: originOf(box, originRef.current) });
+          gsap.fromTo(
+            box,
+            { scale: hasOrigin ? FROM_SCALE : 0.86, opacity: 0 },
+            { scale: 1, opacity: 1, ...IN, overwrite: true },
+          );
+        }
       }
     }
     if (!work && el.open) el.close();
@@ -67,8 +93,11 @@ export default function WorkPlayer({ work, onClose }: WorkPlayerProps) {
       gsap.to(el, { opacity: 0, duration: 0.2, onComplete: done });
       return;
     }
-    gsap.to(box, { scale: 0.88, opacity: 0, ...OUT });
-    gsap.to(el, { opacity: 0, duration: OUT.duration, ease: "power2.out", onComplete: done });
+    // Back into what opened it (the page may have moved, so measure again).
+    const hasOrigin = !!originRef.current?.isConnected;
+    gsap.set(box, { transformOrigin: originOf(box, originRef.current) });
+    gsap.to(box, { scale: hasOrigin ? FROM_SCALE : 0.9, opacity: 0, ...OUT, overwrite: true });
+    gsap.to(el, { opacity: 0, duration: OUT.duration, ease: "power2.in", onComplete: done });
   }, []);
 
   // Esc: run the animated close instead of the browser's instant one.

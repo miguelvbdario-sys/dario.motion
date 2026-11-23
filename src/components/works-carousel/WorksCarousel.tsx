@@ -428,7 +428,7 @@ export default function WorksCarousel() {
         </div>
       </div>
 
-      <WorkPlayer work={playing} onClose={close} />
+      <WorkPlayer work={playing} onClose={close} origin={opener} />
     </section>
   );
 }

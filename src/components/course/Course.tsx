@@ -482,7 +482,7 @@ export default function Course() {
         </Link>
       </section>
 
-      <WorkPlayer work={playing} onClose={closePlayer} />
+      <WorkPlayer work={playing} onClose={closePlayer} origin={opener} />
     </main>
   );
 }
