@@ -7,7 +7,6 @@ import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
-import LowerThird from "@/components/lowerthird/LowerThird";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -530,10 +529,6 @@ export default function Broadcast() {
       <h2 id="broadcast-title" className={styles.srOnly}>
         Broadcast
       </h2>
-      {/* Visible title: a TV lower third with a live dot. */}
-      <div className={styles.lowerThird} aria-hidden="true">
-        <LowerThird tag="On air" live title="Broadcast" sub={`${String(BROADCAST.length).padStart(2, "0")} projects`} />
-      </div>
 
       <div ref={list} className={styles.list} onMouseMove={onMove} onMouseLeave={onLeave}>
         {BROADCAST.map((project, i) => {

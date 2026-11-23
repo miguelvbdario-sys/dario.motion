@@ -2702,16 +2702,6 @@
   }
 }
 
-/* Lower third above the list ("● ON AIR · BROADCAST · 04 PROJECTS"). */
-.lowerThird {
-  margin: 0 0 calc(var(--s) * 18);
-}
-
-@media (max-width: 767px), (max-aspect-ratio: 3/4) {
-  .lowerThird {
-    margin-bottom: 12px;
-  }
-}
 
 /* Rows land one after another (Broadcast.tsx removes data-rows-wait once the list is on screen). */
 .list .row {
