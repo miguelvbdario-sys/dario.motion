@@ -34,6 +34,12 @@
 }
 
 /* The copies beside the main one are dimmer, so one word reads at a time. */
+/* Outline-only word ("MORE"). */
+.outline {
+  color: transparent;
+  -webkit-text-stroke: 2px #e60000;
+}
+
 .word:not(:nth-child(2)) {
   color: transparent;
   -webkit-text-stroke: 1px rgb(230 0 0 / 0.55);
@@ -44,7 +50,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 clamp(10px, 1.2vw, 20px) clamp(16px, 4.4vw, 64px);
+  /* Space between the small index and the giant title. */
+  margin: 0 0 clamp(20px, 2.4vw, 40px) clamp(16px, 4.4vw, 64px);
   font-family: var(--font-sans);
   font-size: clamp(10px, 0.75vw, 12px);
   font-weight: 800;
@@ -90,4 +97,9 @@
   .word {
     font-size: 25vw;
   }
+}
+
+/* In the dim copies the outline word matches the rest. */
+.word:not(:nth-child(2)) .outline {
+  -webkit-text-stroke: 1px rgb(230 0 0 / 0.55);
 }

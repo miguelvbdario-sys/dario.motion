@@ -1,11 +1,10 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WORKS, type Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
-import LowerThird from "@/components/lowerthird/LowerThird";
 import styles from "./WorksCarousel.module.css";
 
 /*
@@ -358,9 +357,10 @@ export default function WorksCarousel() {
 
   return (
     <section ref={root} id="works-carousel" className={styles.section} aria-labelledby="works-carousel-title">
-      <div className={styles.heading}>
-        <LowerThird as="h2" id="works-carousel-title" tag="Standalones" title="More projects" align="center" />
-      </div>
+      {/* The visible title is the giant "MORE WORKS" above the section. */}
+      <h2 id="works-carousel-title" className={styles.srOnly}>
+        More works
+      </h2>
 
       <div ref={stage} className={styles.stage}>
         <div ref={ring} className={styles.ring}>

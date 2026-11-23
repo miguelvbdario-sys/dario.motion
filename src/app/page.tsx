@@ -32,7 +32,7 @@ export default function Home() {
       {/* Broadcast projects (the interactive scoreboard lives in the Paulistão card). */}
       <Broadcast />
       {/* Works: the side-scrolling carousel of cards. */}
-      <ScrollType text="Works" index="02" dir={-1} />
+      <ScrollType outline="More" text="Works" index="02" dir={-1} />
       <WorksCarousel />
       <ScrollType text="About" index="03" />
 

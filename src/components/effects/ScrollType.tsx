@@ -17,7 +17,18 @@ import styles from "./ScrollType.module.css";
 const SHIFT = 42;
 const COPIES = 4;
 
-export default function ScrollType({ text, index, dir = 1 }: { text: string; index: string; dir?: 1 | -1 }) {
+/** `outline`: an optional word before the title, drawn as a red outline only ("MORE" in MORE WORKS). */
+export default function ScrollType({
+  text,
+  index,
+  dir = 1,
+  outline,
+}: {
+  text: string;
+  index: string;
+  dir?: 1 | -1;
+  outline?: string;
+}) {
   const root = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -59,11 +70,12 @@ export default function ScrollType({ text, index, dir = 1 }: { text: string; ind
     <div ref={root} className={styles.band} aria-hidden="true">
       <span className={styles.index}>
         <span className={styles.dot} />
-        {index} — {text}
+        {index} — {outline ? `${outline} ${text}` : text}
       </span>
       <div className={styles.track} data-track>
         {Array.from({ length: COPIES }, (_, i) => (
           <span key={i} className={styles.word}>
+            {outline && <span className={styles.outline}>{outline} </span>}
             {text}
           </span>
         ))}
