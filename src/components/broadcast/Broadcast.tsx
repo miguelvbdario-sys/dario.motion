@@ -166,37 +166,6 @@ export default function Broadcast() {
     };
   }, []);
 
-  // Rows land one after another (fade up + stagger) the first time the list comes on screen.
-  useEffect(() => {
-    const el = list.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (el.getBoundingClientRect().top < window.innerHeight * 0.9) return; // already in view: just show
-    el.dataset.rowsWait = "";
-    // Checked on scroll (not an IntersectionObserver), so a jump past the list
-    // (a menu link, a fast fling) still reveals it.
-    // Also checked when the layout settles without a scroll (the browser
-    // restoring the position on reload, the hero pin being added, the loading
-    // screen lifting, a resize): otherwise the rows could stay hidden in view.
-    const timers: number[] = [];
-    const check = () => {
-      if (el.getBoundingClientRect().top > window.innerHeight * 0.85) return;
-      delete el.dataset.rowsWait;
-      stop();
-    };
-    const stop = () => {
-      window.removeEventListener("scroll", check);
-      window.removeEventListener("resize", check);
-      window.removeEventListener("load", check);
-      window.removeEventListener("site:loaded", check);
-      timers.forEach(clearTimeout);
-    };
-    window.addEventListener("scroll", check, { passive: true });
-    window.addEventListener("resize", check);
-    window.addEventListener("load", check);
-    window.addEventListener("site:loaded", check);
-    [100, 600, 1500, 3000, 4500].forEach((ms) => timers.push(window.setTimeout(check, ms)));
-    return stop;
-  }, []);
   // Thumbnails load and play only while their row is on screen (they used to
   // download with the page and hold up the first paint on phones).
   useEffect(() => {
@@ -550,7 +519,7 @@ export default function Broadcast() {
                 data-align={project.align}
                 data-thumb={project.preview ? "" : undefined}
                 data-open={isOpen || undefined}
-                style={{ "--offset": project.offset, "--i": i } as React.CSSProperties}
+                style={{ "--offset": project.offset } as React.CSSProperties}
                 aria-expanded={isOpen}
                 aria-controls={`broadcast-card-${project.id}`}
                 onClick={() => toggle(project)}

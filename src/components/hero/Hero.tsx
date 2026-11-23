@@ -390,9 +390,6 @@ export default function Hero() {
       {/* Everything below travels up together while the hero is pinned. */}
       <div className={styles.scroll}>
         <div className={styles.fade} aria-hidden="true" />
-        <p className={styles.handle} data-reveal>
-          @dario.motion
-        </p>
 
         <div className={styles.comp}>
           <h1 ref={title} className={styles.title} translate="no">
