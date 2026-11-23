@@ -18,9 +18,9 @@ const MAG_RADIUS = 20; // px around the element where the pull starts (reaches a
 const MAG_PULL = 0.3;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=<>/";
 const SCRAMBLE_SELECTOR = "[data-scramble], [class*='sideLabel'], [class*='playerIndexLabel']";
-const SCRAMBLE_MS = 520;
-/** Most letters scrambled at once (share of the text, at the middle of the effect). */
-const SCRAMBLE_PEAK = 0.35;
+const SCRAMBLE_MS = 650;
+/** How long a scrambled letter keeps the same glyph (lower = more flicker). */
+const GLYPH_MS = 70;
 
 export default function Effects() {
   useEffect(() => {
@@ -106,15 +106,25 @@ export default function Effects() {
         return prev;
       });
       const start = performance.now();
+      const glyphs: string[] = [];
+      let lastGlyph = -Infinity;
       const step = (t: number) => {
         const p = Math.min(1, (t - start) / SCRAMBLE_MS);
-        // Eases in and out: the share of scrambled letters rises from 0 to
-        // SCRAMBLE_PEAK in the middle and settles back to 0 (a sine bump).
-        const amount = Math.sin(Math.PI * p) * SCRAMBLE_PEAK;
+        // A wave: a small band of scrambled letters travels from the first
+        // letter to the last (never the whole word), eased in and out. Each
+        // scrambled letter keeps its glyph for GLYPH_MS, so it flickers calmly.
+        const band = Math.max(2, Math.round(final.length * 0.2));
+        const eased = p < 0.5 ? 2 * p * p : 1 - Math.pow(-2 * p + 2, 2) / 2;
+        const centre = eased * (final.length + band) - band / 2;
+        if (t - lastGlyph > GLYPH_MS) {
+          lastGlyph = t;
+          for (let i = 0; i < final.length; i++) glyphs[i] = GLYPHS[(Math.random() * GLYPHS.length) | 0];
+        }
         let out = "";
         for (let i = 0; i < final.length; i++) {
           const c = final[i];
-          out += " []:·/".includes(c) || Math.random() > amount ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          const inBand = Math.abs(i - centre) < band / 2;
+          out += " []:·/".includes(c) || !inBand ? c : glyphs[i];
         }
         els.forEach((el) => (el.textContent = p < 1 ? out : final));
         if (p < 1) requestAnimationFrame(step);
