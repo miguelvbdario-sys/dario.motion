@@ -523,7 +523,7 @@
   }
 
   .emblemRight {
-    top: calc(var(--u) * 168);
+    top: calc(var(--u) * 235);
     left: calc(var(--u) * 268);
     width: calc(var(--u) * 128);
   }
