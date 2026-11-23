@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <SmoothScroll>{children}</SmoothScroll>
         <CrtScreen />
         <CustomCursor />
-        {/* Magnetic buttons, decoding labels and the optional UI sounds. */}
+        {/* Magnetic buttons and decoding labels. */}
         <Effects />
       </body>
     </html>

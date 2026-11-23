@@ -5,7 +5,6 @@ import gsap from "gsap";
 import { X } from "lucide-react";
 import type Lenis from "lenis";
 import type { Work } from "@/content/works";
-import { crtOff, playerOn } from "@/lib/sound";
 import styles from "./WorkPlayer.module.css";
 
 type WorkPlayerProps = {
@@ -62,7 +61,6 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
     if (!el) return;
     if (work && !el.open) {
       el.showModal();
-      playerOn();
       lenis()?.stop();
       document.documentElement.style.overflow = "hidden";
       // Opened by a click, so the browser allows sound.
@@ -93,7 +91,6 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
     if (!el || !el.open || closing.current) return;
     closing.current = true;
     video.current?.pause();
-    crtOff();
     const box = inner.current;
     // Closing while still opening: the open tweens stop where they are.
     gsap.killTweensOf(el);

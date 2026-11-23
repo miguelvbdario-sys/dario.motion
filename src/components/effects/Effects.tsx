@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { channel, swoosh, tick } from "@/lib/sound";
 
 /*
  * Small site-wide interaction effects, attached by attribute/selector so the
@@ -11,10 +10,8 @@ import { channel, swoosh, tick } from "@/lib/sound";
  *              near (up to MAG_PULL of the distance), and springs back.
  *   Scramble   mono labels ("[ Index ]", "[ On air ]"…) and [data-scramble]:
  *              on hover the text decodes from random glyphs, left to right.
- *   Sounds     a tick on every button/link press (only when sound is on).
  *
- * Mouse only for magnetic and scramble; nothing runs with reduced motion
- * except the sounds.
+ * Mouse only for magnetic and scramble; nothing runs with reduced motion.
  */
 
 const MAG_RADIUS = 70; // px around the element where the pull starts
@@ -24,22 +21,6 @@ const SCRAMBLE_SELECTOR = "[data-scramble], [class*='sideLabel'], [class*='playe
 const SCRAMBLE_MS = 380;
 
 export default function Effects() {
-  // Sounds: a tick on presses.
-  useEffect(() => {
-    // One sound per kind of control (players and cards have their own, see their components).
-    const onDown = (e: PointerEvent) => {
-      if (!(e.target instanceof Element)) return;
-      const el = e.target.closest<HTMLElement>("button, a, [role='tab'], [role='radio'], [role='option']");
-      if (!el || el.dataset.cursor === "view" || el.hasAttribute("aria-expanded")) return;
-      const label = el.getAttribute("aria-label") ?? "";
-      if (/^(previous|next)/i.test(label)) swoosh(/^next/i.test(label) ? 1 : -1);
-      else if (el.matches("[role='tab'], [role='radio'], [role='option']") || el.closest("[role='tablist'], [role='radiogroup'], [role='listbox']")) channel();
-      else tick();
-    };
-    window.addEventListener("pointerdown", onDown, { passive: true });
-    return () => window.removeEventListener("pointerdown", onDown);
-  }, []);
-
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

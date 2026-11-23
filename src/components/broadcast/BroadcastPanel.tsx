@@ -11,7 +11,6 @@ import BroadcastMascots from "./BroadcastMascots";
 import BroadcastProcess from "./BroadcastProcess";
 import { PAULISTAO_ASSETS, PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import { FOCUS_AT } from "./focus";
-import { swoosh } from "@/lib/sound";
 import styles from "./Broadcast.module.css";
 
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -153,7 +152,6 @@ function ScreenSwipe({
     }
     busy.current = true;
     setMoving(true);
-    swoosh(d);
     gsap.to(el, {
       x: -d * (w + SWIPE_GAP),
       duration: 0.38,

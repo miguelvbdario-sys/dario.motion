@@ -265,12 +265,11 @@ Code: `src/app/course/page.tsx` (metadata) → `src/components/course/` (`Course
 ## 9. Site-wide layers
 
 - **Loading screen** (`src/components/loader/`): on black, the character's face small (64px, a few look frames on a loop), "Miguel Dario" and "motion designer" with a "..." that fills one dot at a time. No counter. Lifts after window load + fonts, at least 0.9s and at most 6s, fades out in 0.35s, then the hero intro plays.
-- **Timeline** (`src/components/timeline/`): scroll progress as an After Effects timeline, fixed at the bottom once the visitor scrolls: yellow timecode (30 fps, one frame per 12px), a track with a diamond keyframe per section (click to jump; the name shows on hover) and the red playhead. Ends with the **sound toggle**. Phones: slimmer, no names, and a round **back to top** button above it after the hero.
+- **Timeline** (`src/components/timeline/`): scroll progress as an After Effects timeline, fixed at the bottom once the visitor scrolls: yellow timecode (30 fps, one frame per 12px), a track with a diamond keyframe per section (click to jump; the name shows on hover) and the red playhead. Phones: slimmer, no names, and a round **back to top** button above it after the hero.
 - **Lower thirds** (`src/components/lowerthird/`): section titles as TV lower thirds (red tag, bone title, dark mono sub), wiped in left to right the first time they show. Broadcast: "● ON AIR · BROADCAST · 04 PROJECTS" with a blinking dot.
 - **Effects** (`src/components/effects/Effects.tsx`, mouse only, off with reduced motion): `[data-magnetic]` elements (hero pills, About buttons) lean toward the cursor; mono labels decode from random glyphs on hover. Works carousel cards tilt toward the cursor (up to 8°, CSS `rotate`).
 - **Press feedback:** every button and link dips to 96% while pressed (`globals.css`, the separate `scale` property). Small touch targets get invisible hit areas (pills, carousel arrows).
 - **Cursor:** over playable videos (`data-cursor="view"`) a "PLAY" label shows beside the ring.
-- **Sounds** (`src/lib/sound.ts`): synthesised with Web Audio, **off by default**, remembered per device: a tick on presses, a rising blip when a card or the player opens, two beeps on a goal.
 - **Page changes:** portfolio ↔ /course use a cross-document view transition (old page out 0.22s ease-in, new in 0.45s ease-out).
 - **Share and search:** `opengraph-image.tsx` (name in Tusker + pixel head), `icon.png` / `apple-icon.png` (the face), `sitemap.ts`, `robots.ts` and Person JSON-LD in the layout. The address comes from `NEXT_PUBLIC_SITE_URL` (or Vercel's production URL), see `src/lib/site.ts`.
 
