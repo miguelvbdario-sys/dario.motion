@@ -2739,3 +2739,10 @@
 .marqueeWrap {
   margin-bottom: calc(var(--s) * 48);
 }
+
+/* Phones: the character hangs over the strip into the black, so more room before the first card. */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .marqueeWrap {
+    margin-bottom: 84px;
+  }
+}

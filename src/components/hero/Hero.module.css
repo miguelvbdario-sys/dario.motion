@@ -679,7 +679,7 @@
  */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .stage {
-    height: calc(var(--u) * 430);
+    height: calc(var(--u) * 380);
     /* Not pinned on phones: no travel, and the character can hang over the
        white strip below (as if coming out of the screen). Sideways the name
        still bleeds, so only that axis is clipped. */
@@ -711,7 +711,7 @@
   }
 
   .nav {
-    top: calc(var(--u) * 46);
+    top: calc(var(--u) * 64);
     left: 0;
     right: 0;
     flex-direction: row;
