@@ -18,7 +18,7 @@ const MAG_RADIUS = 20; // px around the element where the pull starts (reaches a
 const MAG_PULL = 0.3;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=<>/";
 const SCRAMBLE_SELECTOR = "[data-scramble], [class*='sideLabel'], [class*='playerIndexLabel']";
-const SCRAMBLE_MS = 380;
+const SCRAMBLE_MS = 320;
 
 export default function Effects() {
   useEffect(() => {
@@ -81,23 +81,23 @@ export default function Effects() {
     };
 
     // ---------- Scramble ----------
+    // Hovering a row, tab, button or card group glitches every label inside it
+    // ([data-scramble], plus the mono side labels): random glyphs that settle
+    // left to right in SCRAMBLE_MS.
     const running = new WeakSet<Element>();
-    const onOver = (e: PointerEvent) => {
-      if (e.pointerType !== "mouse" || !(e.target instanceof Element)) return;
-      const el = e.target.closest<HTMLElement>(SCRAMBLE_SELECTOR);
-      if (!el || running.has(el)) return;
-      // Only plain-text labels (no child elements to break).
-      if (el.childElementCount > 0 || !el.textContent?.trim()) return;
-      const final = el.textContent;
+    const scramble = (el: HTMLElement) => {
+      if (running.has(el) || el.childElementCount > 0) return;
+      const final = el.textContent ?? "";
+      if (!final.trim()) return;
       running.add(el);
       const start = performance.now();
       const step = (t: number) => {
         const p = Math.min(1, (t - start) / SCRAMBLE_MS);
-        const fixed = Math.floor(p * final.length);
+        const fixed = Math.floor(p * p * final.length);
         let out = final.slice(0, fixed);
         for (let i = fixed; i < final.length; i++) {
           const c = final[i];
-          out += c === " " || c === "[" || c === "]" || c === ":" ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
+          out += " []:·/".includes(c) ? c : GLYPHS[(Math.random() * GLYPHS.length) | 0];
         }
         el.textContent = out;
         if (p < 1) requestAnimationFrame(step);
@@ -108,15 +108,31 @@ export default function Effects() {
       };
       requestAnimationFrame(step);
     };
+    let lastHost: Element | null = null;
+    const onOver = (e: PointerEvent) => {
+      if (e.pointerType !== "mouse" || !(e.target instanceof Element)) return;
+      const host = e.target.closest<HTMLElement>("[data-scramble-group], button, a, [role='tab'], " + SCRAMBLE_SELECTOR);
+      if (!host || host === lastHost) return;
+      lastHost = host;
+      const targets = host.matches(SCRAMBLE_SELECTOR)
+        ? [host]
+        : [...host.querySelectorAll<HTMLElement>(SCRAMBLE_SELECTOR)];
+      targets.forEach(scramble);
+    };
+    const onOut = (e: PointerEvent) => {
+      if (lastHost && !(e.relatedTarget instanceof Node && lastHost.contains(e.relatedTarget))) lastHost = null;
+    };
 
     window.addEventListener("pointermove", onMove, { passive: true });
     document.documentElement.addEventListener("pointerleave", onLeave);
     document.addEventListener("pointerover", onOver, { passive: true });
+    document.addEventListener("pointerout", onOut, { passive: true });
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener("pointermove", onMove);
       document.documentElement.removeEventListener("pointerleave", onLeave);
       document.removeEventListener("pointerover", onOver);
+      document.removeEventListener("pointerout", onOut);
       mags.forEach((m) => (m.el.style.translate = ""));
     };
   }, []);

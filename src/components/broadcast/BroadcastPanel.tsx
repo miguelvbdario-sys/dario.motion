@@ -298,7 +298,7 @@ function PillBar({
           onClick={() => onSelect(i)}
         >
           <span className={styles.square} aria-hidden="true" />
-          <span className={styles.filterLabel}>{item.label}</span>
+          <span className={styles.filterLabel} data-scramble>{item.label}</span>
           <span className={styles.count}>{item.count}</span>
         </button>
       ))}
@@ -457,20 +457,20 @@ export default function BroadcastPanel({
       <p className={styles.indexLabel}>[ Index ]</p>
       <dl className={styles.indexRows}>
         <div>
-          <dt>Client</dt>
+          <dt data-scramble>Client</dt>
           <dd>{project.client}</dd>
         </div>
         <div>
-          <dt>Details</dt>
+          <dt data-scramble>Details</dt>
           <dd>{project.role}</dd>
         </div>
         <div>
-          <dt>Year</dt>
+          <dt data-scramble>Year</dt>
           <dd>{project.year}</dd>
         </div>
         {project.team && (
           <div>
-            <dt>Team</dt>
+            <dt data-scramble>Team</dt>
             <dd>{project.team}</dd>
           </div>
         )}
@@ -545,7 +545,7 @@ export default function BroadcastPanel({
             {ab.stats.map((st) => (
               <div key={st.label}>
                 <dd>{st.value}</dd>
-                <dt>{st.label}</dt>
+                <dt data-scramble>{st.label}</dt>
               </div>
             ))}
           </dl>
@@ -651,7 +651,7 @@ export default function BroadcastPanel({
                       onClick={() => setScreen(i)}
                     >
                       <span className={styles.square} aria-hidden="true" />
-                      <span className={styles.filterLabel}>{s.label}</span>
+                      <span className={styles.filterLabel} data-scramble>{s.label}</span>
                       <span className={styles.count}>[{pad(i + 1)}]</span>
                     </button>
                   ))}
@@ -785,10 +785,10 @@ export default function BroadcastPanel({
       </div>
 
       <div className={styles.labels}>
-        <span>[ Broadcast ]</span>
-        <span>{project.meta}</span>
-        <span>Live</span>
-        <span>{project.year}</span>
+        <span data-scramble>[ Broadcast ]</span>
+        <span data-scramble>{project.meta}</span>
+        <span data-scramble>Live</span>
+        <span data-scramble>{project.year}</span>
       </div>
 
       <span className={styles.dot} aria-hidden="true" />
@@ -829,7 +829,7 @@ export default function BroadcastPanel({
                       }}
                     >
                       <span className={styles.square} aria-hidden="true" />
-                      <span className={styles.filterLabel}>{label}</span>
+                      <span className={styles.filterLabel} data-scramble>{label}</span>
                       <span className={styles.count}>[{pad(n + 1)}]</span>
                       <span className={styles.accChevron} aria-hidden="true">▾</span>
                     </button>

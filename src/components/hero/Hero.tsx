@@ -295,6 +295,21 @@ export default function Hero() {
 
       window.addEventListener("pointermove", onWindowMove);
       document.documentElement.addEventListener("mouseleave", onWindowLeave);
+      // Desktop: clicking the character glitches it (red overlay + shake, 1s).
+      let glitchTimer = 0;
+      const onGlitchClick = (e: PointerEvent) => {
+        if (e.pointerType !== "mouse" || e.button !== 0) return;
+        if (blocked(e.target) || !overCharacter(e.clientX, e.clientY)) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        const c = headCanvas.current;
+        if (!c) return;
+        delete c.dataset.glitch;
+        void c.offsetWidth; // restart the animation on a quick second click
+        c.dataset.glitch = "";
+        clearTimeout(glitchTimer);
+        glitchTimer = window.setTimeout(() => delete c.dataset.glitch, 1000);
+      };
+      stage.addEventListener("pointerdown", onGlitchClick);
       stage.addEventListener("pointerdown", onDown);
       stage.addEventListener("pointermove", onMove);
       stage.addEventListener("pointerup", onUp);
@@ -361,6 +376,8 @@ export default function Hero() {
         mm.revert();
         gsap.ticker.remove(tickHead);
         stage.removeEventListener("pointerdown", onDown);
+        stage.removeEventListener("pointerdown", onGlitchClick);
+        clearTimeout(glitchTimer);
         window.removeEventListener("pointermove", onWindowMove);
         document.documentElement.removeEventListener("mouseleave", onWindowLeave);
         stage.removeEventListener("pointermove", onMove);

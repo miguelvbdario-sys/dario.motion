@@ -49,7 +49,7 @@ function RowContent({ project, black }: { project: BroadcastProject; black?: boo
   return (
     <span className={styles.content} data-meta-first={project.metaFirst || undefined} data-black={black || undefined}>
       <span className={styles.title}>{project.title}</span>
-      <span className={styles.meta}>{project.meta}</span>
+      <span className={styles.meta} data-scramble>{project.meta}</span>
     </span>
   );
 }

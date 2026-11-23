@@ -371,6 +371,7 @@ export default function WorksCarousel() {
                 panels.current[i] = node;
               }}
               className={styles.panel}
+              data-scramble-group
               // Mouse events (not pointer events) so every mouse and trackpad
               // fires them; touch screens are filtered out by the hover query.
               onMouseEnter={() => {
@@ -428,8 +429,8 @@ export default function WorksCarousel() {
                 className={styles.caption}
                 aria-hidden="true"
               >
-                <p className={styles.title}>{item.title}</p>
-                {item.meta && <p className={styles.meta}>{item.meta}</p>}
+                <p className={styles.title} data-scramble>{item.title}</p>
+                {item.meta && <p className={styles.meta} data-scramble>{item.meta}</p>}
               </div>
             </div>
           ))}
