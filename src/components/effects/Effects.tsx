@@ -14,8 +14,8 @@ import { useEffect } from "react";
  * Mouse only for magnetic and scramble; nothing runs with reduced motion.
  */
 
-const MAG_RADIUS = 10; // px around the element where the pull starts (small: only the one under the mouse)
-const MAG_PULL = 0.18;
+const MAG_RADIUS = 20; // px around the element where the pull starts (reaches a neighbour, never the whole stack)
+const MAG_PULL = 0.3;
 const GLYPHS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789#%&*+=<>/";
 const SCRAMBLE_SELECTOR = "[data-scramble], [class*='sideLabel'], [class*='playerIndexLabel']";
 const SCRAMBLE_MS = 380;

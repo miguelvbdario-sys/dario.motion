@@ -5,7 +5,8 @@ import { useEffect, useRef } from "react";
 /*
  * Background mouse trail (desktop): the cursor leaves a trail of pixel squares
  * on a grid that fade out, each one split into red / green / blue copies
- * offset sideways, like a CRT's colour fringe. Only runs (and only draws)
+ * offset sideways, like a CRT's colour fringe, in a lighter red than the
+ * background. Only runs (and only draws)
  * while there are cells alive.
  */
 
@@ -67,16 +68,14 @@ export default function PixelTrail({ className }: { className?: string }) {
           return;
         }
         const e = a * a; // fades fast, then lingers
-        ctx.globalCompositeOperation = "source-over";
-        ctx.fillStyle = `rgba(0,0,0,${0.45 * e})`;
-        ctx.fillRect(c.x, c.y, CELL, CELL);
-        ctx.globalCompositeOperation = "lighter";
-        ctx.fillStyle = `rgba(255,40,40,${0.55 * e})`;
+        // A lighter red than the background, with its colour fringe in warm
+        // offsets (magenta to the left, orange to the right).
+        ctx.fillStyle = `rgba(255,70,140,${0.3 * e})`;
         ctx.fillRect(c.x - SPLIT, c.y, CELL, CELL);
-        ctx.fillStyle = `rgba(0,255,120,${0.35 * e})`;
-        ctx.fillRect(c.x, c.y - 1, CELL, CELL);
-        ctx.fillStyle = `rgba(40,90,255,${0.55 * e})`;
+        ctx.fillStyle = `rgba(255,150,70,${0.3 * e})`;
         ctx.fillRect(c.x + SPLIT, c.y, CELL, CELL);
+        ctx.fillStyle = `rgba(255,95,85,${0.6 * e})`;
+        ctx.fillRect(c.x, c.y, CELL, CELL);
       });
       ctx.globalCompositeOperation = "source-over";
       if (cells.size) raf = requestAnimationFrame(draw);
