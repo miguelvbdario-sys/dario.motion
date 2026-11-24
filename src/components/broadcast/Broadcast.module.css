@@ -2583,12 +2583,9 @@
     font-size: calc(var(--s) * 30);
   }
 
+  /* One paragraph: the two parts run on in the same text. */
   .about:has(.aboutStats) .aboutLeadPart {
-    display: block;
-  }
-
-  .about:has(.aboutStats) .aboutLeadPart + .aboutLeadPart {
-    margin-top: 0.4em;
+    display: inline;
   }
 
   /* The four loop cards in one row, so the section fits one screen. */
