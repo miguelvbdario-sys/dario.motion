@@ -252,8 +252,8 @@ export const BROADCAST: BroadcastProject[] = [
   },
   {
     id: "led-displays",
-    title: "LED Displays Broadcasts",
-    meta: "[Venue · Scope]", // TODO: substituir
+    title: "Personal Projects",
+    meta: "NBA · World Cup · Champions League",
     align: "left",
     offset: 0,
     metaFirst: false,
@@ -263,7 +263,11 @@ export const BROADCAST: BroadcastProject[] = [
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
     desc: "[Project description]", // TODO: substituir
-    filters: placeholderFilters(),
+    filters: [
+      { label: "NBA Style", count: "[01]" },
+      { label: "World Cup Graphics", count: "[02]" },
+      { label: "Champions League Graphics", count: "[03]" },
+    ],
     fullVideo: null, // TODO: substituir
   },
 ];
