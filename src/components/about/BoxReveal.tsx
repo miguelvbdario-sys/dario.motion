@@ -22,6 +22,10 @@ const BOX_MS = 760;
 const LINE_GAP = 70;
 const BLOCK_GAP = 120;
 const SHIFT = 40;
+/** Buttons: slide distance (px), duration and offset between them (ms). */
+const BTN_SHIFT = 60;
+const BTN_MS = 700;
+const BTN_GAP = 140;
 
 export default function BoxReveal() {
   const layer = useRef<HTMLDivElement>(null);
@@ -75,6 +79,24 @@ export default function BoxReveal() {
       const sr = section.getBoundingClientRect();
       let t = 0;
       blocks.forEach((block) => {
+        // Buttons: no box; each slides in from the right with a fade, one after the other.
+        const kids = [...block.children] as HTMLElement[];
+        if (kids.length && kids.every((c) => c.tagName === "A")) {
+          block.style.opacity = "1";
+          kids.forEach((k, i) => {
+            anims.push(
+              k.animate(
+                [
+                  { opacity: 0, transform: `translateX(${BTN_SHIFT}px)` },
+                  { opacity: 1, transform: "translateX(0)" },
+                ],
+                { duration: BTN_MS, delay: t + i * BTN_GAP, easing: "cubic-bezier(0.16, 1, 0.3, 1)", fill: "both" },
+              ),
+            );
+          });
+          t += kids.length * BTN_GAP + BLOCK_GAP;
+          return;
+        }
         const rects = lineRects(block);
         rects.forEach((r, i) => {
           const box = document.createElement("span");
