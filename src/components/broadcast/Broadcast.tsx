@@ -9,7 +9,7 @@ import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
 import Marquee from "@/components/marquee/Marquee";
 import ScrollType from "@/components/effects/ScrollType";
-import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
+import { glide, isTouchLayout, onScrollFrame, progress, requestScrollFrame, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
 
@@ -461,7 +461,19 @@ export default function Broadcast() {
         }
       } else {
         // Closing runs faster than opening (fast closing: the visitor is done with it).
-        gsap.to(wrap, { height: 0, duration: OPEN_TIME * 0.55, ease: EASE_OPEN, overwrite: true });
+        // The page shrinks without a scroll event: re-check the rows' reveal every
+        // frame of the collapse, or the rows below stay hidden.
+        gsap.to(wrap, {
+          height: 0,
+          duration: OPEN_TIME * 0.55,
+          ease: EASE_OPEN,
+          overwrite: true,
+          onUpdate: requestScrollFrame,
+          onComplete: () => {
+            (window as unknown as { lenis?: { resize: () => void } }).lenis?.resize();
+            requestScrollFrame();
+          },
+        });
         if (inner) gsap.to(inner, { opacity: 0, duration: 0.18, overwrite: true });
       }
     });
