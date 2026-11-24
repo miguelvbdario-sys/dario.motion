@@ -2570,15 +2570,17 @@
 @media (min-width: 768px) and (min-aspect-ratio: 3/4) {
   .about:has(.aboutStats) {
     grid-template-columns: minmax(0, 1fr);
-    gap: calc(var(--s) * 36);
+    gap: calc(var(--s) * 24);
   }
 
   .about:has(.aboutStats) .aboutMain {
-    gap: calc(var(--s) * 36);
+    gap: calc(var(--s) * 24);
   }
 
   .about:has(.aboutStats) .aboutLead {
     max-width: none;
+    /* Smaller so the whole About fits one screen. */
+    font-size: calc(var(--s) * 30);
   }
 
   .about:has(.aboutStats) .aboutLeadPart {
@@ -2589,9 +2591,9 @@
     margin-top: 0.4em;
   }
 
+  /* The four loop cards in one row, so the section fits one screen. */
   .about:has(.aboutStats) .aboutPoints {
-    width: min(100%, calc(var(--s) * 1040));
-    margin: 0 auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .about:has(.aboutStats) .aboutSide {
