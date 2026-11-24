@@ -11,11 +11,11 @@ import styles from "./AboutIntro.module.css";
  *
  *   CUTS     three video cuts, full screen, with "MIGUEL DARIO" over them as a
  *            red outline.
- *   OPEN     a red circle fills the screen while MIGUEL and DARIO (white, big)
- *            travel to the top and bottom edges, shrinking and turning dark,
- *            and land exactly on ABOUT's own name frame, which takes over.
- *   CONTENT  ABOUT's label, photo and texts slide in from the right, one after
- *            the other.
+ *   OPEN     a red circle fills the screen while MIGUEL rises and DARIO sinks
+ *            out of it.
+ *   CONTENT  ABOUT's photo slides in from the right and the "MIGUEL DARIO"
+ *            line at its bottom edge rises into place (the texts have their
+ *            own box reveal, BoxReveal.tsx).
  *
  * The track overlaps ABOUT by one screen, so when the red screen hides, ABOUT
  * is right under it (the bit of track above ABOUT turns red meanwhile).
@@ -24,16 +24,16 @@ import styles from "./AboutIntro.module.css";
  * the section gets close).
  */
 const CLIPS = ["/projects/palmeiras.mp4", "/projects/copazona.mp4", "/projects/flamengo.mp4"];
-const CUTS: [number, number] = [0, 0.45];
-const OPEN: [number, number] = [0.45, 0.78];
-const CONTENT: [number, number] = [0.74, 1];
-/** Size of the travelling MIGUEL / DARIO at the start, relative to the frame. */
-const START_SCALE = 1.35;
+const CUTS: [number, number] = [0, 0.5];
+// The hand-over (end of OPEN) is late on purpose: ABOUT is then almost at the
+// top of the screen, so no empty red shows above it.
+const OPEN: [number, number] = [0.5, 0.93];
+const CONTENT: [number, number] = [0.84, 1];
+/** Size of the travelling MIGUEL / DARIO (1 = the CSS size). */
+const START_SCALE = 1.2;
 /** Distance the photo and texts slide in from (px). */
 const SLIDE = 180;
 
-const BONE = [239, 238, 238];
-const INK = [20, 0, 0];
 
 export default function AboutIntro() {
   const track = useRef<HTMLDivElement>(null);
@@ -106,29 +106,20 @@ export default function AboutIntro() {
       // Tells ABOUT's box reveal it may play (the red screen no longer covers it).
       if (handed) about.dataset.handed = "";
       else delete about.dataset.handed;
-      frames.forEach((f) => (f.style.opacity = handed ? "1" : "0"));
-
       const sr = stage.getBoundingClientRect();
       const s = eio(o);
       halves.forEach((h, i) => {
         h.style.visibility = opening ? "visible" : "hidden";
-        const f = frames[i];
-        if (!opening || !f) return;
-        const fr = f.getBoundingClientRect();
+        if (!opening) return;
         const w = h.offsetWidth;
         const hh = h.offsetHeight;
-        // Start: centred, MIGUEL just above the middle, DARIO just below, bigger.
-        const k1 = fr.width / w;
-        // Bigger at the start, but never wider than the screen (phones).
-        const k0 = Math.min(START_SCALE * k1, (sr.width * 0.94) / w);
-        const x0 = (sr.width - w * k0) / 2;
-        const y0 = i === 0 ? sr.height / 2 - hh * k0 : sr.height / 2;
-        // End: exactly where ABOUT's frame line is right now.
-        const x1 = fr.left - sr.left;
-        const y1 = fr.top - sr.top;
-        h.style.transform = `translate3d(${mix(x0, x1, s).toFixed(1)}px, ${mix(y0, y1, s).toFixed(1)}px, 0) scale(${mix(k0, k1, s).toFixed(4)})`;
-        const col = BONE.map((v, j) => Math.round(mix(v, INK[j], progress(o, 0.35, 0.9))));
-        h.style.color = `rgb(${col.join(",")})`;
+        // Big, but never wider than the screen (phones).
+        const k = Math.min(START_SCALE, (sr.width * 0.94) / w);
+        const x = (sr.width - w * k) / 2;
+        // Start: MIGUEL just above the middle, DARIO just below. End: out of the screen.
+        const y0 = i === 0 ? sr.height / 2 - hh * k : sr.height / 2;
+        const y1 = i === 0 ? -hh * k - 20 : sr.height + 20;
+        h.style.transform = `translate3d(${x.toFixed(1)}px, ${mix(y0, y1, s).toFixed(1)}px, 0) scale(${k.toFixed(4)})`;
       });
 
       // ---- Content: slides in from the right, one after the other ----
@@ -138,12 +129,21 @@ export default function AboutIntro() {
         el.style.opacity = t.toFixed(3);
         el.style.translate = t >= 1 ? "" : `${((1 - t) * SLIDE).toFixed(1)}px 0`;
       });
+      // The "MIGUEL DARIO" line cut by the bottom edge rises into place.
+      frames.forEach((f) => {
+        const t = eo(progress(e, 0.1, 0.7));
+        f.style.opacity = t.toFixed(3);
+        f.style.translate = t >= 1 ? "" : `-50% calc(var(--frame-y) + ${((1 - t) * 100).toFixed(1)}%)`;
+      });
 
       return p !== target;
     });
     return () => {
       unsub();
-      frames.forEach((f) => (f.style.opacity = ""));
+      frames.forEach((f) => {
+        f.style.opacity = "";
+        f.style.translate = "";
+      });
       items.forEach((el) => {
         el.style.opacity = "";
         el.style.translate = "";

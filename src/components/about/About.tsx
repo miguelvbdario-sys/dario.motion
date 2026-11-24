@@ -22,13 +22,10 @@ export default function About() {
         <span />
       </div>
 
-      {/* The name as a frame: MIGUEL cut by the top edge, DARIO by the bottom
-          one, inside the section's padding so it never reaches the text. */}
-      <p className={`${styles.frame} ${styles.frameTop}`} data-frame aria-hidden="true">
-        Miguel
-      </p>
+      {/* "MIGUEL DARIO" cut by the bottom edge, inside the section's bottom
+          padding so it never reaches the text. */}
       <p className={`${styles.frame} ${styles.frameBot}`} data-frame aria-hidden="true">
-        Dario
+        Miguel Dario
       </p>
 
       {/* Box reveal of the texts (label, lead, paragraph, buttons). */}

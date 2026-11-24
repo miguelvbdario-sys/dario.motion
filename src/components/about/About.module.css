@@ -7,7 +7,7 @@
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  padding: calc(var(--s) * 200) calc(var(--s) * 64) calc(var(--s) * 180);
+  padding: calc(var(--s) * 110) calc(var(--s) * 64) calc(var(--s) * 180);
   background:
     repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
     var(--red);
@@ -173,7 +173,7 @@
 @media (max-width: 767px) {
   .section {
     --s: 1px;
-    padding: 72px 16px 88px;
+    padding: 72px 16px 150px;
   }
 
   .guides {
@@ -240,9 +240,9 @@
 }
 
 /*
- * Name frame: MIGUEL cut by the top edge, DARIO by the bottom one. Only about
- * half of each line shows, which stays inside the section's top / bottom
- * padding, so it never touches the text.
+ * Name line: "MIGUEL DARIO" cut by the bottom edge. Only about half of it
+ * shows, which stays inside the section's bottom padding, so it never touches
+ * the text.
  */
 .frame {
   position: absolute;
@@ -250,7 +250,7 @@
   z-index: -1;
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(72px, 15vw, 280px);
+  font-size: clamp(64px, 11vw, 220px);
   font-weight: 800;
   line-height: 0.84;
   letter-spacing: 0.01em;
@@ -262,11 +262,6 @@
   --frame-y: 52%;
 }
 
-.frameTop {
-  top: 0;
-  translate: -50% calc(var(--frame-y) * -1);
-}
-
 .frameBot {
   bottom: 0;
   translate: -50% var(--frame-y);
@@ -274,8 +269,13 @@
 
 @media (max-width: 767px) {
   .frame {
-    font-size: 26vw;
-    --frame-y: 64%;
+    font-size: 13.5vw;
+    /* Whole line, just above the page timeline (which covers the last ~70px). */
+    --frame-y: 0%;
+  }
+
+  .frameBot {
+    bottom: 72px;
   }
 }
 

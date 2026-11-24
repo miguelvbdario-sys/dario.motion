@@ -16,7 +16,7 @@ import styles from "./BoxReveal.module.css";
  * Lines are measured at play time (a Range's line boxes), so they follow the
  * real wrapping at any width. The buttons get one box each.
  */
-const TRIGGER = 0.82;
+const TRIGGER = 0.95;
 const RESET = 1.02;
 const BOX_MS = 760;
 const LINE_GAP = 70;
