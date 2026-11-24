@@ -255,6 +255,7 @@ export default function Hero() {
       const onWindowLeave = () => (mouseX = 0);
       /** Desktop: the head is on the scroll pose and follows the scroll 1:1. */
       let scrollLocked = true;
+      let lastScroll = view.scroll;
 
       const tickHead = (_t: number, deltaMs: number) => {
         const dt = Math.min(deltaMs / 1000, 0.1);
@@ -268,6 +269,11 @@ export default function Hero() {
         };
         // Scrolling turns the head from rest to the right end (desktop and phones).
         scrollOffset = -(view.scroll / HEAD_FRAMES.last) * maxRight;
+        // Scrolling hands the head back to the scroll: the mouse zone is dropped
+        // (until the mouse moves again), so the head glides to the scroll pose
+        // and then follows the scroll 1:1, without a jump.
+        if (Math.abs(view.scroll - lastScroll) > 0.01) mouseX = 0;
+        lastScroll = view.scroll;
         if (followMouse) {
           // Desktop: the mouse zones win; over the character (or away), the head
           // sits where the scroll puts it.
