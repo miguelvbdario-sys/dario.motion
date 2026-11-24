@@ -169,39 +169,63 @@
 }
 
 /* ---------- Phones ---------- */
+/* Everything fits one screen: small photo on the left, compact type and
+   buttons, wider side margins (28px) so the text never touches the edges. */
 
 @media (max-width: 767px) {
   .section {
     --s: 1px;
-    padding: 72px 16px 150px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 100svh;
+    /* Bottom: room for the "MIGUEL DARIO" line and the page timeline. */
+    padding: 48px 28px 150px;
   }
 
   .guides {
-    inset: 0 16px;
+    inset: 0 28px;
   }
 
   .grid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 28px;
+    gap: 18px;
   }
 
+  .label {
+    font-size: 10px;
+  }
 
-  /* Small square photo, centred, with the name around it. */
+  /* Small photo on the left; the round badge sits on its right corner. */
   .portrait {
-    width: min(48vw, 200px);
-    margin: 24px auto;
+    width: min(36vw, 150px);
+    /* Top: clears the label from the badge. */
+    margin: 18px 0 0;
   }
 
-  .script {
-    --script-size: 200px;
+  .text {
+    gap: 14px;
   }
 
   .lead {
-    font-size: 24px;
+    font-size: 20px;
+    line-height: 1.12;
   }
 
   .body {
-    font-size: 17px;
+    font-size: 15px;
+    line-height: 1.35;
+  }
+
+  .buttons {
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .button {
+    gap: 0.6em;
+    padding: 0.65em 0.95em;
+    font-size: 14px;
   }
 }
 
