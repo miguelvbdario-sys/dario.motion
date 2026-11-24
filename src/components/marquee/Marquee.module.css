@@ -38,6 +38,29 @@
   margin: 0 3.5em 0 2.6em;
 }
 
+/*
+ * Entrance with the hero: the strip waits off to the right while the loading
+ * screen is up (html[data-intro]), then slides in slowly to the left once it
+ * lifts (html[data-loaded]). Without JS it simply shows.
+ */
+:global(html[data-intro]) .marquee {
+  translate: 100% 0;
+}
+
+:global(html[data-intro][data-loaded]) .marquee {
+  /* Slow: 3s, easing out gently. */
+  animation: stripIn 3s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+}
+
+@keyframes stripIn {
+  from {
+    translate: 100% 0;
+  }
+  to {
+    translate: 0 0;
+  }
+}
+
 @keyframes marquee {
   to {
     transform: translateX(-50%);
@@ -46,6 +69,12 @@
 
 @media (prefers-reduced-motion: reduce) {
   .track {
+    animation: none;
+  }
+
+  :global(html[data-intro]) .marquee,
+  :global(html[data-intro][data-loaded]) .marquee {
+    translate: none;
     animation: none;
   }
 }

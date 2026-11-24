@@ -8,6 +8,8 @@ type LoaderWindow = Window & { __siteLoaded?: boolean };
 
 export function markLoaded() {
   (window as LoaderWindow).__siteLoaded = true;
+  // CSS hook for intros that are pure CSS (e.g. the white strip sliding in).
+  document.documentElement.dataset.loaded = "";
   window.dispatchEvent(new Event(EVENT));
 }
 

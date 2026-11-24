@@ -43,6 +43,8 @@ export default function Loader() {
     // Lenis is created by a parent effect, which runs after this one.
     const stopLenis = setTimeout(() => lenis()?.stop(), 0);
     document.documentElement.style.overflow = "hidden";
+    // CSS intros wait for data-loaded (set by markLoaded) while this is on.
+    document.documentElement.dataset.intro = "";
     if (!reduced) preloadCuts();
 
     // Turning face: draw whichever frames have arrived, in order, on a loop.
