@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { ABOUT } from "@/content/about";
-import WordReveal from "@/components/effects/WordReveal";
+import BoxReveal from "./BoxReveal";
 import styles from "./About.module.css";
 
 /*
@@ -30,8 +30,11 @@ export default function About() {
         Dario
       </p>
 
+      {/* Box reveal of the texts (label, lead, paragraph, buttons). */}
+      <BoxReveal />
+
       <div className={styles.grid}>
-        <p className={styles.label} data-enter style={{ "--i": 0 } as React.CSSProperties}>{ABOUT.label}</p>
+        <p className={styles.label} data-box="0">{ABOUT.label}</p>
 
         <div className={styles.portrait}>
           <div className={styles.photo} data-enter style={{ "--i": 1 } as React.CSSProperties}>
@@ -46,16 +49,15 @@ export default function About() {
         </div>
 
         <div className={styles.text}>
-          <p id="about-lead" className={styles.lead} data-enter style={{ "--i": 2 } as React.CSSProperties}>
-            {/* Words light up one by one as the lead crosses the screen. */}
-            <WordReveal text={ABOUT.lead} />
+          <p id="about-lead" className={styles.lead} data-box="1">
+            {ABOUT.lead}
           </p>
           {ABOUT.paragraphs.map((p) => (
-            <p key={p} className={styles.body} data-enter style={{ "--i": 3 } as React.CSSProperties}>
+            <p key={p} className={styles.body} data-box="2">
               {p}
             </p>
           ))}
-          <div className={styles.buttons} data-enter style={{ "--i": 4 } as React.CSSProperties}>
+          <div className={styles.buttons} data-box="3">
             {ABOUT.buttons.map((b) => {
               const external = b.href.startsWith("http");
               return (

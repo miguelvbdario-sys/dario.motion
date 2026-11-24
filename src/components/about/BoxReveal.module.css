@@ -1,0 +1,16 @@
+/* Boxes of the ABOUT box reveal (BoxReveal.tsx), drawn over the texts. */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.box {
+  position: absolute;
+  /* The text colour, so the box reads as the text "printing" in. */
+  background: #140000;
+  transform-origin: right center;
+  transform: scaleX(0);
+}

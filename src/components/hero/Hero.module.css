@@ -274,6 +274,28 @@
 .letter[data-active] {
   color: #ae3623;
 }
+
+/*
+ * Intro: the name switches on like neon (Hero.tsx sets data-neon). Each letter
+ * flickers a few times with a glow, starting at its own moment (--d, 0–0.33s),
+ * then settles lit with no glow.
+ */
+.title[data-neon] .letter {
+  animation: heroNeon 1.3s linear both;
+  animation-delay: calc(var(--d, 0) * 1s);
+}
+
+@keyframes heroNeon {
+  0% { opacity: 0; text-shadow: none; }
+  6% { opacity: 1; text-shadow: 0 0 0.08em #fff, 0 0 0.3em #ff6a5a; }
+  10% { opacity: 0.1; text-shadow: none; }
+  18% { opacity: 1; text-shadow: 0 0 0.08em #fff, 0 0 0.3em #ff6a5a; }
+  23% { opacity: 0.3; text-shadow: none; }
+  30% { opacity: 1; text-shadow: 0 0 0.08em #fff, 0 0 0.35em #ff6a5a; }
+  36% { opacity: 0.65; }
+  42% { opacity: 1; text-shadow: 0 0 0.1em #fff, 0 0 0.4em #ff6a5a; }
+  100% { opacity: 1; text-shadow: 0 0 0 transparent; }
+}
 /* ---------- Portrait sequence ---------- */
 
 .head {

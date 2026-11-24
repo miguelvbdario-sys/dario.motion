@@ -103,6 +103,9 @@ export default function AboutIntro() {
       // The bit of track above ABOUT turns red once the screen hands over.
       if (handed) root.dataset.red = "";
       else delete root.dataset.red;
+      // Tells ABOUT's box reveal it may play (the red screen no longer covers it).
+      if (handed) about.dataset.handed = "";
+      else delete about.dataset.handed;
       frames.forEach((f) => (f.style.opacity = handed ? "1" : "0"));
 
       const sr = stage.getBoundingClientRect();

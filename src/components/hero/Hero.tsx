@@ -355,12 +355,9 @@ export default function Hero() {
           .fromTo(q("[data-vline]"), { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 1.6, stagger: 0.07 }, 0)
           .fromTo(q("[data-hline]"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 1.6, stagger: 0.07 }, 0.1)
           .fromTo(q("[data-mark]"), { opacity: 0 }, { opacity: 1, duration: 0.8, stagger: 0.025 }, 0.9)
-          .fromTo(
-            q("[data-word]"),
-            { yPercent: 30, opacity: 0 },
-            { yPercent: 0, opacity: 1, duration: 1.4, stagger: 0.12 },
-            0.15,
-          )
+          // Name: neon flicker, each letter switching on like a tube (CSS heroNeon).
+          .fromTo(q("[data-word]"), { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.1)
+          .call(() => title.current?.setAttribute("data-neon", ""), undefined, 0.1)
           .fromTo(q("[data-head]"), { opacity: 0, yPercent: 2.5 }, { opacity: 1, yPercent: 0, duration: 1.6 }, 0.35)
           .fromTo(
             q("[data-reveal]"),
@@ -424,7 +421,12 @@ export default function Hero() {
             {["Miguel", "Dario"].map((word) => (
               <span key={word} data-word>
                 {[...word].map((char, i) => (
-                  <span key={i} className={styles.letter}>
+                  <span
+                    key={i}
+                    className={styles.letter}
+                    // Neon flicker: each letter starts at its own moment (scattered).
+                    style={{ "--d": (((i + word.length) * 37) % 11) / 30 } as CSSProperties}
+                  >
                     {char}
                   </span>
                 ))}
