@@ -34,10 +34,10 @@ export default function About() {
       <div className={styles.grid}>
         <p className={styles.label} data-box="0">{ABOUT.label}</p>
 
-        <div className={styles.portrait} data-enter style={{ "--i": 1 } as React.CSSProperties}>
+        <div className={styles.portrait}>
           {/* Round text badge on the photo's corner, turning with the scroll. */}
           <CircleText />
-          <div className={styles.photo}>
+          <div className={styles.photo} data-enter style={{ "--i": 2 } as React.CSSProperties}>
             <Image
               src={ABOUT.photo.src}
               alt={ABOUT.photo.alt}

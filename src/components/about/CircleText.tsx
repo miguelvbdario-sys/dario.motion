@@ -26,8 +26,9 @@ export default function CircleText() {
     });
   }, []);
 
+  // Enters first (AboutIntro slides [data-enter] in by --i), the photo after.
   return (
-    <div className={styles.badge} aria-hidden="true">
+    <div className={styles.badge} aria-hidden="true" data-enter style={{ "--i": 0 } as React.CSSProperties}>
       <svg ref={ring} className={styles.ring} viewBox="0 0 200 200">
         <defs>
           <path id="about-circle-path" d="M100,100 m-78,0 a78,78 0 1,1 156,0 a78,78 0 1,1 -156,0" />
