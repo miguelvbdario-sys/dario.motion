@@ -23,12 +23,17 @@ import styles from "./AboutIntro.module.css";
  * Where to tune: the phase ranges below; videos in CLIPS (they load only when
  * the section gets close).
  */
-const CLIPS = ["/projects/palmeiras.mp4", "/projects/copazona.mp4", "/projects/flamengo.mp4"];
+const CLIPS = ["/projects/palmeiras.mp4", "/projects/flamengo.mp4"];
+/** Share of the cuts phase Palmeiras stays on before Flamengo. */
+const FIRST_CUT = 0.72;
 const CUTS: [number, number] = [0, 0.5];
 // The hand-over (end of OPEN) is late on purpose: ABOUT is then almost at the
 // top of the screen, so no empty red shows above it.
 const OPEN: [number, number] = [0.5, 0.93];
-const CONTENT: [number, number] = [0.84, 1];
+const CONTENT: [number, number] = [0.72, 1];
+/** Point of OPEN where the circle is full and the stage turns see-through,
+ *  so ABOUT shows behind MIGUEL / DARIO while they leave (no empty red). */
+const REVEAL = 0.6;
 /** Size of the travelling MIGUEL / DARIO (1 = the CSS size). */
 const START_SCALE = 1.2;
 /** Distance the photo and texts slide in from (px). */
@@ -88,7 +93,7 @@ export default function AboutIntro() {
       // ---- Cuts ----
       const c = progress(p, CUTS[0], CUTS[1]);
       const inCuts = p < CUTS[1] && r.top < vh;
-      setCut(inCuts ? Math.min(CLIPS.length - 1, Math.floor(c * CLIPS.length)) : -1);
+      setCut(inCuts ? (c < FIRST_CUT ? 0 : 1) : -1);
       outline.style.visibility = p < CUTS[1] ? "" : "hidden";
       const blink = inCuts && Math.floor(c * 60) % 9 === 0;
       vids.forEach((v) => (v.style.filter = blink ? "invert(1) hue-rotate(180deg)" : ""));
@@ -97,14 +102,16 @@ export default function AboutIntro() {
       const o = progress(p, OPEN[0], OPEN[1]);
       const opening = p >= OPEN[0] && p < OPEN[1];
       const handed = p >= OPEN[1];
+      const clear = handed || (opening && o >= REVEAL);
       stage.style.visibility = handed ? "hidden" : "";
-      circle.style.visibility = opening ? "visible" : "hidden";
+      stage.style.background = clear ? "transparent" : "";
+      circle.style.visibility = opening && !clear ? "visible" : "hidden";
       circle.style.transform = `translate3d(-50%, -50%, 0) scale(${(0.15 + eio(progress(o, 0, 0.7)) * 9).toFixed(3)})`;
       // The bit of track above ABOUT turns red once the screen hands over.
-      if (handed) root.dataset.red = "";
+      if (clear) root.dataset.red = "";
       else delete root.dataset.red;
       // Tells ABOUT's box reveal it may play (the red screen no longer covers it).
-      if (handed) about.dataset.handed = "";
+      if (clear) about.dataset.handed = "";
       else delete about.dataset.handed;
       const sr = stage.getBoundingClientRect();
       const s = eio(o);

@@ -57,7 +57,7 @@ export default function About() {
               {p}
             </p>
           ))}
-          <div className={styles.buttons} data-box="3">
+          <div className={styles.buttons} data-enter style={{ "--i": 2 } as React.CSSProperties}>
             {ABOUT.buttons.map((b) => {
               const external = b.href.startsWith("http");
               return (
