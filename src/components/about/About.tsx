@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { ABOUT } from "@/content/about";
 import BoxReveal from "./BoxReveal";
+import CircleText from "./CircleText";
 import styles from "./About.module.css";
 
 /*
@@ -36,8 +37,10 @@ export default function About() {
       <div className={styles.grid}>
         <p className={styles.label} data-box="0">{ABOUT.label}</p>
 
-        <div className={styles.portrait}>
-          <div className={styles.photo} data-enter style={{ "--i": 1 } as React.CSSProperties}>
+        <div className={styles.portrait} data-enter style={{ "--i": 1 } as React.CSSProperties}>
+          {/* Round text badge on the photo's corner, turning with the scroll. */}
+          <CircleText />
+          <div className={styles.photo}>
             <Image
               src={ABOUT.photo.src}
               alt={ABOUT.photo.alt}
