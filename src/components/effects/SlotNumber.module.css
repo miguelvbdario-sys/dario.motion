@@ -1,0 +1,26 @@
+/* Slot machine number (SlotNumber.tsx): each digit is a reel in a 1em window. */
+
+.slot {
+  display: inline-flex;
+  vertical-align: bottom;
+}
+
+.window {
+  display: inline-block;
+  height: 1em;
+  overflow: hidden;
+  line-height: 1;
+}
+
+.reel {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+}
+
+.reel > span {
+  display: block;
+  height: 1em;
+  line-height: 1;
+  text-align: center;
+}

@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WORKS, type Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
+import SlotNumber from "@/components/effects/SlotNumber";
 import styles from "./WorksCarousel.module.css";
 
 /*
@@ -448,7 +449,8 @@ export default function WorksCarousel() {
             <ChevronLeft aria-hidden="true" strokeWidth={1.25} />
           </button>
           <span className={styles.counter} aria-hidden="true">
-            {String(realIndex).padStart(2, "0")} <span className={styles.counterSep}>/</span>{" "}
+            {/* Current number rolls like a slot machine when it changes. */}
+            <SlotNumber value={realIndex} /> <span className={styles.counterSep}>/</span>{" "}
             {String(WORKS.length).padStart(2, "0")}
           </span>
           <button type="button" className={styles.arrow} onClick={() => turn(1)} aria-label="Next work">
