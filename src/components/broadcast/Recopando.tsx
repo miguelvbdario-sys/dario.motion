@@ -29,6 +29,10 @@ type Decade = (typeof DECADES)[number];
 /** Only this decade has the wireframe (render + 3D). */
 const WIRE: Decade = "00s";
 /** 3D start view, relative to the props' size (front, slightly above and to the side). */
+/** Touch: sideways px before the set turns, how much more across than down, and the vertical px that hand the gesture to the page (same as the mascots). */
+const SWIPE_MIN = 22;
+const SWIPE_RATIO = 2;
+const SWIPE_SCROLL = 10;
 const VIEW = { side: 0.15, up: 0.32, back: 0.95, lift: 0.12 };
 
 function Compare({ decade, active }: { decade: Decade; active: boolean }) {
@@ -171,6 +175,50 @@ function Scene3D({ active }: { active: boolean }) {
       controls.maxDistance = size * 4;
       controls.update();
 
+      // Touch (phones): same rule as the mascots' "break the goal" — a vertical
+      // swipe scrolls the page; only a clearly sideways swipe (SWIPE_MIN px across,
+      // SWIPE_RATIO times more across than down) turns the set. No pinch zoom.
+      const touch = window.matchMedia("(pointer: coarse)").matches;
+      const cv = renderer.domElement;
+      let t0: { x: number; y: number; last: number } | null = null;
+      let turning = false;
+      const auto = controls.autoRotate;
+      const onDown = (e: PointerEvent) => {
+        if (e.pointerType === "mouse") return;
+        t0 = { x: e.clientX, y: e.clientY, last: e.clientX };
+        turning = false;
+      };
+      const onMove = (e: PointerEvent) => {
+        if (!t0 || e.pointerType === "mouse") return;
+        if (!turning) {
+          const dx = Math.abs(e.clientX - t0.x);
+          const dy = Math.abs(e.clientY - t0.y);
+          if (dy > SWIPE_SCROLL) return void (t0 = null); // the page scrolls
+          if (dx < SWIPE_MIN || dx < dy * SWIPE_RATIO) return;
+          turning = true;
+          controls.autoRotate = false;
+          cv.setPointerCapture(e.pointerId);
+          t0.last = e.clientX;
+        }
+        const a = (-(e.clientX - t0.last) / (cv.clientWidth || 1)) * Math.PI * 1.5;
+        t0.last = e.clientX;
+        const off = camera.position.clone().sub(controls.target).applyAxisAngle(new THREE.Vector3(0, 1, 0), a);
+        camera.position.copy(controls.target).add(off);
+      };
+      const onUp = () => {
+        t0 = null;
+        turning = false;
+        controls.autoRotate = auto;
+      };
+      if (touch) {
+        controls.enabled = false;
+        cv.style.touchAction = "pan-y";
+        cv.addEventListener("pointerdown", onDown);
+        cv.addEventListener("pointermove", onMove);
+        cv.addEventListener("pointerup", onUp);
+        cv.addEventListener("pointercancel", onUp);
+      }
+
       const resize = () => {
         const w = el.clientWidth;
         const h = el.clientHeight;
@@ -198,6 +246,10 @@ function Scene3D({ active }: { active: boolean }) {
         cancelAnimationFrame(raf);
         io.disconnect();
         ro.disconnect();
+        cv.removeEventListener("pointerdown", onDown);
+        cv.removeEventListener("pointermove", onMove);
+        cv.removeEventListener("pointerup", onUp);
+        cv.removeEventListener("pointercancel", onUp);
         controls.dispose();
         env.dispose();
         pmrem.dispose();
@@ -221,7 +273,7 @@ function Scene3D({ active }: { active: boolean }) {
       <div ref={host} className={styles.canvas} />
       {state !== "ready" && <span className={styles.loading}>Loading the 3D scene…</span>}
       <span className={`${styles.tag} ${styles.tagLeft}`}>Blender scene · 00s</span>
-      <span className={styles.hint}>Drag to rotate · scroll to zoom</span>
+      <span className={styles.hint} data-touch="Swipe sideways to rotate">Drag to rotate · scroll to zoom</span>
     </div>
   );
 }

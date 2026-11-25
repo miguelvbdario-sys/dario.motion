@@ -253,6 +253,8 @@
 
   .scene {
     aspect-ratio: 4 / 5;
+    /* Vertical swipes scroll the page (Recopando.tsx turns the set sideways). */
+    touch-action: pan-y;
   }
 
   .note {
@@ -263,4 +265,16 @@
 /* Intro text above the render × wireframe. */
 .intro {
   margin: 0 0 4px;
+}
+
+/* Touch: the hint says how the set turns there. */
+@media (pointer: coarse) {
+  .hint {
+    font-size: 0;
+  }
+
+  .hint::after {
+    content: attr(data-touch);
+    font-size: 11px;
+  }
 }
