@@ -13,7 +13,8 @@ export const ABOUT = {
     "I also mentor over 100 students through the Motion Pro course.",
   ],
   buttons: [
-    { label: "Book a call", href: "#" }, // TODO: substituir pelo link de agendamento
+    // "#contact" opens the WhatsApp / e-mail pop-up (ContactButton.tsx).
+    { label: "Contact me", href: "#contact" },
     { label: "Access Instagram", href: "https://www.instagram.com/dario.motion/" },
     { label: "Course page", href: "/course" },
   ],

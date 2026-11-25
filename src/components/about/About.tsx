@@ -2,6 +2,7 @@ import Image from "next/image";
 import { ABOUT } from "@/content/about";
 import BoxReveal from "./BoxReveal";
 import CircleText from "./CircleText";
+import ContactButton from "./ContactButton";
 import styles from "./About.module.css";
 
 /*
@@ -59,6 +60,8 @@ export default function About() {
           ))}
           <div className={styles.buttons} data-box="3">
             {ABOUT.buttons.map((b) => {
+              if (b.href === "#contact")
+                return <ContactButton key={b.label} className={styles.button} dotClass={styles.buttonDot} label={b.label} />;
               const external = b.href.startsWith("http");
               return (
                 <a

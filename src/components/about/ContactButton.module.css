@@ -1,0 +1,136 @@
+/* "Contact me" pop-up (ContactButton.tsx). */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgb(0 0 0 / 0.7);
+  animation: fadeIn 0.2s ease-out both;
+}
+
+.panel {
+  position: relative;
+  width: min(100%, 420px);
+  padding: 28px 24px 24px;
+  border-radius: 8px;
+  background: #e60000;
+  color: #140000;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.5);
+  animation: popIn 0.32s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border: 0;
+  border-radius: 50%;
+  background: #140000;
+  color: #efeeee;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.title {
+  margin: 6px 0 18px;
+  font-family: var(--font-sans);
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background: #140000;
+  color: #efeeee;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.option:hover,
+.option:focus-visible {
+  background: #efeeee;
+  color: #140000;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  color: #fff;
+}
+
+.icon[data-kind="whatsapp"] {
+  background: #25d366;
+}
+
+.icon[data-kind="mail"] {
+  background: #e60000;
+}
+
+.text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.optionTitle {
+  font-family: var(--font-sans);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.optionSub {
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop,
+  .panel {
+    animation: none;
+  }
+}
