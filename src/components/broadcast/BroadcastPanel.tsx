@@ -5,7 +5,7 @@ import gsap from "gsap";
 import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
-import Showcase from "./Showcase";
+import Showcase, { Lightbox } from "./Showcase";
 import Recopando from "./Recopando";
 import Marked, { Mark, splitMarks } from "@/components/effects/Marked";
 import BroadcastScoreboard from "./BroadcastScoreboard";
@@ -79,6 +79,8 @@ function Placeholder169({ label = "[ PREVIEW 16:9 ]" }: { label?: string }) {
 /** A muted loop that only plays while its card is open and near the screen. */
 function Loop({ src, poster, active }: { src: string; poster?: string; active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
+  /** Click: the loop opens fullscreen (muted), like the other zoomable media. */
+  const [open, setOpen] = useState(false);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
@@ -88,17 +90,26 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
     else v.pause();
   }, [active]);
   return (
-    <video
-      ref={ref}
-      src={src}
-      poster={poster}
-      muted
-      loop
-      playsInline
-      preload="metadata"
-      disablePictureInPicture
-      aria-hidden="true"
-    />
+    <>
+      <video
+        ref={ref}
+        src={src}
+        poster={poster}
+        muted
+        loop
+        playsInline
+        preload="metadata"
+        disablePictureInPicture
+        aria-hidden="true"
+        data-cursor="view"
+        style={{ cursor: "pointer" }}
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen(true);
+        }}
+      />
+      {open && <Lightbox src={src.split("#")[0]} poster={poster} onClose={() => setOpen(false)} />}
+    </>
   );
 }
 

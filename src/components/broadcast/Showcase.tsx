@@ -123,7 +123,20 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
 }
 
 /** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. `sound`: plays with audio and controls. */
-export function Lightbox({ base, sound, onClose }: { base: string; sound?: boolean; onClose: () => void }) {
+export function Lightbox({
+  base,
+  src,
+  poster,
+  sound,
+  onClose,
+}: {
+  base?: string;
+  /** Direct file (instead of base + .mp4 / .jpg). */
+  src?: string;
+  poster?: string;
+  sound?: boolean;
+  onClose: () => void;
+}) {
   useEffect(() => {
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();
@@ -138,7 +151,7 @@ export function Lightbox({ base, sound, onClose }: { base: string; sound?: boole
     <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Video fullscreen" onClick={onClose}>
       {/* The close button sits on the video's own corner, inside the screen. */}
       <div className={styles.frame} onClick={(e) => e.stopPropagation()}>
-        <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted={!sound} controls={sound} loop playsInline />
+        <video src={src ?? `${base}.mp4`} poster={poster ?? (base ? `${base}.jpg` : undefined)} autoPlay muted={!sound} controls={sound} loop playsInline />
         <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
           ✕
         </button>
