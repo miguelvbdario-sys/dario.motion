@@ -14,9 +14,7 @@ import styles from "./ContactButton.module.css";
 const WHATSAPP = "5521967849102";
 const EMAIL = "miguel@dario-motion.com";
 /** The e-mail opens ready to send: address, subject and a first line filled in. */
-const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("Project inquiry")}&body=${encodeURIComponent("Hi Miguel,
-
-")}`;
+const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("Project inquiry")}&body=${encodeURIComponent("Hi Miguel,\n\n")}`;
 
 function WhatsAppIcon() {
   return (
