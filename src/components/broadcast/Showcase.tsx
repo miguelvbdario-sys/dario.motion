@@ -121,7 +121,7 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
 }
 
 /** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. `sound`: plays with audio and controls. */
-function Lightbox({ base, sound, onClose }: { base: string; sound?: boolean; onClose: () => void }) {
+export function Lightbox({ base, sound, onClose }: { base: string; sound?: boolean; onClose: () => void }) {
   useEffect(() => {
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();

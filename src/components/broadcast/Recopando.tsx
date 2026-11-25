@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Mesh, Object3D } from "three";
 import styles from "./Recopando.module.css";
+import { Lightbox } from "./Showcase";
 
 /*
  * RECOPANDO tab (2026 World Cup card): the vignette was made entirely in
@@ -222,24 +223,34 @@ function Scene3D({ active }: { active: boolean }) {
 
 export default function Recopando({ active }: { active: boolean }) {
   const [decade, setDecade] = useState<Decade>(WIRE);
+  const [full, setFull] = useState(false);
   return (
     <div className={styles.root}>
       <Compare decade={decade} active={active} />
-      <div className={styles.decades} role="radiogroup" aria-label="Vignette version">
-        {DECADES.map((d) => (
-          <button
-            key={d}
-            type="button"
-            role="radio"
-            aria-checked={d === decade}
-            className={styles.decade}
-            data-on={d === decade || undefined}
-            onClick={() => setDecade(d)}
-          >
-            {d}
-            {d === WIRE && <span className={styles.wireDot}>wireframe</span>}
-          </button>
-        ))}
+      {full && <Lightbox base={`${BASE}/vinheta-${decade}-full`} sound onClose={() => setFull(false)} />}
+      {/* One line: decade switch on the left, "Watch full screen" on the right. */}
+      <div className={styles.controls}>
+        <div className={styles.decades} role="radiogroup" aria-label="Vignette version">
+          {DECADES.map((d) => (
+            <button
+              key={d}
+              type="button"
+              role="radio"
+              aria-checked={d === decade}
+              className={styles.decade}
+              data-on={d === decade || undefined}
+              onClick={() => setDecade(d)}
+            >
+              {d}
+              {d === WIRE && <span className={styles.wireDot}>wireframe</span>}
+            </button>
+          ))}
+        </div>
+        {/* The whole vignette alone (no wireframe), fullscreen with sound. */}
+        <button type="button" className={styles.watch} data-cursor="view" onClick={() => setFull(true)}>
+          <span className={styles.watchSquare} aria-hidden="true" />
+          Watch full screen · {decade}
+        </button>
       </div>
       {/* Desktop: the text on the left (right-aligned), the 3D scene on 60% of the width. */}
       <div className={styles.sceneRow}>

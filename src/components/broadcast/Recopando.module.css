@@ -86,6 +86,42 @@
   right: 10px;
 }
 
+/* "Watch full screen": under the compare, on the Final render side. */
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.watch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.75em 1.1em;
+  border: 0;
+  border-radius: 4px;
+  background: #140000;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.watch:hover {
+  background: #efeeee;
+  color: #140000;
+}
+
+.watchSquare {
+  width: 6px;
+  height: 6px;
+  background: #e60000;
+}
+
 /* ---- Decade switch ---- */
 .decades {
   display: flex;
@@ -94,7 +130,6 @@
   padding: 6px;
   border-radius: 5px;
   background: rgb(20 0 0 / 0.86);
-  align-self: flex-start;
 }
 
 .decade {
