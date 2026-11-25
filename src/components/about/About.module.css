@@ -5,6 +5,11 @@
   --red: #e60000;
   --ink: #140000;
   position: relative;
+  /* At least one screen tall: the intro track before it overlaps ABOUT by one
+     screen (AboutIntro margin-bottom: -100vh), so a shorter ABOUT left a black
+     band under it at the end of the page. Now the page ends on the red. */
+  min-height: 100vh;
+  box-sizing: border-box;
   overflow: hidden;
   isolation: isolate;
   padding: calc(var(--s) * 110) calc(var(--s) * 64) calc(var(--s) * 180);
