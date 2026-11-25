@@ -1,0 +1,195 @@
+/* RECOPANDO tab (Recopando.tsx). */
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: calc(var(--s, 1px) * 20);
+}
+
+/* ---- Render × wireframe ---- */
+.compare {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.compare[data-wire] {
+  cursor: ew-resize;
+}
+
+.compare video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* The wireframe shows on the right of the split line. */
+.wire {
+  clip-path: inset(0 0 0 var(--split));
+}
+
+.handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--split);
+  width: 2px;
+  margin-left: -1px;
+  background: #efeeee;
+  pointer-events: none;
+}
+
+.handle span {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  translate: -50% -50%;
+  border-radius: 50%;
+  background: #e60000;
+  color: #efeeee;
+  font-family: var(--font-mono, monospace);
+  font-size: 14px;
+  letter-spacing: 0.1em;
+  box-shadow: 0 4px 16px rgb(0 0 0 / 0.45);
+}
+
+.tag {
+  position: absolute;
+  top: 10px;
+  padding: 0.35em 0.6em;
+  border-radius: 3px;
+  background: rgb(20 0 0 / 0.86);
+  color: #efeeee;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.tagLeft {
+  left: 10px;
+}
+
+.tagRight {
+  right: 10px;
+}
+
+/* ---- Decade switch ---- */
+.decades {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 6px;
+  border-radius: 5px;
+  background: rgb(20 0 0 / 0.86);
+  align-self: flex-start;
+}
+
+.decade {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.55em 0.95em;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: rgb(239 238 238 / 0.8);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.decade:hover {
+  color: #efeeee;
+  background: rgb(239 238 238 / 0.08);
+}
+
+.decade[data-on] {
+  background: #efeeee;
+  color: #140000;
+}
+
+.wireDot {
+  font-family: var(--font-mono, monospace);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #e60000;
+}
+
+/* ---- 3D scene ---- */
+.scene {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: radial-gradient(circle at 50% 45%, #2a0303, #0c0000 70%);
+  touch-action: none;
+}
+
+.canvas,
+.canvas canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.loading {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: rgb(239 238 238 / 0.7);
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.hint {
+  position: absolute;
+  right: 10px;
+  bottom: 10px;
+  color: rgb(239 238 238 / 0.6);
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.note {
+  margin: 4px 0 0;
+  max-width: 60ch;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s, 1px) * 20);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #140000;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .scene {
+    aspect-ratio: 4 / 5;
+  }
+
+  .note {
+    font-size: 17px;
+  }
+}

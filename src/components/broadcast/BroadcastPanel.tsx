@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import Showcase from "./Showcase";
+import Recopando from "./Recopando";
 import Marked, { Mark, splitMarks } from "@/components/effects/Marked";
 import BroadcastScoreboard from "./BroadcastScoreboard";
 import BroadcastShields from "./BroadcastShields";
@@ -712,6 +713,7 @@ export default function BroadcastPanel({
               )}
             </div>
           )}
+          {kind === "recopando" && <Recopando active={live} />}
           {kind === "showcase" && sections?.[tab]?.loops && (
             <Showcase key={sections[tab].label} loops={sections[tab].loops!} verticals={sections[tab].verticals ?? []} zoom={sections[tab].zoom} note={sections[tab].note} cta={sections[tab].cta} active={live} compact={compact} />
           )}

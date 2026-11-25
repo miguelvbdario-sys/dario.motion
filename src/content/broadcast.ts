@@ -49,7 +49,7 @@ export type BroadcastProject = {
    */
   sections?: {
     label: string;
-    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "placeholder";
+    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "recopando" | "placeholder";
     /** kind "showcase": vertical videos played one after the other (base paths, .mp4 + .jpg). */
     verticals?: string[];
     /** kind "showcase": loops that open fullscreen on click (base paths). */
@@ -207,12 +207,14 @@ export const BROADCAST: BroadcastProject[] = [
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
     desc: "[Project description]", // TODO: substituir
-    // "About the project" is always the first tab; then these.
-    filters: [
-      { label: "Motion Branding", count: "[02]" },
-      { label: "Bora Copar", count: "[03]" },
-      { label: "Recopando", count: "[04]" },
-      { label: "Live", count: "[05]" },
+    filters: [],
+    sections: [
+      { label: "About the project", kind: "about" },
+      { label: "Motion Branding", kind: "placeholder" }, // TODO: substituir
+      { label: "Bora Copar", kind: "placeholder" }, // TODO: substituir
+      // The vignette made in Blender: render × wireframe + the 3D set.
+      { label: "Recopando", kind: "recopando" },
+      { label: "Live", kind: "placeholder" }, // TODO: substituir
     ],
     fullVideo: null, // TODO: substituir
   },
