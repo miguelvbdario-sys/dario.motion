@@ -3,6 +3,7 @@
 .desktop {
   display: grid;
   /* 2.1 : 1 so the 2×3 landscape grid ends at the 9:16 player's height. */
+  /* Columns set inline (Showcase.tsx) so the loops end at the player height. */
   grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
   gap: 8px;
   align-items: start;
@@ -11,7 +12,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -75,6 +76,35 @@
 
 .bar[data-on] {
   background: #e60000;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  margin-top: -20px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(20 0 0 / 0.8);
+  color: #efeeee;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.arrow:hover {
+  background: #e60000;
+}
+
+.prev {
+  left: 8px;
+}
+
+.next {
+  right: 8px;
 }
 
 .tag {

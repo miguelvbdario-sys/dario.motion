@@ -267,7 +267,13 @@ export const BROADCAST: BroadcastProject[] = [
     desc: "[Project description]", // TODO: substituir
     filters: [],
     sections: [
-      { label: "NBA Style", kind: "placeholder" }, // TODO: substituir
+      {
+        label: "NBA Style",
+        kind: "showcase",
+        loops: ["final-flamengo", "final-palmeiras"].map((n) => `/broadcast/nba-style/${n}`),
+        // Add "process-2" here when the second process video arrives.
+        verticals: ["/broadcast/nba-style/process-1"],
+      },
       {
         label: "World Cup Graphics",
         kind: "showcase",
@@ -281,6 +287,7 @@ export const BROADCAST: BroadcastProject[] = [
         ].map((n) => `/broadcast/world-cup/${n}`),
         verticals: [1, 2, 3].map((n) => `/broadcast/world-cup/process-${n}`),
       },
+      // Same layout ready: switch to kind "showcase" with loops + verticals when the files arrive.
       { label: "Champions League Graphics", kind: "placeholder" }, // TODO: substituir
     ],
     fullVideo: null, // TODO: substituir
