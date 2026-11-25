@@ -25,13 +25,6 @@
   year?: string;
 };
 
-/** Placeholder Index, until the real credits are filled in. */
-const INDEX_TODO = {
-  client: "[Client]", // TODO: substituir
-  role: "[Details]", // TODO: substituir
-  year: "[Year]", // TODO: substituir
-};
-
 /*
  * Portfolio pieces, in display order. To add one: export a preview loop, a poster
  * and a full video into /public/projects (see DESIGN.md §8) and add an entry here.
@@ -41,32 +34,35 @@ export const WORKS: Work[] = [
   {
     id: "cazetv-tenis",
     title: "CazéTV Tênis",
-    meta: "Vignette", // TODO(Miguel): client · year · role
+    meta: "Tennis livestream",
     preview: "/projects/cazetv-tenis-preview.mp4",
     poster: "/projects/cazetv-tenis-poster.webp",
     video: "/projects/cazetv-tenis.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Program dedicated to streaming tennis matches",
+    year: "2026",
   },
   {
     id: "br360",
     title: "BR360",
-    meta: "Vignette", // TODO(Miguel): client · year · role
+    meta: "Program vignette",
     preview: "/projects/br360-preview.mp4",
     poster: "/projects/br360-poster.webp",
     video: "/projects/br360.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Program during the Brasileirão Championship",
+    year: "2026",
   },
   {
     id: "secadores",
-    title: "Secadores",
-    meta: "Bumper", // TODO(Miguel): client · year · role
+    title: "CaféTV",
+    meta: "Program vignette",
     preview: "/projects/secadores-preview.mp4",
     poster: "/projects/secadores-poster.webp",
     video: "/projects/secadores.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Morning program during the 2025 FIFA Club World Cup",
+    year: "2025",
   },
   {
     id: "geral-cazetv",
@@ -76,68 +72,75 @@ export const WORKS: Work[] = [
     poster: "/projects/geral-cazetv-poster.webp",
     video: "/projects/geral-cazetv.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Program during the Brasileirão Championship",
+    year: "2024",
   },
   {
     id: "vini-jr-hala-madrid",
     title: "Vini Jr — Hala Madrid",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "Personal",
     preview: "/projects/vini-jr-hala-madrid-preview.mp4",
     poster: "/projects/vini-jr-hala-madrid-poster.webp",
     video: "/projects/vini-jr-hala-madrid.mp4",
     hasAudio: false,
-    ...INDEX_TODO,
+    role: "Trying out a different style, as a tribute to Vini Jr",
+    year: "2026",
     vertical: true,
   },
   {
     id: "vinheta-brasileirao",
     title: "Vinheta Brasileirão",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "CazéTV",
     preview: "/projects/vinheta-brasileirao-preview.mp4",
     poster: "/projects/vinheta-brasileirao-poster.webp",
     video: "/projects/vinheta-brasileirao.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Intro for the Brasileirão Championship broadcast",
+    year: "2025",
   },
   {
     id: "clash-of-titans",
     title: "Clash of Titans",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "YouTube channel",
     preview: "/projects/clash-of-titans-preview.mp4",
     poster: "/projects/clash-of-titans-poster.webp",
     video: "/projects/clash-of-titans.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Full live screens for a German YouTube channel",
+    year: "2026",
   },
   {
     id: "copazona",
     title: "Copazona",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "CazéTV",
     preview: "/projects/copazona-preview.mp4",
     poster: "/projects/copazona-poster.webp",
     video: "/projects/copazona.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Program during the 2025 FIFA Club World Cup",
+    year: "2025",
   },
   {
     id: "intro-motion-pro",
     title: "Intro Motion Pro",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "Motion course",
     preview: "/projects/intro-motion-pro-preview.mp4",
     poster: "/projects/intro-motion-pro-poster.webp",
     video: "/projects/intro-motion-pro.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Intro and ads for my motion design course, Motion PRO",
+    year: "2026",
   },
   {
     id: "personal-experimentations",
     title: "Personal Experimentations",
-    meta: "Motion design", // TODO(Miguel): client · year · role
+    meta: "Personal",
     preview: "/projects/personal-experimentations-preview.mp4",
     poster: "/projects/personal-experimentations-poster.webp",
     video: "/projects/personal-experimentations.mp4",
     hasAudio: true,
-    ...INDEX_TODO,
+    role: "Videos in my own style, made to learn",
+    year: "2024–2026",
     vertical: true,
   },
 ];

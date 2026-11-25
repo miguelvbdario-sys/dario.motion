@@ -185,14 +185,10 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
 
             {/* Index (credits), when the video has any (works and BROADCAST do;
                 course videos don't). Placeholders until they are filled in. */}
-            {(work.client || work.role || work.year) && (
+            {(work.role || work.year) && (
             <aside className={styles.playerIndex} aria-label="Index">
               <p className={styles.playerIndexLabel}>[ Index ]</p>
               <dl className={styles.playerIndexRows}>
-                <div>
-                  <dt>Client</dt>
-                  <dd>{work.client ?? "[Client]"}</dd>
-                </div>
                 <div>
                   <dt>Details</dt>
                   <dd>{work.role ?? "[Details]"}</dd>

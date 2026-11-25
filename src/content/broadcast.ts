@@ -205,9 +205,9 @@ export const BROADCAST: BroadcastProject[] = [
     // Cover: "Se Tem Copa, Esquece!" (the same loop as in the works).
     img: "/projects/copa-poster.webp",
     preview: "/projects/copa-preview.mp4",
-    client: "[Client]", // TODO: substituir
-    role: "[Details]", // TODO: substituir
-    year: "[Year]", // TODO: substituir
+    client: "CazéTV",
+    role: "Official broadcast of the FIFA World Cup matches",
+    year: "2026",
     desc: "Official CazéTV broadcast of the FIFA World Cup 2026",
     filters: [],
     sections: [
@@ -281,9 +281,9 @@ export const BROADCAST: BroadcastProject[] = [
     metaFirst: false,
     img: "/broadcast/nba-style/final-flamengo.jpg",
     preview: "/broadcast/nba-style/final-flamengo.mp4",
-    client: "[Client]", // TODO: substituir
-    role: "[Details]", // TODO: substituir
-    year: "[Year]", // TODO: substituir
+    client: "Personal",
+    role: "Experiments in my own style",
+    year: "2026",
     desc: "Exploring ==broadcast graphics== in my own way. All these videos go to my Instagram page.",
     filters: [],
     sections: [
