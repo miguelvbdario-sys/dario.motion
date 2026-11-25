@@ -39,6 +39,26 @@ const INDEX_TODO = {
  */
 export const WORKS: Work[] = [
   {
+    id: "cazetv-tenis",
+    title: "CazéTV Tênis",
+    meta: "Vignette", // TODO(Miguel): client · year · role
+    preview: "/projects/cazetv-tenis-preview.mp4",
+    poster: "/projects/cazetv-tenis-poster.webp",
+    video: "/projects/cazetv-tenis.mp4",
+    hasAudio: true,
+    ...INDEX_TODO,
+  },
+  {
+    id: "br360",
+    title: "BR360",
+    meta: "Vignette", // TODO(Miguel): client · year · role
+    preview: "/projects/br360-preview.mp4",
+    poster: "/projects/br360-poster.webp",
+    video: "/projects/br360.mp4",
+    hasAudio: true,
+    ...INDEX_TODO,
+  },
+  {
     id: "vini-jr-hala-madrid",
     title: "Vini Jr — Hala Madrid",
     meta: "Motion design", // TODO(Miguel): client · year · role
