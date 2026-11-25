@@ -59,6 +59,16 @@ export const WORKS: Work[] = [
     ...INDEX_TODO,
   },
   {
+    id: "secadores",
+    title: "Secadores",
+    meta: "Bumper", // TODO(Miguel): client · year · role
+    preview: "/projects/secadores-preview.mp4",
+    poster: "/projects/secadores-poster.webp",
+    video: "/projects/secadores.mp4",
+    hasAudio: true,
+    ...INDEX_TODO,
+  },
+  {
     id: "vini-jr-hala-madrid",
     title: "Vini Jr — Hala Madrid",
     meta: "Motion design", // TODO(Miguel): client · year · role
