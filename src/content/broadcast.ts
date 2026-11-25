@@ -261,8 +261,8 @@ export const BROADCAST: BroadcastProject[] = [
     align: "left",
     offset: 0,
     metaFirst: false,
-    img: null, // TODO: substituir
-    preview: null, // TODO: substituir
+    img: "/broadcast/nba-style/final-flamengo.jpg",
+    preview: "/broadcast/nba-style/final-flamengo.mp4",
     client: "[Client]", // TODO: substituir
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
