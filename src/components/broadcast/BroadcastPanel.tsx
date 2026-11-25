@@ -320,7 +320,9 @@ export default function BroadcastPanel({
   onPlay: (work: Work, origin: HTMLElement) => void;
 }) {
   // Chosen video / filter; -1 = the "About the project" tab (where cards open).
-  const [active, setActive] = useState(-1);
+  /** Classic layout (no "About the project" tab): videos tabs + preview beside the Index. */
+  const classic = !!project.classic && !project.sections;
+  const [active, setActive] = useState(classic ? 0 : -1);
   const [tab, setTab] = useState(0); // chosen section
   /** Tab/screen content; its height change is animated (stretch/shrink). */
   const stack = useRef<HTMLDivElement>(null);
@@ -756,7 +758,7 @@ export default function BroadcastPanel({
   const accItems = sections
     ? sections.map((x, i) => ({ label: x.label, index: i })).filter((x) => sections[x.index].kind !== "scoreboard")
     : [
-        { label: "About the project", index: -1 },
+        ...(classic ? [] : [{ label: "About the project", index: -1 }]),
         ...(videos
           ? videos.map((v, i) => ({ label: v.title, index: i }))
           : project.filters.map((f, i) => ({ label: f.label, index: i }))),
@@ -804,6 +806,7 @@ export default function BroadcastPanel({
         // Phones: vertical tabs (About first); the Paulistão scoreboard is always
         // on, right after the About tab.
         <>
+          {classic && index}
           {accItems ? (
             <div className={styles.accordion}>
               {accItems.map(({ label, index: i }, n) => {
@@ -863,20 +866,25 @@ export default function BroadcastPanel({
         <PillBar
           label={`${project.title} tabs`}
           items={[
-            { key: "about", label: "About the project", count: "[01]" },
+            ...(classic ? [] : [{ key: "about", label: "About the project", count: "[01]" }]),
             ...(videos
-              ? videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + 2)}]` }))
+              ? videos.map((v, i) => ({ key: v.vimeo, label: v.title, count: `[${pad(i + (classic ? 1 : 2))}]` }))
               : project.filters.map((f, i) => ({ key: String(i), label: f.label, count: f.count }))),
           ]}
-          active={active + 1}
-          onSelect={(i) => setActive(i - 1)}
+          active={classic ? active : active + 1}
+          onSelect={(i) => setActive(classic ? i : i - 1)}
         />
       )}
 
       {compact ? null : sections ? (
         stackEl
       ) : (
-        active === -1 ? aboutEl : mediaPreview
+        classic ? (
+          <div className={styles.mediaGrid}>
+            {mediaPreview}
+            {index}
+          </div>
+        ) : active === -1 ? aboutEl : mediaPreview
       )}
 
       {/* How it looked live. */}

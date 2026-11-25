@@ -66,6 +66,8 @@ export type BroadcastProject = {
     /** Short live loops (gif-like) shown left of the Index: base paths, .mp4 + .jpg poster. */
     loops?: string[];
   }[];
+  /** Old layout: no "About the project" tab; video tabs, preview beside the Index. */
+  classic?: boolean;
   /** Team line in the Index panel (optional). */
   team?: string;
   /**
@@ -223,22 +225,7 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2024",
     team: "Anderson Frade · Marcelo Pineschi",
     desc: "Development of LED screens for the official broadcast studios of the Paris 2024 Olympics, ensuring the alignment with the event's identity.",
-    about: {
-      lead: "LED screens for CazéTV's studios at Paris 2024, in the Games' identity.",
-      points: [
-        {
-          title: "Studio screens",
-          text: "Athlete, medal and ceremony packages for the studio LED walls.",
-          loop: { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
-        },
-        {
-          title: "24h live",
-          text: "On air around the clock during the Games.",
-          loop: { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
-        },
-        { title: "Programs", text: "Vignettes for Tamo em Paris and Partiu Paris." },
-      ],
-    },
+    classic: true,
     filters: [],
     fullVideo: null,
     videos: [
