@@ -317,3 +317,55 @@
     transition: none;
   }
 }
+
+/* Description under all the videos + optional button (e.g. Course page). */
+.footer {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-top: 14px;
+}
+
+.note {
+  margin: 0;
+  max-width: 60ch;
+  font-family: var(--font-sans);
+  font-size: calc(var(--s, 1px) * 20);
+  font-weight: 700;
+  line-height: 1.2;
+  color: #140000;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.75em 1.1em;
+  border-radius: 4px;
+  background: #140000;
+  color: #efeeee;
+  font-family: var(--font-sans);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.cta:hover {
+  background: #efeeee;
+  color: #140000;
+}
+
+.ctaSquare {
+  width: 6px;
+  height: 6px;
+  background: #e60000;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .note {
+    font-size: 17px;
+  }
+}

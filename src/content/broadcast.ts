@@ -52,6 +52,9 @@ export type BroadcastProject = {
     verticals?: string[];
     /** kind "showcase": loops that open fullscreen on click (base paths). */
     zoom?: string[];
+    /** kind "showcase": short text under all the videos, and an optional link button. */
+    note?: string;
+    cta?: { label: string; href: string };
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
     /**
@@ -276,6 +279,7 @@ export const BROADCAST: BroadcastProject[] = [
         // Add "process-2" here when the second process video arrives.
         verticals: ["/broadcast/nba-style/process-1"],
         zoom: ["final-flamengo", "final-palmeiras"].map((n) => `/broadcast/nba-style/${n}`),
+        note: "Reimagining Brazilian teams in the NBA motion style.",
       },
       {
         label: "World Cup Graphics",
@@ -290,14 +294,17 @@ export const BROADCAST: BroadcastProject[] = [
         ].map((n) => `/broadcast/world-cup/${n}`),
         verticals: [1, 2, 3, 4, 5].map((n) => `/broadcast/world-cup/process-${n}`),
         zoom: ["escalacao-arg-esp", "escalacao-bra-por"].map((n) => `/broadcast/world-cup/${n}`),
+        note: "Recreating the World Cup graphics in my own way, including the goal animations.",
       },
       {
         label: "Champions League Graphics",
         kind: "showcase",
-        loops: ["placar", "halftime", "bola", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
+        loops: ["placar", "halftime", "bola", "escudo-city", "modulo-1", "modulo-3"].map((n) => `/broadcast/champions/${n}`),
         // process-2 is cut at 7s (only the first 7s are used).
         verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
         zoom: ["placar", "halftime", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
+        note: "Recreating the scoreboard and the line-up, and teaching them in my course, from the principles of motion to the final animations.",
+        cta: { label: "Course page", href: "/course" },
       },
     ],
     fullVideo: null, // TODO: substituir

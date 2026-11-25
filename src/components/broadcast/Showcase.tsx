@@ -149,10 +149,15 @@ export default function Showcase({
   loops,
   verticals,
   zoom = [],
+  note,
+  cta,
   active,
   compact,
 }: {
   loops: string[];
+  /** Short description under all the videos, and an optional link button. */
+  note?: string;
+  cta?: { label: string; href: string };
   /** Loops that open fullscreen on click. */
   zoom?: string[];
   verticals: string[];
@@ -163,6 +168,18 @@ export default function Showcase({
   const [cur, setCur] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
   const lightbox = open && <Lightbox base={open} onClose={() => setOpen(null)} />;
+
+  const footer = (note || cta) && (
+    <div className={styles.footer}>
+      {note && <p className={styles.note}>{note}</p>}
+      {cta && (
+        <a href={cta.href} className={styles.cta}>
+          <span className={styles.ctaSquare} aria-hidden="true" />
+          {cta.label} <span aria-hidden="true">&gt;</span>
+        </a>
+      )}
+    </div>
+  );
 
   const cell = (b: string, on: boolean) => {
     const z = zoom.includes(b);
@@ -221,6 +238,7 @@ export default function Showcase({
         <div className={styles.verticalSmall}>
           <Vertical videos={verticals} active={active} />
         </div>
+        {footer}
         {lightbox}
       </div>
     );
@@ -234,6 +252,7 @@ export default function Showcase({
   const ratio = ((256 * cols) / (81 * rows)).toFixed(3);
 
   return (
+    <>
     <div className={styles.desktop} style={{ gridTemplateColumns: `minmax(0, ${ratio}fr) minmax(0, 1fr)` }}>
       <div className={styles.grid} style={{ "--cols": cols } as React.CSSProperties}>
         {loops.map((b) => cell(b, active))}
@@ -241,5 +260,7 @@ export default function Showcase({
       <Vertical videos={verticals} active={active} />
       {lightbox}
     </div>
+    {footer}
+    </>
   );
 }
