@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import styles from "./Showcase.module.css";
 
 /*
@@ -118,19 +119,68 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
   );
 }
 
+/** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. */
+function Lightbox({ base, onClose }: { base: string; onClose: () => void }) {
+  useEffect(() => {
+    const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
+    lenis?.stop();
+    const key = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", key);
+    return () => {
+      window.removeEventListener("keydown", key);
+      lenis?.start();
+    };
+  }, [onClose]);
+  return createPortal(
+    <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Video fullscreen" onClick={onClose}>
+      <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted loop playsInline onClick={(e) => e.stopPropagation()} />
+      <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
+        ✕
+      </button>
+    </div>,
+    document.body,
+  );
+}
+
 export default function Showcase({
   loops,
   verticals,
+  zoom = [],
   active,
   compact,
 }: {
   loops: string[];
+  /** Loops that open fullscreen on click. */
+  zoom?: string[];
   verticals: string[];
   active: boolean;
   compact: boolean;
 }) {
   const track = useRef<HTMLDivElement>(null);
   const [cur, setCur] = useState(0);
+  const [open, setOpen] = useState<string | null>(null);
+  const lightbox = open && <Lightbox base={open} onClose={() => setOpen(null)} />;
+
+  const cell = (b: string, on: boolean) => {
+    const z = zoom.includes(b);
+    return (
+      <div
+        key={b}
+        className={styles.cell}
+        data-zoom={z || undefined}
+        {...(z && {
+          role: "button",
+          tabIndex: 0,
+          "aria-label": "Open video fullscreen",
+          onClick: () => setOpen(b),
+          onKeyDown: (e: React.KeyboardEvent) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), setOpen(b)),
+        })}
+      >
+        <Clip base={b} active={on} />
+        {z && <span className={styles.zoomIcon} aria-hidden="true">⤢</span>}
+      </div>
+    );
+  };
 
   const go = (n: number) => {
     const el = track.current;
@@ -151,11 +201,7 @@ export default function Showcase({
             setCur(Math.round(el.scrollLeft / (w + 8)));
           }}
         >
-          {loops.map((b, n) => (
-            <div key={b} className={styles.cell}>
-              <Clip base={b} active={active && Math.abs(n - cur) <= 1} />
-            </div>
-          ))}
+          {loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
         </div>
         <div className={styles.counter}>
           <button type="button" aria-label="Previous" onClick={() => go(cur - 1)} disabled={cur === 0}>
@@ -171,6 +217,7 @@ export default function Showcase({
         <div className={styles.verticalSmall}>
           <Vertical videos={verticals} active={active} />
         </div>
+        {lightbox}
       </div>
     );
   }
@@ -185,13 +232,10 @@ export default function Showcase({
   return (
     <div className={styles.desktop} style={{ gridTemplateColumns: `minmax(0, ${ratio}fr) minmax(0, 1fr)` }}>
       <div className={styles.grid} style={{ "--cols": cols } as React.CSSProperties}>
-        {loops.map((b) => (
-          <div key={b} className={styles.cell}>
-            <Clip base={b} active={active} />
-          </div>
-        ))}
+        {loops.map((b) => cell(b, active))}
       </div>
       <Vertical videos={verticals} active={active} />
+      {lightbox}
     </div>
   );
 }

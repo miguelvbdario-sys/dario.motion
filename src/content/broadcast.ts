@@ -50,6 +50,8 @@ export type BroadcastProject = {
     kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "placeholder";
     /** kind "showcase": vertical videos played one after the other (base paths, .mp4 + .jpg). */
     verticals?: string[];
+    /** kind "showcase": loops that open fullscreen on click (base paths). */
+    zoom?: string[];
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
     /**
@@ -273,6 +275,7 @@ export const BROADCAST: BroadcastProject[] = [
         loops: ["final-flamengo", "final-palmeiras"].map((n) => `/broadcast/nba-style/${n}`),
         // Add "process-2" here when the second process video arrives.
         verticals: ["/broadcast/nba-style/process-1"],
+        zoom: ["final-flamengo", "final-palmeiras"].map((n) => `/broadcast/nba-style/${n}`),
       },
       {
         label: "World Cup Graphics",
@@ -286,9 +289,16 @@ export const BROADCAST: BroadcastProject[] = [
           "gol-espanha",
         ].map((n) => `/broadcast/world-cup/${n}`),
         verticals: [1, 2, 3, 4, 5].map((n) => `/broadcast/world-cup/process-${n}`),
+        zoom: ["escalacao-arg-esp", "escalacao-bra-por"].map((n) => `/broadcast/world-cup/${n}`),
       },
-      // Same layout ready: switch to kind "showcase" with loops + verticals when the files arrive.
-      { label: "Champions League Graphics", kind: "placeholder" }, // TODO: substituir
+      {
+        label: "Champions League Graphics",
+        kind: "showcase",
+        loops: ["placar", "halftime", "bola", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
+        // process-2 is cut at 7s (only the first 7s are used).
+        verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
+        zoom: ["placar", "halftime"].map((n) => `/broadcast/champions/${n}`),
+      },
     ],
     fullVideo: null, // TODO: substituir
   },
