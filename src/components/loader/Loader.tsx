@@ -34,6 +34,12 @@ export default function Loader() {
   /** The opening sting (IntroCuts) runs between the loader and the hero. */
   const [sting, setSting] = useState(false);
 
+  // A reload always starts at the top (the hero), never where the last visit left off.
+  useEffect(() => {
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+    if (!location.hash) window.scrollTo(0, 0);
+  }, []);
+
   useEffect(() => {
     const el = root.current;
     const cv = canvas.current;
