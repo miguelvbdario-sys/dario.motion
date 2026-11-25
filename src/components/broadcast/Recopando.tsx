@@ -243,7 +243,7 @@ export default function Recopando({ active }: { active: boolean }) {
       </div>
       <Scene3D active={active} />
       <p className={styles.note}>
-        Everything in the vignette was built and rendered in Blender: the room, the TVs, the PS2, the trophies.
+        Everything in the vignette was composed and animated in Blender: the room, the TVs, the PS2, the trophies.
       </p>
     </div>
   );
