@@ -247,7 +247,7 @@ export const BROADCAST: BroadcastProject[] = [
   {
     id: "led-displays",
     title: "Personal Projects",
-    meta: "NBA · World Cup · Champions League",
+    meta: "NBA · World Cup · Champions",
     align: "left",
     offset: 0,
     metaFirst: false,
