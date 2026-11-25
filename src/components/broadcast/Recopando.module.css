@@ -252,7 +252,8 @@
   }
 
   .scene {
-    aspect-ratio: 4 / 5;
+    /* Phones: shorter than 4:5 so the scene takes less of the screen. */
+    aspect-ratio: 1 / 1;
   }
 
   .note {
