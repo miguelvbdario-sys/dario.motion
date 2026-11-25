@@ -69,6 +69,16 @@ export const WORKS: Work[] = [
     ...INDEX_TODO,
   },
   {
+    id: "geral-cazetv",
+    title: "Geral CazéTV",
+    meta: "Bumpers and LED screen",
+    preview: "/projects/geral-cazetv-preview.mp4",
+    poster: "/projects/geral-cazetv-poster.webp",
+    video: "/projects/geral-cazetv.mp4",
+    hasAudio: true,
+    ...INDEX_TODO,
+  },
+  {
     id: "vini-jr-hala-madrid",
     title: "Vini Jr — Hala Madrid",
     meta: "Motion design", // TODO(Miguel): client · year · role
