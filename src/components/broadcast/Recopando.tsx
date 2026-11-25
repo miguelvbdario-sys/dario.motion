@@ -116,11 +116,12 @@ function Scene3D({ active }: { active: boolean }) {
     (async () => {
       const THREE = await import("three");
       const { GLTFLoader } = await import("three/examples/jsm/loaders/GLTFLoader.js");
+      const { DRACOLoader } = await import("three/examples/jsm/loaders/DRACOLoader.js");
       const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
       const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
       if (disposed) return;
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
       el.appendChild(renderer.domElement);
       const scene = new THREE.Scene();
       const camera = new THREE.PerspectiveCamera(35, 1, 0.01, 200);
@@ -138,7 +139,10 @@ function Scene3D({ active }: { active: boolean }) {
       const pmrem = new THREE.PMREMGenerator(renderer);
       const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
       scene.environment = env;
-      const gltf = await new GLTFLoader().loadAsync(`${BASE}/scene-mat.glb`);
+      // Geometry is Draco-compressed (decoder in /public/draco).
+      const draco = new DRACOLoader().setDecoderPath("/draco/");
+      const gltf = await new GLTFLoader().setDRACOLoader(draco).loadAsync(`${BASE}/scene-mat.glb`);
+      draco.dispose();
       if (disposed) return;
       // Frame the set (the room planes are left out of the export).
       scene.add(gltf.scene);
@@ -171,16 +175,22 @@ function Scene3D({ active }: { active: boolean }) {
       const ro = new ResizeObserver(resize);
       ro.observe(el);
       resize();
+      // Draws only while the scene is on screen.
       let raf = 0;
       const tick = () => {
         controls.update();
         renderer.render(scene, camera);
         raf = requestAnimationFrame(tick);
       };
-      tick();
+      const io = new IntersectionObserver(([e]) => {
+        cancelAnimationFrame(raf);
+        if (e.isIntersecting) tick();
+      });
+      io.observe(el);
       setState("ready");
       cleanup = () => {
         cancelAnimationFrame(raf);
+        io.disconnect();
         ro.disconnect();
         controls.dispose();
         env.dispose();
