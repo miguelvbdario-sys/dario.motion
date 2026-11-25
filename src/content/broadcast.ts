@@ -297,7 +297,7 @@ export const BROADCAST: BroadcastProject[] = [
         loops: ["placar", "halftime", "bola", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
         // process-2 is cut at 7s (only the first 7s are used).
         verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
-        zoom: ["placar", "halftime"].map((n) => `/broadcast/champions/${n}`),
+        zoom: ["placar", "halftime", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
       },
     ],
     fullVideo: null, // TODO: substituir

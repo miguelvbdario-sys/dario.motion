@@ -95,10 +95,10 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
       {n > 1 && (
         <>
           <button type="button" className={`${styles.arrow} ${styles.prev}`} aria-label="Previous process video" onClick={() => step(-1)}>
-            ‹
+            <span>‹</span>
           </button>
           <button type="button" className={`${styles.arrow} ${styles.next}`} aria-label="Next process video" onClick={() => step(1)}>
-            ›
+            <span>›</span>
           </button>
           <div className={styles.bars}>
             {videos.map((v, k) => (
@@ -133,10 +133,13 @@ function Lightbox({ base, onClose }: { base: string; onClose: () => void }) {
   }, [onClose]);
   return createPortal(
     <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Video fullscreen" onClick={onClose}>
-      <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted loop playsInline onClick={(e) => e.stopPropagation()} />
-      <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
-        ✕
-      </button>
+      {/* The close button sits on the video's own corner, inside the screen. */}
+      <div className={styles.frame} onClick={(e) => e.stopPropagation()}>
+        <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted loop playsInline />
+        <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
+          ✕
+        </button>
+      </div>
     </div>,
     document.body,
   );
@@ -168,6 +171,7 @@ export default function Showcase({
         key={b}
         className={styles.cell}
         data-zoom={z || undefined}
+        data-cursor={z ? "view" : undefined}
         {...(z && {
           role: "button",
           tabIndex: 0,

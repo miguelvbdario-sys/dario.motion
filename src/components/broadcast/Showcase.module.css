@@ -78,33 +78,55 @@
   background: #e60000;
 }
 
+/* Arrows: the whole side strip of the player is the hit area (easy to hit);
+   the visible circle sits in its middle. */
 .arrow {
   position: absolute;
-  top: 50%;
+  top: 0;
+  bottom: 36px;
   z-index: 2;
-  width: 40px;
-  height: 40px;
-  margin-top: -20px;
+  width: 30%;
+  display: grid;
+  place-items: center;
+  padding: 0;
   border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.arrow span {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   background: rgb(20 0 0 / 0.8);
   color: #efeeee;
-  font-size: 22px;
+  font-size: 26px;
   line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
-.arrow:hover {
+.arrow:hover span,
+.arrow:focus-visible span {
   background: #e60000;
+  transform: scale(1.08);
+}
+
+.arrow:active span {
+  transform: scale(0.94);
 }
 
 .prev {
-  left: 8px;
+  left: 0;
+  justify-items: start;
+  padding-left: 8px;
 }
 
 .next {
-  right: 8px;
+  right: 0;
+  justify-items: end;
+  padding-right: 8px;
 }
 
 .tag {
@@ -180,9 +202,6 @@
 }
 
 /* ---- Fullscreen (zoomable loops) ---- */
-.cell[data-zoom] {
-  cursor: zoom-in;
-}
 
 .cell[data-zoom]:focus-visible {
   outline: 2px solid #efeeee;
@@ -218,29 +237,52 @@
   place-items: center;
   padding: 24px;
   background: rgb(0 0 0 / 0.92);
-  cursor: zoom-out;
   animation: lbIn 0.22s ease-out both;
 }
 
-.lightbox video {
+.frame {
+  position: relative;
   max-width: 100%;
   max-height: 100%;
-  border-radius: 6px;
-  cursor: default;
 }
 
+.lightbox video {
+  display: block;
+  /* Not edge to edge, so the close button sits well inside the screen. */
+  max-width: 86vw;
+  max-height: 80vh;
+  border-radius: 6px;
+}
+
+/* Close: big white disc on the video's top-right corner. */
 .close {
   position: absolute;
-  top: max(16px, env(safe-area-inset-top));
-  right: 16px;
-  width: 44px;
-  height: 44px;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
   border: 0;
   border-radius: 50%;
+  background: #efeeee;
+  color: #140000;
+  font-size: 22px;
+  font-weight: 700;
+  box-shadow: 0 4px 18px rgb(0 0 0 / 0.5);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease, transform 0.15s ease;
+}
+
+.close:focus-visible {
+  outline: 3px solid #e60000;
+  outline-offset: 3px;
+}
+
+.close:hover {
   background: #e60000;
   color: #efeeee;
-  font-size: 18px;
-  cursor: pointer;
+  transform: scale(1.06);
 }
 
 @keyframes lbIn {
