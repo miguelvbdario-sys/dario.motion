@@ -130,7 +130,6 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
       <span className={styles.tag}>Process</span>
       {full && (
         <Lightbox
-          key={videos[i]}
           base={videos[i]}
           loop={n === 1}
           onEnded={() => step(1)}
