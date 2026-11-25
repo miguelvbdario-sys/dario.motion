@@ -287,24 +287,25 @@
   white-space: nowrap;
   color: var(--ink);
   pointer-events: none;
-  /* How far each line hides past its edge (more = less of it shows). */
-  --frame-y: 52%;
+  /* How far each line hides past its edge (more = less of it shows). 0 = the whole line. */
+  --frame-y: 0%;
 }
 
+/* The whole name, resting right on top of the page timeline bar
+   (bar offset from the bottom + its height, ~56px with the playhead). */
 .frameBot {
-  bottom: 0;
+  bottom: calc(clamp(14px, 2.2vh, 26px) + 56px);
   translate: -50% var(--frame-y);
 }
 
 @media (max-width: 767px) {
   .frame {
-    font-size: 13.5vw;
-    /* Whole line, just above the page timeline (which covers the last ~70px). */
-    --frame-y: 0%;
+    font-size: 12.5vw;
   }
 
+  /* The bar is shorter on phones. */
   .frameBot {
-    bottom: 72px;
+    bottom: calc(clamp(14px, 2.2vh, 26px) + 28px);
   }
 }
 
