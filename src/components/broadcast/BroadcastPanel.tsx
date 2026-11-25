@@ -728,7 +728,7 @@ export default function BroadcastPanel({
           {kind === "recopando" && <Recopando active={live} />}
           {kind === "branding" && <MotionBranding active={live} compact={compact} />}
           {kind === "showcase" && sections?.[tab]?.loops && (
-            <Showcase key={sections[tab].label} loops={sections[tab].loops!} verticals={sections[tab].verticals ?? []} zoom={sections[tab].zoom} sound={sections[tab].sound} note={sections[tab].note} cta={sections[tab].cta} active={live} compact={compact} />
+            <Showcase key={sections[tab].label} loops={sections[tab].loops!} verticals={sections[tab].verticals ?? []} zoom={sections[tab].zoom} sound={sections[tab].sound} note={sections[tab].note} cta={sections[tab].cta} pairs={sections[tab].pairs} active={live} compact={compact} />
           )}
           {kind === "placeholder" && (
             <div className={styles.preview}>

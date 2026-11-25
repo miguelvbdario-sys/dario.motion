@@ -487,3 +487,17 @@
     right: 0;
   }
 }
+
+/* Phones, `pairs`: each carousel page holds two loops, one above the other.
+   The track follows the height of the page on screen (Showcase.tsx). */
+.swipe[data-pairs] {
+  align-items: start;
+  transition: height 0.35s cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scroll-snap-align: start;
+}

@@ -241,7 +241,10 @@ export default function Showcase({
   cta,
   active,
   compact,
+  pairs,
 }: {
+  /** Phones: the carousel shows two videos stacked per page. */
+  pairs?: boolean;
   loops: string[];
   /** Short description under all the videos, and an optional link button. */
   note?: string;
@@ -298,10 +301,22 @@ export default function Showcase({
     );
   };
 
+  // Phones with `pairs`: pages of two loops, one above the other.
+  const pages = compact && pairs ? Array.from({ length: Math.ceil(loops.length / 2) }, (_, i) => loops.slice(i * 2, i * 2 + 2)) : null;
+  const count = pages ? pages.length : loops.length;
+  // The track takes the height of the page on screen (the last page, with one
+  // video, is shorter, so the card below comes up instead of leaving a gap).
+  useEffect(() => {
+    const el = track.current;
+    if (!pages || !el) return;
+    const page = el.children[cur] as HTMLElement | undefined;
+    if (page) el.style.height = `${page.offsetHeight}px`;
+  });
+
   const go = (n: number) => {
     const el = track.current;
     if (!el) return;
-    const k = Math.max(0, Math.min(loops.length - 1, n));
+    const k = Math.max(0, Math.min(count - 1, n));
     el.scrollTo({ left: (el.children[k] as HTMLElement).offsetLeft - el.offsetLeft, behavior: "smooth" });
   };
 
@@ -314,22 +329,29 @@ export default function Showcase({
             ‹
           </button>
           <span>
-            {pad(cur + 1)} / {pad(loops.length)}
+            {pad(cur + 1)} / {pad(count)}
           </span>
-          <button type="button" aria-label="Next" onClick={() => go(cur + 1)} disabled={cur === loops.length - 1}>
+          <button type="button" aria-label="Next" onClick={() => go(cur + 1)} disabled={cur === count - 1}>
             ›
           </button>
         </div>
         <div
           ref={track}
           className={styles.swipe}
+          data-pairs={pages ? "" : undefined}
           onScroll={(e) => {
             const el = e.currentTarget;
             const w = (el.children[0] as HTMLElement)?.offsetWidth || 1;
             setCur(Math.round(el.scrollLeft / (w + 8)));
           }}
         >
-          {loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
+          {pages
+            ? pages.map((pg, n) => (
+                <div key={pg[0]} className={styles.page}>
+                  {pg.map((b) => cell(b, active && Math.abs(n - cur) <= 1))}
+                </div>
+              ))
+            : loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
         </div>
         {verticals.length > 0 && (
           <div className={styles.verticalSmall}>

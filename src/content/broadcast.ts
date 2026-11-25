@@ -59,6 +59,8 @@ export type BroadcastProject = {
     /** kind "showcase": short text under all the videos, and an optional link button. */
     note?: string;
     cta?: { label: string; href: string };
+    /** kind "showcase", phones: carousel pages of two videos stacked. */
+    pairs?: boolean;
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
     /**
@@ -221,6 +223,7 @@ export const BROADCAST: BroadcastProject[] = [
         verticals: [],
         note: "CazéTV was the ==official broadcaster== of the FIFA World Cup 2026, live on YouTube. This is how the graphics looked on air.",
         cta: { label: "Watch on YouTube", href: "https://www.youtube.com/watch?v=zPQDvq-Fe0U&t=16178s" },
+        pairs: true,
       },
       {
         label: "Bora Copar",

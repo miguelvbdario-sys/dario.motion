@@ -76,7 +76,7 @@ export default function MotionBranding({ active, compact }: { active: boolean; c
         </div>
       </div>
       <p className={styles.label}>[ On air ] Program openings and transitions</p>
-      <Showcase loops={APPLIED} verticals={[]} active={active} compact={compact} />
+      <Showcase loops={APPLIED} verticals={[]} active={active} compact={compact} pairs />
       {full && <Lightbox src={`${BASE}/brand-full.mp4`} poster={`${BASE}/brand.jpg`} sound loop={false} onClose={() => setFull(false)} />}
     </div>
   );
