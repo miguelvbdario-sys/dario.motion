@@ -23,6 +23,8 @@ function Clip({ base, active }: { base: string; active: boolean }) {
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
+    // Metadata may already be in (cached) before React attached onLoadedMetadata.
+    if (v.readyState >= 1 && v.videoWidth / v.videoHeight > 2.2) v.parentElement?.setAttribute("data-strip", "");
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (active && !still) v.play().catch(() => {});
     else v.pause();
