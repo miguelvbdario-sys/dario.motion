@@ -2789,12 +2789,13 @@
   }
 }
 
-/* Hover zoom on every media tile (stills and videos) inside the cards.
+/* Hover zoom on every media tile (stills and videos) inside the cards; the
+   About cards (video + title + text) zoom as a whole.
    `scale` (not transform), so it adds to any GSAP transform on the same tile. */
 .preview,
 .onAirTile,
 .loopCell,
-.aboutPointLoop,
+.aboutPoints > li,
 .mascotVideo,
 .extra {
   transition: scale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -2804,12 +2805,12 @@
   .preview:hover,
   .onAirTile:hover,
   .loopCell:hover,
-  .aboutPointLoop:hover,
+  .aboutPoints > li:hover,
   .mascotVideo:hover,
   .extra:hover {
     position: relative;
     z-index: 2;
-    scale: 1.04;
+    scale: 1.1;
   }
 }
 
@@ -2817,7 +2818,7 @@
   .preview,
   .onAirTile,
   .loopCell,
-  .aboutPointLoop,
+  .aboutPoints > li,
   .mascotVideo,
   .extra {
     transition: none;
