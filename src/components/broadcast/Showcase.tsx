@@ -92,6 +92,8 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
         aria-label={`Process video ${i + 1} of ${n}`}
         loop={n === 1}
         onEnded={() => step(1)}
+        // Tap the video: next one, like stories.
+        onClick={() => n > 1 && step(1)}
       />
       {n > 1 && (
         <>
@@ -221,17 +223,7 @@ export default function Showcase({
   if (compact) {
     return (
       <div className={styles.mobile}>
-        <div
-          ref={track}
-          className={styles.swipe}
-          onScroll={(e) => {
-            const el = e.currentTarget;
-            const w = (el.children[0] as HTMLElement)?.offsetWidth || 1;
-            setCur(Math.round(el.scrollLeft / (w + 8)));
-          }}
-        >
-          {loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
-        </div>
+        {/* Phones: the arrows and counter sit above the screens. */}
         <div className={styles.counter}>
           <button type="button" aria-label="Previous" onClick={() => go(cur - 1)} disabled={cur === 0}>
             ‹
@@ -242,6 +234,17 @@ export default function Showcase({
           <button type="button" aria-label="Next" onClick={() => go(cur + 1)} disabled={cur === loops.length - 1}>
             ›
           </button>
+        </div>
+        <div
+          ref={track}
+          className={styles.swipe}
+          onScroll={(e) => {
+            const el = e.currentTarget;
+            const w = (el.children[0] as HTMLElement)?.offsetWidth || 1;
+            setCur(Math.round(el.scrollLeft / (w + 8)));
+          }}
+        >
+          {loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
         </div>
         {verticals.length > 0 && (
           <div className={styles.verticalSmall}>

@@ -201,6 +201,38 @@
   margin: 4px auto 0;
 }
 
+/* Phones: the process arrows sit outside the video, in the side margins. */
+.verticalSmall .vertical {
+  overflow: visible;
+}
+
+.verticalSmall .vertical video {
+  border-radius: 5px;
+}
+
+.verticalSmall .arrow {
+  top: 50%;
+  bottom: auto;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  justify-items: center;
+}
+
+.verticalSmall .prev {
+  left: -56px;
+}
+
+.verticalSmall .next {
+  right: -56px;
+}
+
+.verticalSmall .arrow span {
+  width: 44px;
+  height: 44px;
+}
+
 /* ---- Fullscreen (zoomable loops) ---- */
 
 .cell[data-zoom]:focus-visible {
