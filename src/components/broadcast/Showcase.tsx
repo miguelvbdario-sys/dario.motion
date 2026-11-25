@@ -164,7 +164,6 @@ export function Lightbox({
 export default function Showcase({
   loops,
   verticals,
-  zoom = [],
   sound = [],
   note,
   cta,
@@ -205,7 +204,8 @@ export default function Showcase({
   );
 
   const cell = (b: string, on: boolean) => {
-    const z = zoom.includes(b);
+    // Every loop opens fullscreen (muted unless it is in `sound`).
+    const z = true;
     return (
       <div
         key={b}
