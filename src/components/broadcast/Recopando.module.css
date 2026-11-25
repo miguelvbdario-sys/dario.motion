@@ -87,11 +87,12 @@
 }
 
 /* "Watch full screen": under the compare, on the Final render side. */
+/* Decade switch and "Watch full screen" side by side (centred on phones). */
 .controls {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
 }
 
@@ -233,6 +234,10 @@
 }
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .controls {
+    justify-content: center;
+  }
+
   .sceneRow {
     grid-template-columns: minmax(0, 1fr);
   }
