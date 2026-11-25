@@ -76,7 +76,7 @@ const courseHref = ABOUT.buttons.find((b) => b.label === "Course page")?.href ??
 const PILLS = [
   { label: "Projects", href: "#broadcast" },
   { label: "Standalones", href: "#works-carousel" },
-  { label: "About me", href: "#about" },
+  { label: "Contact", href: "#about" },
   { label: "Course", href: courseHref === "#" ? "#about" : courseHref },
 ];
 
