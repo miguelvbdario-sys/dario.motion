@@ -162,7 +162,17 @@
     font-size: 12px;
   }
 
+  /* Phones: text, then the brand video, then the chair and trophy under it. */
+  .copy {
+    display: contents;
+  }
+
+  .brand {
+    order: 1;
+  }
+
   .assets {
+    order: 2;
     justify-content: center;
     height: 70px;
   }
