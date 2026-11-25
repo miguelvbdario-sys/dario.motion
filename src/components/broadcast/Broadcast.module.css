@@ -380,6 +380,25 @@
   margin-top: calc(var(--s) * 20);
 }
 
+/* Preview and Index the same height: the preview stretches to the row (its
+   video covers the box) instead of keeping a strict 16:9. */
+.mediaGrid {
+  align-items: stretch;
+}
+
+.mediaGrid > .preview {
+  aspect-ratio: auto;
+  min-height: 100%;
+}
+
+.mediaGrid > .preview video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .preview {
   position: relative;
   aspect-ratio: 16 / 9;
