@@ -13,6 +13,10 @@ import styles from "./ContactButton.module.css";
  */
 const WHATSAPP = "5521967849102";
 const EMAIL = "miguel@dario-motion.com";
+/** The e-mail opens ready to send: address, subject and a first line filled in. */
+const MAILTO = `mailto:${EMAIL}?subject=${encodeURIComponent("Project inquiry")}&body=${encodeURIComponent("Hi Miguel,
+
+")}`;
 
 function WhatsAppIcon() {
   return (
@@ -91,7 +95,7 @@ export default function ContactButton({ className, dotClass, label }: { classNam
                     <span className={styles.optionSub}>+55 21 96784-9102</span>
                   </span>
                 </a>
-                <a className={styles.option} href={`mailto:${EMAIL}`}>
+                <a className={styles.option} href={MAILTO}>
                   <span className={styles.icon} data-kind="mail">
                     <MailIcon />
                   </span>
