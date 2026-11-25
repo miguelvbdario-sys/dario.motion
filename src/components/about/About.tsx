@@ -62,7 +62,8 @@ export default function About() {
             {ABOUT.buttons.map((b) => {
               if (b.href === "#contact")
                 return <ContactButton key={b.label} className={styles.button} dotClass={styles.buttonDot} label={b.label} />;
-              const external = b.href.startsWith("http");
+              // Everything here leaves the portfolio: open it in a new tab.
+              const external = !b.href.startsWith("#");
               return (
                 <a
                   key={b.label}

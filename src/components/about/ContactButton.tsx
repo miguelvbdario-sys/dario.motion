@@ -93,7 +93,7 @@ export default function ContactButton({ className, dotClass, label }: { classNam
                     <span className={styles.optionSub}>+55 21 96784-9102</span>
                   </span>
                 </a>
-                <a className={styles.option} href={MAILTO}>
+                <a className={styles.option} href={MAILTO} target="_blank" rel="noopener noreferrer">
                   <span className={styles.icon} data-kind="mail">
                     <MailIcon />
                   </span>

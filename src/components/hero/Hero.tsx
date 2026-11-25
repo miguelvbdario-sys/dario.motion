@@ -459,7 +459,8 @@ export default function Hero() {
           {/* Navigation: each pill scrolls to its section (Course opens /course in the same tab). */}
           <nav className={styles.nav} aria-label="Sections">
             {PILLS.map((pill) => {
-              const external = pill.href.startsWith("http");
+              // Anything that leaves the page (course, other sites) opens in a new tab.
+              const external = !pill.href.startsWith("#");
               return (
                 <a
                   key={pill.label}

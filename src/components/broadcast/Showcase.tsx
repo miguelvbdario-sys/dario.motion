@@ -263,7 +263,7 @@ export default function Showcase({
         </p>
       )}
       {cta && (
-        <a href={cta.href} className={styles.cta}>
+        <a href={cta.href} className={styles.cta} target="_blank" rel="noopener noreferrer">
           <span className={styles.ctaSquare} aria-hidden="true" />
           {cta.label} <span aria-hidden="true">&gt;</span>
         </a>
