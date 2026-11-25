@@ -843,7 +843,6 @@ export default function BroadcastPanel({
         // Phones: vertical tabs (About first); the Paulistão scoreboard is always
         // on, right after the About tab.
         <>
-          {classic && index}
           {accItems ? (
             <div className={styles.accordion}>
               {accItems.map(({ label, index: i }, n) => {
@@ -970,6 +969,9 @@ export default function BroadcastPanel({
           </div>
         </section>
       )}
+
+      {/* Phones, classic layout (Paris): the Index closes the card. */}
+      {compact && classic && <div className={styles.indexLast}>{index}</div>}
     </div>
   );
 }

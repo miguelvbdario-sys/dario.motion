@@ -2864,3 +2864,8 @@
   outline: 2px solid #efeeee;
   outline-offset: -4px;
 }
+
+/* Phones, Paris: the Index as the last block of the card. */
+.indexLast {
+  margin-top: 16px;
+}
