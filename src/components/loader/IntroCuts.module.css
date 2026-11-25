@@ -42,11 +42,13 @@
 /* Phones: MIGUEL over DARIO. */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .name {
-    font-size: 27vw;
+    font-size: 24vw;
     line-height: 0.84;
   }
 
-  .space {
+  /* ".name span" (inline-block) outranked a plain ".space", so the break never
+     happened and the line ran off screen. */
+  .name .space {
     display: block;
     width: auto;
     height: 0;
