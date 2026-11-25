@@ -299,7 +299,7 @@ export const BROADCAST: BroadcastProject[] = [
       {
         label: "Champions League Graphics",
         kind: "showcase",
-        loops: ["placar", "halftime", "bola", "escudo-city", "modulo-1", "modulo-3"].map((n) => `/broadcast/champions/${n}`),
+        loops: ["placar", "halftime", "bola", "escudo-city", "modulo-2", "modulo-3"].map((n) => `/broadcast/champions/${n}`),
         // process-2 is cut at 7s (only the first 7s are used).
         verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
         zoom: ["placar", "halftime", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
