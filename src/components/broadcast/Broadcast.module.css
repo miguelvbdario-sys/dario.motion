@@ -2873,3 +2873,19 @@
     transition: none;
   }
 }
+
+/* Classic cards (Paris): the whole preview is the play button. */
+.previewHit {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.previewHit:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: -4px;
+}

@@ -480,7 +480,8 @@ export default function BroadcastPanel({
         )}
       </dl>
       {/* No "Watch full" on tabbed projects (Paulistão): the tabs are the content. */}
-      {!sections && <button
+      {/* Classic (Paris): no button, the preview itself opens the player. */}
+      {!sections && !classic && <button
         type="button"
         className={styles.watch}
         onClick={watch}
@@ -755,6 +756,16 @@ export default function BroadcastPanel({
               <Loop src={project.preview} poster={project.img ?? undefined} active={live} />
             ) : (
               <Placeholder169 />
+            )}
+            {classic && current && (
+              // Clicking the video opens it fullscreen (play cursor), over the Vimeo iframe.
+              <button
+                type="button"
+                className={styles.previewHit}
+                data-cursor="view"
+                aria-label={`Watch ${current.title} fullscreen`}
+                onClick={watch}
+              />
             )}
             <span className={styles.previewLabel}>
               Preview · Loop{videos && current ? ` · ${pad(active + 1)} / ${pad(videos.length)}` : ""}
