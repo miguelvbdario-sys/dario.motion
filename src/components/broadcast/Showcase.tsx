@@ -56,10 +56,12 @@ function Clip({ base, active }: { base: string; active: boolean }) {
 function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
   const [i, setI] = useState(0);
+  const [full, setFull] = useState(false);
   const n = videos.length;
   const step = (d: number) => setI((k) => (k + d + n) % n);
   // Finger swipe: a sideways drag past SWIPE_PX changes video.
   const start = useRef<{ x: number; y: number } | null>(null);
+  const swiped = useRef(false);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
@@ -77,7 +79,10 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
         if (!s0 || n < 2) return;
         const dx = e.changedTouches[0].clientX - s0.x;
         const dy = e.changedTouches[0].clientY - s0.y;
-        if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(dy)) step(dx < 0 ? 1 : -1);
+        if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(dy)) {
+          swiped.current = true; // the click that follows a swipe doesn't open fullscreen
+          step(dx < 0 ? 1 : -1);
+        }
       }}
     >
       <video
@@ -92,8 +97,13 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
         aria-label={`Process video ${i + 1} of ${n}`}
         loop={n === 1}
         onEnded={() => step(1)}
-        // Tap the video: next one, like stories.
-        onClick={() => n > 1 && step(1)}
+        // Click / tap: fullscreen, where the arrows and swipe still change video.
+        data-cursor="view"
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          if (swiped.current) swiped.current = false;
+          else setFull(true);
+        }}
       />
       {n > 1 && (
         <>
@@ -118,6 +128,18 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
         </>
       )}
       <span className={styles.tag}>Process</span>
+      {full && (
+        <Lightbox
+          key={videos[i]}
+          base={videos[i]}
+          loop={n === 1}
+          onEnded={() => step(1)}
+          onPrev={n > 1 ? () => step(-1) : undefined}
+          onNext={n > 1 ? () => step(1) : undefined}
+          label={`${pad(i + 1)} / ${pad(n)}`}
+          onClose={() => setFull(false)}
+        />
+      )}
     </div>
   );
 }
@@ -128,6 +150,11 @@ export function Lightbox({
   src,
   poster,
   sound,
+  loop = true,
+  onEnded,
+  onPrev,
+  onNext,
+  label,
   onClose,
 }: {
   base?: string;
@@ -135,23 +162,65 @@ export function Lightbox({
   src?: string;
   poster?: string;
   sound?: boolean;
+  loop?: boolean;
+  onEnded?: () => void;
+  /** Gallery mode (process videos): arrows, keyboard and swipe change video. */
+  onPrev?: () => void;
+  onNext?: () => void;
+  label?: string;
   onClose: () => void;
 }) {
+  const touch = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();
-    const key = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const key = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      else if (e.key === "ArrowLeft") onPrev?.();
+      else if (e.key === "ArrowRight") onNext?.();
+    };
     window.addEventListener("keydown", key);
     return () => {
       window.removeEventListener("keydown", key);
       lenis?.start();
     };
-  }, [onClose]);
+  }, [onClose, onPrev, onNext]);
   return createPortal(
     <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Video fullscreen" onClick={onClose}>
       {/* The close button sits on the video's own corner, inside the screen. */}
-      <div className={styles.frame} onClick={(e) => e.stopPropagation()}>
-        <video src={src ?? `${base}.mp4`} poster={poster ?? (base ? `${base}.jpg` : undefined)} autoPlay muted={!sound} controls={sound} loop playsInline />
+      <div
+        className={styles.frame}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
+        onTouchEnd={(e) => {
+          const t0 = touch.current;
+          touch.current = null;
+          if (!t0) return;
+          const dx = e.changedTouches[0].clientX - t0.x;
+          if (Math.abs(dx) > SWIPE_PX && Math.abs(dx) > Math.abs(e.changedTouches[0].clientY - t0.y)) (dx < 0 ? onNext : onPrev)?.();
+        }}
+      >
+        <video
+          src={src ?? `${base}.mp4`}
+          poster={poster ?? (base ? `${base}.jpg` : undefined)}
+          autoPlay
+          muted={!sound}
+          controls={sound}
+          loop={loop}
+          playsInline
+          onEnded={onEnded}
+        />
+        {onPrev && (
+          <button type="button" className={`${styles.lbArrow} ${styles.lbPrev}`} aria-label="Previous video" onClick={onPrev}>
+            ‹
+          </button>
+        )}
+        {onNext && (
+          <button type="button" className={`${styles.lbArrow} ${styles.lbNext}`} aria-label="Next video" onClick={onNext}>
+            ›
+          </button>
+        )}
+        {label && <span className={styles.lbCount}>{label}</span>}
         <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
           ✕
         </button>

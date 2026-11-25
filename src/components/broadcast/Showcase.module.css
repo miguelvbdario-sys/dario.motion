@@ -423,3 +423,57 @@
 .flatRest {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+/* Fullscreen gallery (process videos): arrows outside the video, counter under it. */
+.lbArrow {
+  position: absolute;
+  top: 50%;
+  width: 52px;
+  height: 52px;
+  margin-top: -26px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(239 238 238 / 0.14);
+  color: #efeeee;
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.lbArrow:hover {
+  background: #e60000;
+}
+
+.lbPrev {
+  left: -68px;
+}
+
+.lbNext {
+  right: -68px;
+}
+
+.lbCount {
+  position: absolute;
+  left: 50%;
+  bottom: -32px;
+  translate: -50% 0;
+  color: rgb(239 238 238 / 0.8);
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .lbPrev {
+    left: 6px;
+  }
+
+  .lbNext {
+    right: 6px;
+  }
+
+  .lbArrow {
+    background: rgb(20 0 0 / 0.7);
+  }
+}
