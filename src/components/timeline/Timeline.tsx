@@ -43,13 +43,11 @@ export default function Timeline() {
   const tc = useRef<HTMLSpanElement>(null);
   const [marks, setMarks] = useState<{ id: string; label: string; at: number }[]>([]);
   const [shown, setShown] = useState(false);
-  const [past, setPast] = useState(false);
 
   useEffect(() => {
     let max = 1;
     let lastAts = "";
     let shownNow = false;
-    let pastNow = false;
     // Section positions as a fraction of the scrollable height (the hero pin
     // adds a spacer, so they are measured from the live layout). Only re-renders
     // when a marker really moved.
@@ -84,9 +82,7 @@ export default function Timeline() {
       if (fill.current) fill.current.style.setProperty("--p", String(p));
       if (tc.current) tc.current.textContent = timecode(y / FRAME_PX);
       const s = y > SHOW_AFTER;
-      const pa = y > window.innerHeight * 1.2;
       if (s !== shownNow) setShown((shownNow = s));
-      if (pa !== pastNow) setPast((pastNow = pa));
     };
     measure();
     update();
@@ -134,19 +130,6 @@ export default function Timeline() {
           <div ref={head} className={styles.playhead} aria-hidden="true" />
         </nav>
       </div>
-      {/* Phones: back to the top, once the hero is behind. */}
-      <button
-        type="button"
-        className={styles.toTop}
-        data-shown={past || undefined}
-        onClick={() => go("hero")}
-        aria-label="Back to top"
-        tabIndex={past ? 0 : -1}
-      >
-        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
-          <path d="M12 19V5M5 12l7-7 7 7" fill="none" stroke="currentColor" strokeWidth="2" />
-        </svg>
-      </button>
     </>
   );
 }
