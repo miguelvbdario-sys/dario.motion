@@ -380,37 +380,12 @@
   margin-top: calc(var(--s) * 20);
 }
 
-/* Preview and Index the same height: the preview stretches to the row (its
-   video covers the box) instead of keeping a strict 16:9. */
+/* Classic cards (Paris): the preview keeps its full 16:9 (nothing cut) in a
+   wider column; the Index, narrower, stretches to the same height.
+   Where to tune: the 2fr / 1fr split. */
 .mediaGrid {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   align-items: stretch;
-}
-
-.mediaGrid > .preview {
-  aspect-ratio: auto;
-  min-height: 100%;
-}
-
-/* Vimeo player: scaled to cover the box (no letterbox bars), like the loop. */
-.mediaGrid > .preview {
-  container-type: size;
-}
-
-.mediaGrid > .preview iframe {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max(100cqw, 177.78cqh);
-  height: max(100cqh, 56.25cqw);
-  translate: -50% -50%;
-}
-
-.mediaGrid > .preview video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
 }
 
 .preview {
