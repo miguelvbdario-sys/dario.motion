@@ -49,7 +49,7 @@ export type BroadcastProject = {
    */
   sections?: {
     label: string;
-    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "recopando" | "placeholder";
+    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "recopando" | "branding" | "placeholder";
     /** kind "showcase": vertical videos played one after the other (base paths, .mp4 + .jpg). */
     verticals?: string[];
     /** kind "showcase": loops that open fullscreen on click (base paths). */
@@ -208,11 +208,11 @@ export const BROADCAST: BroadcastProject[] = [
     client: "[Client]", // TODO: substituir
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
-    desc: "[Project description]", // TODO: substituir
+    desc: "Official CazéTV broadcast of the FIFA World Cup 2026",
     filters: [],
     sections: [
-      { label: "About the project", kind: "about" },
-      { label: "Motion Branding", kind: "placeholder" }, // TODO: substituir
+      // Text + chair/trophy assets + the motion brand video (MotionBranding.tsx).
+      { label: "Motion Branding", kind: "branding" },
       {
         label: "Bora Copar",
         kind: "showcase",
@@ -223,7 +223,15 @@ export const BROADCAST: BroadcastProject[] = [
       },
       // The vignette made in Blender: render × wireframe + the 3D set.
       { label: "Recopando", kind: "recopando" },
-      { label: "Live", kind: "placeholder" }, // TODO: substituir
+      {
+        label: "Live",
+        kind: "showcase",
+        // How the graphics looked on air (cut from the broadcast).
+        loops: ["live-final", "live-taca", "live-camisa", "live-pacote", "live-wipe"].map((n) => `/broadcast/copa-cazetv/${n}`),
+        verticals: [],
+        note: "CazéTV was the ==official broadcaster== of the FIFA World Cup 2026, live on YouTube. This is how the graphics looked on air.",
+        cta: { label: "Watch on YouTube", href: "https://www.youtube.com/watch?v=zPQDvq-Fe0U&t=16178s" },
+      },
     ],
     fullVideo: null, // TODO: substituir
   },

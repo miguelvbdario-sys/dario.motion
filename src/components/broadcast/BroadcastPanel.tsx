@@ -7,6 +7,7 @@ import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import Showcase, { Lightbox } from "./Showcase";
 import Recopando from "./Recopando";
+import MotionBranding from "./MotionBranding";
 import Marked, { Mark, splitMarks } from "@/components/effects/Marked";
 import BroadcastScoreboard from "./BroadcastScoreboard";
 import BroadcastShields from "./BroadcastShields";
@@ -725,6 +726,7 @@ export default function BroadcastPanel({
             </div>
           )}
           {kind === "recopando" && <Recopando active={live} />}
+          {kind === "branding" && <MotionBranding active={live} compact={compact} />}
           {kind === "showcase" && sections?.[tab]?.loops && (
             <Showcase key={sections[tab].label} loops={sections[tab].loops!} verticals={sections[tab].verticals ?? []} zoom={sections[tab].zoom} sound={sections[tab].sound} note={sections[tab].note} cta={sections[tab].cta} active={live} compact={compact} />
           )}
