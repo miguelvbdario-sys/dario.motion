@@ -285,7 +285,7 @@ export const BROADCAST: BroadcastProject[] = [
           "gol-argentina",
           "gol-espanha",
         ].map((n) => `/broadcast/world-cup/${n}`),
-        verticals: [1, 2, 3].map((n) => `/broadcast/world-cup/process-${n}`),
+        verticals: [1, 2, 3, 4, 5].map((n) => `/broadcast/world-cup/process-${n}`),
       },
       // Same layout ready: switch to kind "showcase" with loops + verticals when the files arrive.
       { label: "Champions League Graphics", kind: "placeholder" }, // TODO: substituir
