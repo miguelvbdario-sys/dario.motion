@@ -120,8 +120,8 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
   );
 }
 
-/** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. */
-function Lightbox({ base, onClose }: { base: string; onClose: () => void }) {
+/** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. `sound`: plays with audio and controls. */
+function Lightbox({ base, sound, onClose }: { base: string; sound?: boolean; onClose: () => void }) {
   useEffect(() => {
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();
@@ -136,7 +136,7 @@ function Lightbox({ base, onClose }: { base: string; onClose: () => void }) {
     <div className={styles.lightbox} role="dialog" aria-modal="true" aria-label="Video fullscreen" onClick={onClose}>
       {/* The close button sits on the video's own corner, inside the screen. */}
       <div className={styles.frame} onClick={(e) => e.stopPropagation()}>
-        <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted loop playsInline />
+        <video src={`${base}.mp4`} poster={`${base}.jpg`} autoPlay muted={!sound} controls={sound} loop playsInline />
         <button type="button" className={styles.close} aria-label="Close" onClick={onClose} autoFocus>
           ✕
         </button>
@@ -150,6 +150,7 @@ export default function Showcase({
   loops,
   verticals,
   zoom = [],
+  sound = [],
   note,
   cta,
   active,
@@ -161,6 +162,8 @@ export default function Showcase({
   cta?: { label: string; href: string };
   /** Loops that open fullscreen on click. */
   zoom?: string[];
+  /** Of the zoom loops, these open with sound (and player controls). */
+  sound?: string[];
   verticals: string[];
   active: boolean;
   compact: boolean;
@@ -168,7 +171,7 @@ export default function Showcase({
   const track = useRef<HTMLDivElement>(null);
   const [cur, setCur] = useState(0);
   const [open, setOpen] = useState<string | null>(null);
-  const lightbox = open && <Lightbox base={open} onClose={() => setOpen(null)} />;
+  const lightbox = open && <Lightbox base={open} sound={sound.includes(open)} onClose={() => setOpen(null)} />;
 
   const footer = (note || cta) && (
     <div className={styles.footer}>
@@ -240,12 +243,28 @@ export default function Showcase({
             ›
           </button>
         </div>
-        <div className={styles.verticalSmall}>
-          <Vertical videos={verticals} active={active} />
-        </div>
+        {verticals.length > 0 && (
+          <div className={styles.verticalSmall}>
+            <Vertical videos={verticals} active={active} />
+          </div>
+        )}
         {footer}
         {lightbox}
       </div>
+    );
+  }
+
+  // No vertical videos: the first two loops side by side, the rest in rows of three.
+  if (!verticals.length) {
+    return (
+      <>
+        <div className={styles.flat}>
+          <div className={styles.flatTop}>{loops.slice(0, 2).map((b) => cell(b, active))}</div>
+          {loops.length > 2 && <div className={styles.flatRest}>{loops.slice(2).map((b) => cell(b, active))}</div>}
+          {lightbox}
+        </div>
+        {footer}
+      </>
     );
   }
 

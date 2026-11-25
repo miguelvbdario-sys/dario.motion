@@ -369,3 +369,25 @@
     font-size: 17px;
   }
 }
+
+/* No vertical videos: two big tiles on top, the rest in rows of three. */
+.flat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: calc(var(--s) * 20);
+}
+
+.flatTop,
+.flatRest {
+  display: grid;
+  gap: 8px;
+}
+
+.flatTop {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.flatRest {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}

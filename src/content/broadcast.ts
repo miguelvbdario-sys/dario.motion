@@ -54,6 +54,8 @@ export type BroadcastProject = {
     verticals?: string[];
     /** kind "showcase": loops that open fullscreen on click (base paths). */
     zoom?: string[];
+    /** kind "showcase": zoom loops that open with sound. */
+    sound?: string[];
     /** kind "showcase": short text under all the videos, and an optional link button. */
     note?: string;
     cta?: { label: string; href: string };
@@ -211,7 +213,14 @@ export const BROADCAST: BroadcastProject[] = [
     sections: [
       { label: "About the project", kind: "about" },
       { label: "Motion Branding", kind: "placeholder" }, // TODO: substituir
-      { label: "Bora Copar", kind: "placeholder" }, // TODO: substituir
+      {
+        label: "Bora Copar",
+        kind: "showcase",
+        loops: ["vinheta", "bumper", "telao", "live-1", "live-2"].map((n) => `/broadcast/bora-copar/${n}`),
+        verticals: [],
+        zoom: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
+        sound: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
+      },
       // The vignette made in Blender: render × wireframe + the 3D set.
       { label: "Recopando", kind: "recopando" },
       { label: "Live", kind: "placeholder" }, // TODO: substituir
