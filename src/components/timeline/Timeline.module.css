@@ -159,12 +159,13 @@
   z-index: 41;
   /* Above the MIGUEL DARIO line at the end of the page (About.module.css
      .frameBot: bar offset + gap + the line's height), so it never covers it. */
-  right: clamp(16px, 3vw, 48px);
+  /* Where to change: right = distance from the edge, width/height = size. */
+  right: clamp(48px, 9vw, 160px);
   bottom: calc(clamp(14px, 2.2vh, 26px) + 56px + clamp(64px, 11vw, 220px) * 0.84 + 16px);
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 64px;
+  height: 64px;
   padding: 0;
   border: 1px solid rgb(239 238 238 / 0.5);
   border-radius: 50%;
@@ -188,7 +189,9 @@
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .toTop {
-    right: 12px;
+    right: 20px;
+    width: 48px;
+    height: 48px;
     bottom: calc(clamp(14px, 2.2vh, 26px) + 28px + 12.5vw * 0.84 + 12px);
   }
 }
