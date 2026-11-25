@@ -84,7 +84,8 @@ export default function Timeline() {
       if (fill.current) fill.current.style.setProperty("--p", String(p));
       if (tc.current) tc.current.textContent = timecode(y / FRAME_PX);
       const s = y > SHOW_AFTER;
-      const pa = y > window.innerHeight * 1.2;
+      // Only at the very end of the page (full scroll done).
+      const pa = y >= document.documentElement.scrollHeight - window.innerHeight - 40;
       if (s !== shownNow) setShown((shownNow = s));
       if (pa !== pastNow) setPast((pastNow = pa));
     };
@@ -134,7 +135,7 @@ export default function Timeline() {
           <div ref={head} className={styles.playhead} aria-hidden="true" />
         </nav>
       </div>
-      {/* Phones: back to the top, once the hero is behind. */}
+      {/* Phones: back to the top, only once the page has been scrolled to the end. */}
       <button
         type="button"
         className={styles.toTop}
