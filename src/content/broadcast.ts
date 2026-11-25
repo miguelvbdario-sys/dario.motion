@@ -47,7 +47,9 @@ export type BroadcastProject = {
    */
   sections?: {
     label: string;
-    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "placeholder";
+    kind: "about" | "scoreboard" | "shields" | "screens" | "mascots" | "process" | "youtube" | "showcase" | "placeholder";
+    /** kind "showcase": vertical videos played one after the other (base paths, .mp4 + .jpg). */
+    verticals?: string[];
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
     /**
@@ -263,10 +265,23 @@ export const BROADCAST: BroadcastProject[] = [
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
     desc: "[Project description]", // TODO: substituir
-    filters: [
-      { label: "NBA Style", count: "[01]" },
-      { label: "World Cup Graphics", count: "[02]" },
-      { label: "Champions League Graphics", count: "[03]" },
+    filters: [],
+    sections: [
+      { label: "NBA Style", kind: "placeholder" }, // TODO: substituir
+      {
+        label: "World Cup Graphics",
+        kind: "showcase",
+        loops: [
+          "escalacao-arg-esp",
+          "escalacao-bra-por",
+          "placar",
+          "assets-placar",
+          "gol-argentina",
+          "gol-espanha",
+        ].map((n) => `/broadcast/world-cup/${n}`),
+        verticals: [1, 2, 3].map((n) => `/broadcast/world-cup/process-${n}`),
+      },
+      { label: "Champions League Graphics", kind: "placeholder" }, // TODO: substituir
     ],
     fullVideo: null, // TODO: substituir
   },

@@ -5,6 +5,7 @@ import gsap from "gsap";
 import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
+import Showcase from "./Showcase";
 import BroadcastScoreboard from "./BroadcastScoreboard";
 import BroadcastShields from "./BroadcastShields";
 import BroadcastMascots from "./BroadcastMascots";
@@ -699,6 +700,9 @@ export default function BroadcastPanel({
               )}
             </div>
           )}
+          {kind === "showcase" && sections?.[tab]?.loops && (
+            <Showcase loops={sections[tab].loops!} verticals={sections[tab].verticals ?? []} active={live} compact={compact} />
+          )}
           {kind === "placeholder" && (
             <div className={styles.preview}>
               <Placeholder169 />
@@ -706,7 +710,7 @@ export default function BroadcastPanel({
           )}
           {/* Live examples. Scoreboard: left of the Index (the only tab with it).
               Screens: under the stage, in the right column. */}
-          {loops && !(compact && kind === "screens") && (
+          {loops && kind !== "showcase" && !(compact && kind === "screens") && (
             <div className={kind === "screens" ? styles.screenLoops : styles.loopsFull}>
               <div className={styles.loopsGrid}>
                 {loops.map((base) => (

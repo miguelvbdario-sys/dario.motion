@@ -1,0 +1,145 @@
+/* Personal project gallery (Showcase.tsx). */
+
+.desktop {
+  display: grid;
+  /* 2.1 : 1 so the 2×3 landscape grid ends at the 9:16 player's height. */
+  grid-template-columns: minmax(0, 2.1fr) minmax(0, 1fr);
+  gap: 8px;
+  align-items: start;
+  margin-top: calc(var(--s) * 20);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.cell {
+  position: relative;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+/* Wide scoreboard strips sit centred on the dark tile (contain). */
+.cell video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.vertical {
+  position: relative;
+  aspect-ratio: 9 / 16;
+  overflow: hidden;
+  border-radius: 5px;
+  background: #111;
+}
+
+.vertical video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.bars {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  gap: 6px;
+}
+
+.bar {
+  flex: 1;
+  height: 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: rgb(239 238 238 / 0.35);
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bar[data-on] {
+  background: #e60000;
+}
+
+.tag {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  padding: 0.35em 0.6em;
+  border-radius: 3px;
+  background: rgb(20 0 0 / 0.86);
+  color: #efeeee;
+  font-family: var(--font-mono, monospace);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ---- Phones ---- */
+.mobile {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.swipe {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 88%;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+}
+
+.swipe::-webkit-scrollbar {
+  display: none;
+}
+
+.swipe > .cell {
+  scroll-snap-align: start;
+}
+
+.counter {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 18px;
+  font-family: var(--font-mono, monospace);
+  font-size: 13px;
+  color: #140000;
+}
+
+.counter button {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 50%;
+  background: #140000;
+  color: #efeeee;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.counter button:disabled {
+  opacity: 0.35;
+}
+
+.verticalSmall {
+  width: 62%;
+  margin: 4px auto 0;
+}
