@@ -2813,7 +2813,7 @@
   .extra:hover {
     position: relative;
     z-index: 2;
-    scale: 1.5;
+    scale: 1.05;
   }
 
   /* The LIVE (YouTube) player: just a touch. */

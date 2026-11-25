@@ -266,7 +266,7 @@ export const BROADCAST: BroadcastProject[] = [
     client: "[Client]", // TODO: substituir
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
-    desc: "[Project description]", // TODO: substituir
+    desc: "Exploring broadcast graphics in my own way. All these videos go to my Instagram page.",
     filters: [],
     sections: [
       {
