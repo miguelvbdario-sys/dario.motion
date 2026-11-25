@@ -170,6 +170,8 @@ export function Lightbox({
   onClose: () => void;
 }) {
   const touch = useRef<{ x: number; y: number } | null>(null);
+  /** Landscape video: on phones the ✕ sits above the frame instead of on it. */
+  const [wide, setWide] = useState(true);
   useEffect(() => {
     const lenis = (window as unknown as { lenis?: { stop: () => void; start: () => void } }).lenis;
     lenis?.stop();
@@ -189,6 +191,7 @@ export function Lightbox({
       {/* The close button sits on the video's own corner, inside the screen. */}
       <div
         className={styles.frame}
+        data-wide={wide || undefined}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={(e) => (touch.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
         onTouchEnd={(e) => {
@@ -208,6 +211,7 @@ export function Lightbox({
           loop={loop}
           playsInline
           onEnded={onEnded}
+          onLoadedMetadata={(e) => setWide(e.currentTarget.videoWidth >= e.currentTarget.videoHeight)}
         />
         {onPrev && (
           <button type="button" className={`${styles.lbArrow} ${styles.lbPrev}`} aria-label="Previous video" onClick={onPrev}>

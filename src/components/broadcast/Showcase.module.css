@@ -477,3 +477,13 @@
     background: rgb(20 0 0 / 0.7);
   }
 }
+
+/* Phones: on landscape videos the ✕ sits just above the frame (vertical
+   videos keep it on their top-right corner). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .frame[data-wide] .close {
+    top: auto;
+    bottom: calc(100% + 12px);
+    right: 0;
+  }
+}
