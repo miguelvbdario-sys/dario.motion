@@ -2790,27 +2790,39 @@
 }
 
 /* Hover zoom on every media tile (stills and videos) inside the cards; the
-   About cards (video + title + text) zoom as a whole.
-   `scale` (not transform), so it adds to any GSAP transform on the same tile. */
-.preview,
+   About cards (video + title + text) zoom as a whole and invert to white.
+   Not on ALL ASSETS (.preview[data-assets]) nor the mascots (break the goal).
+   `scale` (not transform), so it adds to any GSAP transform on the same tile.
+   Where to tune: ZOOM below (1.5) and the 0.7s transition. */
+.preview:not([data-assets]),
 .onAirTile,
 .loopCell,
 .aboutPoints > li,
-.mascotVideo,
 .extra {
-  transition: scale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    scale 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    background-color 0.4s ease,
+    color 0.4s ease;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .preview:hover,
+  .preview:not([data-assets]):hover,
   .onAirTile:hover,
   .loopCell:hover,
   .aboutPoints > li:hover,
-  .mascotVideo:hover,
   .extra:hover {
     position: relative;
     z-index: 2;
-    scale: 1.1;
+    scale: 1.5;
+  }
+
+  .aboutPoints > li:hover {
+    background: #efeeee;
+    color: #111;
+  }
+
+  .aboutPoints > li:hover .aboutPointText {
+    color: rgb(17 17 17 / 0.72);
   }
 }
 
@@ -2819,7 +2831,6 @@
   .onAirTile,
   .loopCell,
   .aboutPoints > li,
-  .mascotVideo,
   .extra {
     transition: none;
   }
