@@ -184,7 +184,33 @@
   color: #140000;
 }
 
+.sceneRow {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: calc(var(--s, 1px) * 32);
+  align-items: center;
+}
+
+.sceneRow .note {
+  margin: 0;
+  justify-self: end;
+  text-align: right;
+}
+
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .sceneRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .sceneRow .scene {
+    order: -1;
+  }
+
+  .sceneRow .note {
+    justify-self: start;
+    text-align: left;
+  }
+
   .scene {
     aspect-ratio: 4 / 5;
   }

@@ -241,10 +241,13 @@ export default function Recopando({ active }: { active: boolean }) {
           </button>
         ))}
       </div>
-      <Scene3D active={active} />
-      <p className={styles.note}>
-        Everything in the vignette was composed and animated in Blender: the room, the TVs, the PS2, the trophies.
-      </p>
+      {/* Desktop: the text on the left (right-aligned), the 3D scene on 60% of the width. */}
+      <div className={styles.sceneRow}>
+        <p className={styles.note}>
+          Everything in the vignette was composed and animated in Blender: the room, the TVs, the PS2, the trophies.
+        </p>
+        <Scene3D active={active} />
+      </div>
     </div>
   );
 }
