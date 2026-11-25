@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Showcase.module.css";
+import Marked from "@/components/effects/Marked";
 
 /*
  * Personal project gallery (e.g. World Cup Graphics).
@@ -171,7 +172,11 @@ export default function Showcase({
 
   const footer = (note || cta) && (
     <div className={styles.footer}>
-      {note && <p className={styles.note}>{note}</p>}
+      {note && (
+        <p className={styles.note}>
+          <Marked text={note} />
+        </p>
+      )}
       {cta && (
         <a href={cta.href} className={styles.cta}>
           <span className={styles.ctaSquare} aria-hidden="true" />

@@ -6,6 +6,7 @@ import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
 import Showcase from "./Showcase";
+import Marked, { Mark, splitMarks } from "@/components/effects/Marked";
 import BroadcastScoreboard from "./BroadcastScoreboard";
 import BroadcastShields from "./BroadcastShields";
 import BroadcastMascots from "./BroadcastMascots";
@@ -513,7 +514,15 @@ export default function BroadcastPanel({
             <span key={i} className={styles.aboutLeadPart}>
               {i > 0 && " "}
               {/* Words light up one by one when the About opens. */}
-              <WordReveal text={part} mode="play" play={aboutShown} />
+              {splitMarks(part).map((sg, k) =>
+                sg.mark ? (
+                  <Mark key={k}>
+                    <WordReveal text={sg.text} mode="play" play={aboutShown} />
+                  </Mark>
+                ) : (
+                  <WordReveal key={k} text={sg.text} mode="play" play={aboutShown} />
+                ),
+              )}
             </span>
           ))}
         </p>
@@ -799,7 +808,9 @@ export default function BroadcastPanel({
 
       <span className={styles.dot} aria-hidden="true" />
       <h3 className={styles.bigTitle}>{project.title}</h3>
-      <p className={styles.desc}>{project.desc}</p>
+      <p className={styles.desc}>
+        <Marked text={project.desc} />
+      </p>
 
       {/* Tabs (sections), the video selector, or plain filters. */}
       {compact ? (

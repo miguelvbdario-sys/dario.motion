@@ -1,0 +1,24 @@
+/* Highlighter mark (Marked.tsx): a yellow band that sweeps across the words. */
+.mark {
+  color: inherit;
+  padding: 0 0.12em;
+  margin: 0 -0.04em;
+  background: linear-gradient(#f5c400, #f5c400) no-repeat 0 50% / 0% 100%;
+  /* Each wrapped line gets its own band. */
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 0.25s ease-in;
+}
+
+/* Where to tune: the sweep length (0.9s) and the wait before it (0.35s). */
+.mark[data-on] {
+  background-size: 100% 100%;
+  transition: background-size 0.9s cubic-bezier(0.65, 0, 0.35, 1) 0.35s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mark,
+  .mark[data-on] {
+    transition: none;
+  }
+}

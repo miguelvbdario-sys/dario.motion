@@ -1,4 +1,6 @@
 ﻿/*
+ * Highlighter: ==words== in a desc / lead / note get the yellow marker (Marked.tsx).
+ *
  * BROADCAST section (#broadcast): the four broadcast projects, in display order.
  *
  * Everything still missing is a visible placeholder in [brackets], each marked
@@ -121,7 +123,7 @@ export const BROADCAST: BroadcastProject[] = [
     year: "2026",
     desc: "Official Paulistão 2026 broadcast assets",
     about: {
-      lead: "Paulistão is São Paulo's state football championship, the biggest in Brazil.\nWe made the graphics package and the animations for its official broadcast.",
+      lead: "Paulistão is São Paulo's state football championship, the biggest in Brazil.\nWe made the ==graphics package and the animations== for its official broadcast.",
       points: [
         {
           title: "The championship",
@@ -230,7 +232,7 @@ export const BROADCAST: BroadcastProject[] = [
     role: "Head Project — Motion",
     year: "2024",
     team: "Anderson Frade · Marcelo Pineschi",
-    desc: "Development of LED screens for the official broadcast studios of the Paris 2024 Olympics, ensuring the alignment with the event's identity.",
+    desc: "==Development of LED screens== for the official broadcast studios of the Paris 2024 Olympics, ensuring the alignment with the event's identity.",
     classic: true,
     filters: [],
     fullVideo: null,
@@ -262,7 +264,7 @@ export const BROADCAST: BroadcastProject[] = [
     client: "[Client]", // TODO: substituir
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
-    desc: "Exploring broadcast graphics in my own way. All these videos go to my Instagram page.",
+    desc: "Exploring ==broadcast graphics== in my own way. All these videos go to my Instagram page.",
     filters: [],
     sections: [
       {
@@ -272,7 +274,7 @@ export const BROADCAST: BroadcastProject[] = [
         // Add "process-2" here when the second process video arrives.
         verticals: ["/broadcast/nba-style/process-1"],
         zoom: ["final-flamengo", "final-palmeiras"].map((n) => `/broadcast/nba-style/${n}`),
-        note: "Reimagining Brazilian teams in the NBA motion style.",
+        note: "Reimagining Brazilian teams in the ==NBA motion style==.",
       },
       {
         label: "World Cup Graphics",
@@ -287,7 +289,7 @@ export const BROADCAST: BroadcastProject[] = [
         ].map((n) => `/broadcast/world-cup/${n}`),
         verticals: [1, 2, 3, 4, 5].map((n) => `/broadcast/world-cup/process-${n}`),
         zoom: ["escalacao-arg-esp", "escalacao-bra-por"].map((n) => `/broadcast/world-cup/${n}`),
-        note: "Recreating the World Cup graphics in my own way, including the goal animations.",
+        note: "==Recreating the World Cup graphics== in my own way, including the goal animations.",
       },
       {
         label: "Champions League Graphics",
@@ -296,7 +298,7 @@ export const BROADCAST: BroadcastProject[] = [
         // process-2 is cut at 7s (only the first 7s are used).
         verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
         zoom: ["placar", "halftime", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
-        note: "Recreating the scoreboard and the line-up, and teaching them in my course, from the principles of motion to the final animations.",
+        note: "==Recreating the scoreboard and the line-up==, and teaching them in my course, from the principles of motion to the final animations.",
         cta: { label: "Course page", href: "/course" },
       },
     ],
