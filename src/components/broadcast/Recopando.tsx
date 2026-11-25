@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { Mesh } from "three";
+import type { Mesh, Object3D } from "three";
 import styles from "./Recopando.module.css";
 
 /*
@@ -23,7 +23,7 @@ type Decade = (typeof DECADES)[number];
 /** Only this decade has the wireframe (render + 3D). */
 const WIRE: Decade = "00s";
 /** 3D start view, relative to the props' size (front, slightly above and to the side). */
-const VIEW = { side: 0.2, up: 0.18, back: 0.85 };
+const VIEW = { side: 0.15, up: 0.32, back: 0.95, lift: 0.12 };
 
 function Compare({ decade, active }: { decade: Decade; active: boolean }) {
   const box = useRef<HTMLDivElement>(null);
@@ -142,8 +142,15 @@ function Scene3D({ active }: { active: boolean }) {
       if (disposed) return;
       // Frame the set (the room planes are left out of the export).
       scene.add(gltf.scene);
-      const bb = new THREE.Box3().setFromObject(gltf.scene);
+      // Centred on the main object: the TV stand (with the TV on it).
+      let stand: Object3D | undefined;
+      gltf.scene.traverse((o) => {
+        if (!stand && /tvstand/i.test(o.name)) stand = o;
+      });
+      const bb = new THREE.Box3().setFromObject(stand ?? gltf.scene);
       const mid = bb.getCenter(new THREE.Vector3());
+      // Aim a bit above the stand, at the TV.
+      mid.y += bb.getSize(new THREE.Vector3()).length() * VIEW.lift;
       const size = bb.getSize(new THREE.Vector3()).length();
       controls.target.copy(mid);
       camera.position.set(mid.x + size * VIEW.side, mid.y + size * VIEW.up, mid.z + size * VIEW.back);
@@ -194,7 +201,7 @@ function Scene3D({ active }: { active: boolean }) {
   }, [active]);
 
   return (
-    <div className={styles.scene} data-cursor="drag">
+    <div className={styles.scene} data-cursor="drag" data-lenis-prevent>
       <div ref={host} className={styles.canvas} />
       {state !== "ready" && <span className={styles.loading}>Loading the 3D scene…</span>}
       <span className={`${styles.tag} ${styles.tagLeft}`}>Blender scene · 00s</span>
