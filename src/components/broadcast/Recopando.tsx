@@ -4,6 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import type { Mesh, Object3D } from "three";
 import styles from "./Recopando.module.css";
 import { Lightbox } from "./Showcase";
+import Marked from "@/components/effects/Marked";
+
+/** Intro text at the top of the tab (where to change it). */
+const INTRO =
+  "Recopando replays the most memorable matches from past World Cups. The vignette is all about ==nostalgia==: a typical Brazilian bedroom from the 90s to the 00s, with the CRT TV and the PS2.";
 
 /*
  * RECOPANDO tab (2026 World Cup card): the vignette was made entirely in
@@ -226,6 +231,9 @@ export default function Recopando({ active }: { active: boolean }) {
   const [full, setFull] = useState(false);
   return (
     <div className={styles.root}>
+      <p className={`${styles.note} ${styles.intro}`}>
+        <Marked text={INTRO} />
+      </p>
       <Compare decade={decade} active={active} />
       {full && <Lightbox base={`${BASE}/vinheta-${decade}-full`} sound onClose={() => setFull(false)} />}
       {/* One line: decade switch on the left, "Watch full screen" on the right. */}

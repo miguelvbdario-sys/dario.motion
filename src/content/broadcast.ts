@@ -214,16 +214,6 @@ export const BROADCAST: BroadcastProject[] = [
       // Text + chair/trophy assets + the motion brand video (MotionBranding.tsx).
       { label: "Motion Branding", kind: "branding" },
       {
-        label: "Bora Copar",
-        kind: "showcase",
-        loops: ["vinheta", "bumper", "telao", "live-1", "live-2"].map((n) => `/broadcast/bora-copar/${n}`),
-        verticals: [],
-        zoom: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
-        sound: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
-      },
-      // The vignette made in Blender: render × wireframe + the 3D set.
-      { label: "Recopando", kind: "recopando" },
-      {
         label: "Live",
         kind: "showcase",
         // How the graphics looked on air (cut from the broadcast).
@@ -232,6 +222,17 @@ export const BROADCAST: BroadcastProject[] = [
         note: "CazéTV was the ==official broadcaster== of the FIFA World Cup 2026, live on YouTube. This is how the graphics looked on air.",
         cta: { label: "Watch on YouTube", href: "https://www.youtube.com/watch?v=zPQDvq-Fe0U&t=16178s" },
       },
+      {
+        label: "Bora Copar",
+        kind: "showcase",
+        loops: ["vinheta", "bumper", "telao", "live-1", "live-2"].map((n) => `/broadcast/bora-copar/${n}`),
+        verticals: [],
+        zoom: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
+        sound: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
+        note: "Bora Copar is CazéTV's World Cup show: squad call-ups, behind the scenes of the Brazil team and everything around the tournament. I was responsible for the ==LED screens and the vignettes==.",
+      },
+      // The vignette made in Blender: render × wireframe + the 3D set.
+      { label: "Recopando", kind: "recopando" },
     ],
     fullVideo: null, // TODO: substituir
   },

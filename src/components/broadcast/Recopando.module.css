@@ -259,3 +259,8 @@
     font-size: 17px;
   }
 }
+
+/* Intro text above the render × wireframe. */
+.intro {
+  margin: 0 0 4px;
+}
