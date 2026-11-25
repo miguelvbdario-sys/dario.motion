@@ -32,6 +32,11 @@
   object-fit: contain;
 }
 
+/* Same grey as the strips' own background (#b0b0b0), so the bars blend in. */
+.cell[data-strip] {
+  background: #b0b0b0;
+}
+
 .vertical {
   position: relative;
   aspect-ratio: 9 / 16;

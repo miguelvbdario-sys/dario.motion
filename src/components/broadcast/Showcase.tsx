@@ -38,6 +38,11 @@ function Clip({ base, active }: { base: string; active: boolean }) {
       preload="metadata"
       disablePictureInPicture
       aria-hidden="true"
+      // Wide strips (scoreboards) get their own grey around them, not black.
+      onLoadedMetadata={(e) => {
+        const v = e.currentTarget;
+        if (v.videoWidth / v.videoHeight > 2.2) v.parentElement?.setAttribute("data-strip", "");
+      }}
     />
   );
 }
