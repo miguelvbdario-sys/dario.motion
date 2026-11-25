@@ -12,7 +12,7 @@ import styles from "./Recopando.module.css";
  *      camera, rendered from the scene) on top; a split line follows the mouse
  *      or the finger. The wireframe video follows the vignette's time.
  *      The other decades play as plain videos (no wireframe).
- *   2. The scene in 3D: the 00s set as a wireframe model the visitor can
+ *   2. The scene in 3D: the 00s set in material preview the visitor can
  *      rotate (three.js, loaded only when the tab is open).
  *
  * Media in /public/broadcast/recopando.
@@ -117,6 +117,7 @@ function Scene3D({ active }: { active: boolean }) {
       const THREE = await import("three");
       const { GLTFLoader } = await import("three/examples/jsm/loaders/GLTFLoader.js");
       const { OrbitControls } = await import("three/examples/jsm/controls/OrbitControls.js");
+      const { RoomEnvironment } = await import("three/examples/jsm/environments/RoomEnvironment.js");
       if (disposed) return;
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -129,12 +130,16 @@ function Scene3D({ active }: { active: boolean }) {
       controls.autoRotate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       controls.autoRotateSpeed = 0.6;
 
-      const gltf = await new GLTFLoader().loadAsync(`${BASE}/scene.glb`);
+      // Material preview: the set's own materials and textures (downsized),
+      // lit by a soft studio environment, like Blender's Material Preview.
+      renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.05;
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      const env = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environment = env;
+      const gltf = await new GLTFLoader().loadAsync(`${BASE}/scene-mat.glb`);
       if (disposed) return;
-      const mat = new THREE.MeshBasicMaterial({ color: 0xefeeee, wireframe: true, transparent: true, opacity: 0.55 });
-      gltf.scene.traverse((o) => {
-        if ((o as Mesh).isMesh) (o as Mesh).material = mat;
-      });
       // Frame the set (the room planes are left out of the export).
       scene.add(gltf.scene);
       const bb = new THREE.Box3().setFromObject(gltf.scene);
@@ -171,8 +176,13 @@ function Scene3D({ active }: { active: boolean }) {
         cancelAnimationFrame(raf);
         ro.disconnect();
         controls.dispose();
-        mat.dispose();
-        gltf.scene.traverse((o) => (o as Mesh).geometry?.dispose());
+        env.dispose();
+        pmrem.dispose();
+        gltf.scene.traverse((o) => {
+          const m = o as Mesh;
+          m.geometry?.dispose();
+          (Array.isArray(m.material) ? m.material : m.material ? [m.material] : []).forEach((x) => x.dispose());
+        });
         renderer.dispose();
         renderer.domElement.remove();
       };
