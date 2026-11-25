@@ -909,7 +909,7 @@ export default function BroadcastPanel({
       {project.extras && (
         <section className={styles.extras} aria-label="Programs">
           <div className={styles.stripHead}>
-            <span>[ Programs ]</span>
+            <span>[ Programs vignettes ]</span>
             <span>Sound on</span>
           </div>
           <div className={styles.extrasGrid}>

@@ -39,26 +39,6 @@ const INDEX_TODO = {
  */
 export const WORKS: Work[] = [
   {
-    id: "flamengo",
-    title: "Flamengo",
-    meta: "Motion design", // TODO(Miguel): client · year · role
-    preview: "/projects/flamengo-preview.mp4",
-    poster: "/projects/flamengo-poster.webp",
-    video: "/projects/flamengo.mp4",
-    hasAudio: false,
-    ...INDEX_TODO,
-  },
-  {
-    id: "palmeiras",
-    title: "Palmeiras",
-    meta: "Motion design", // TODO(Miguel): client · year · role
-    preview: "/projects/palmeiras-preview.mp4",
-    poster: "/projects/palmeiras-poster.webp",
-    video: "/projects/palmeiras.mp4",
-    hasAudio: false,
-    ...INDEX_TODO,
-  },
-  {
     id: "vini-jr-hala-madrid",
     title: "Vini Jr — Hala Madrid",
     meta: "Motion design", // TODO(Miguel): client · year · role
