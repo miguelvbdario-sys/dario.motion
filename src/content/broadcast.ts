@@ -205,7 +205,13 @@ export const BROADCAST: BroadcastProject[] = [
     role: "[Details]", // TODO: substituir
     year: "[Year]", // TODO: substituir
     desc: "[Project description]", // TODO: substituir
-    filters: placeholderFilters(),
+    // "About the project" is always the first tab; then these.
+    filters: [
+      { label: "Motion Branding", count: "[02]" },
+      { label: "Bora Copar", count: "[03]" },
+      { label: "Recopando", count: "[04]" },
+      { label: "Live", count: "[05]" },
+    ],
     fullVideo: null, // TODO: substituir
   },
   {
