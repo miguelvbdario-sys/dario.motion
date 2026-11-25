@@ -135,7 +135,7 @@ export default function Timeline() {
           <div ref={head} className={styles.playhead} aria-hidden="true" />
         </nav>
       </div>
-      {/* Phones: back to the top, only once the page has been scrolled to the end. */}
+      {/* Back to the top (phones and desktop), only once the page has been scrolled to the end. */}
       <button
         type="button"
         className={styles.toTop}
