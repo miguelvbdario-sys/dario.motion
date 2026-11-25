@@ -621,7 +621,7 @@ export default function BroadcastPanel({
           {kind === "mascots" && <BroadcastMascots />}
           {kind === "process" && <BroadcastProcess active={live} />}
           {kind === "youtube" && (
-            <div className={styles.preview}>
+            <div className={styles.preview} data-zoom-soft>
               {live ? (
                 <iframe
                   className={styles.previewFrame}

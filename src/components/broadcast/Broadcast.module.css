@@ -2816,6 +2816,11 @@
     scale: 1.5;
   }
 
+  /* The LIVE (YouTube) player: just a touch. */
+  .preview[data-zoom-soft]:hover {
+    scale: 1.03;
+  }
+
   .aboutPoints > li:hover {
     background: #efeeee;
     color: #111;
