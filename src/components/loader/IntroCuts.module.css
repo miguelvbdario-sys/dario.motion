@@ -43,7 +43,7 @@
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .name {
     font-size: 24vw;
-    line-height: 0.84;
+    line-height: 1.05;
   }
 
   /* ".name span" (inline-block) outranked a plain ".space", so the break never
