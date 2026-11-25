@@ -296,3 +296,24 @@
     animation: none;
   }
 }
+
+/* Hover zoom on the tiles, like the other media in the cards. */
+.cell,
+.vertical {
+  transition: scale 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover,
+  .vertical:hover {
+    z-index: 2;
+    scale: 1.04;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cell,
+  .vertical {
+    transition: none;
+  }
+}
