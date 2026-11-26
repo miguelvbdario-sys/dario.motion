@@ -105,12 +105,18 @@ export class FrameSequence {
     }
   }
 
+  /**
+   * Next frame to download: first a coarse pass (every COARSE-th frame, closest
+   * first), so the whole range scrubs early on a slow connection, then the
+   * frames in between, closest to the requested one first.
+   */
   private takeClosestPending() {
+    const coarseLeft = this.pending.some((f) => f % FrameSequence.COARSE === 0);
+    const cost = (f: number) =>
+      Math.abs(f - this.wanted) + (coarseLeft && f % FrameSequence.COARSE !== 0 && f !== this.wanted ? 1e6 : 0);
     let best = 0;
     for (let i = 1; i < this.pending.length; i++) {
-      if (Math.abs(this.pending[i] - this.wanted) < Math.abs(this.pending[best] - this.wanted)) {
-        best = i;
-      }
+      if (cost(this.pending[i]) < cost(this.pending[best])) best = i;
     }
     return this.pending.splice(best, 1)[0];
   }
@@ -146,6 +152,8 @@ export class FrameSequence {
     this.painted = frame;
     if (firstPaint) this.onReady?.();
   }
+
+  private static readonly COARSE = 6;
 
   private alphaMap: { frame: number; data: Uint8ClampedArray } | null = null;
   private static readonly ALPHA_SIZE = 96;

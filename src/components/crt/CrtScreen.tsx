@@ -104,6 +104,16 @@ export default function CrtScreen() {
       {/* Bulge off: the full-screen SVG backdrop filter cost ~2/3 of every frame
           (60 → 20 fps even on fast machines). Set CURVE = true to bring it back. */}
       {CURVE && map && <div className={styles.bulge} aria-hidden="true" />}
+      {/* Light curve: a static "pillow" screen silhouette (edges bowed out,
+          corners tucked in) and a soft glare on the glass. Drawn once by the
+          browser, no per-frame cost. Where to tweak: the path below and .glare. */}
+      <svg className={styles.shape} viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
+        <path
+          fillRule="evenodd"
+          d="M-20 -20H1020V1020H-20Z M14 20 Q500 -8 986 20 Q1008 500 986 980 Q500 1008 14 980 Q-8 500 14 20Z"
+        />
+      </svg>
+      <div className={styles.glare} aria-hidden="true" />
       <div className={styles.glass} aria-hidden="true" />
     </>
   );

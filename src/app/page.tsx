@@ -14,7 +14,7 @@ export default function Home() {
       <link
         rel="preload"
         as="image"
-        href="/sequence/hero-look/LOOK_049.webp"
+        href="/sequence/hero-look-960/LOOK_049.webp"
         media="(min-width: 768px) and (min-aspect-ratio: 751/1000)"
         fetchPriority="high"
       />

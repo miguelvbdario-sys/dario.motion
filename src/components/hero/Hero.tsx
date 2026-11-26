@@ -134,8 +134,9 @@ export default function Hero() {
       const stage = root.current;
       if (!stage || !headCanvas.current || !arrowCanvas.current) return;
 
-      // Phones get the lighter 720px frames.
-      const headFolder = window.matchMedia(COMPACT_QUERY).matches ? `${HEAD.folder}-720` : HEAD.folder;
+      // Phones get the 720px frames.
+      // Desktop: 960px frames (same look on screen as the 1256px masters, ~4x lighter).
+      const headFolder = `${HEAD.folder}-${window.matchMedia(COMPACT_QUERY).matches ? 720 : 960}`;
       const arrow = new FrameSequence({
         canvas: arrowCanvas.current,
         ...ARROW_FRAMES,
