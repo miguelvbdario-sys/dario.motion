@@ -110,7 +110,20 @@ export default function CrtScreen() {
       <svg className={styles.shape} viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
         <path
           fillRule="evenodd"
-          d="M-20 -20H1020V1020H-20Z M14 20 Q500 -8 986 20 Q1008 500 986 980 Q500 1008 14 980 Q-8 500 14 20Z"
+          d="M-20 -20H1020V1020H-20Z M18 26 Q500 -10 982 26 Q1010 500 982 974 Q500 1010 18 974 Q-10 500 18 26Z"
+        />
+        {/* Glass rim: a thin light line just inside the bowed edge, so the curve
+            reads on the black sections too (brighter at the top, like a reflection). */}
+        <defs>
+          <linearGradient id="crt-rim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stopColor="#fff" stopOpacity="0.32" />
+            <stop offset="0.5" stopColor="#fff" stopOpacity="0.1" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
+          </linearGradient>
+        </defs>
+        <path
+          className={styles.rim}
+          d="M22 30 Q500 -4 978 30 Q1004 500 978 970 Q500 1004 22 970 Q-4 500 22 30Z"
         />
       </svg>
       <div className={styles.glare} aria-hidden="true" />

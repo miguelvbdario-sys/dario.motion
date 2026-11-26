@@ -57,6 +57,14 @@
   z-index: 9001;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 60% 45% at 28% 18%, rgb(255 255 255 / 0.07), transparent 70%),
+    radial-gradient(ellipse 60% 45% at 28% 18%, rgb(255 255 255 / 0.11), transparent 70%),
     radial-gradient(ellipse 70% 60% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.28) 100%);
+}
+
+/* The glass rim line (stroke only; keeps 1.5px whatever the screen size). */
+.rim {
+  fill: none;
+  stroke: url(#crt-rim);
+  stroke-width: 1.5px;
+  vector-effect: non-scaling-stroke;
 }
