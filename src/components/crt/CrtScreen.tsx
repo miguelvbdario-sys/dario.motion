@@ -56,6 +56,13 @@ function barrelMap(width: number, height: number) {
   return { href: canvas.toDataURL("image/png"), scale };
 }
 
+/** The rim glow: copies of the screen edge stepping inwards, fading out. */
+const RIM = Array.from({ length: 12 }, (_, i) => {
+  const k = 4 + i * 2.2; // inset of this copy (viewBox units)
+  const x0 = 18 + k, x1 = 982 - k, y0 = 26 + k, y1 = 974 - k;
+  return `M${x0} ${y0} Q500 ${-10 + k} ${x1} ${y0} Q${1010 - k} 500 ${x1} ${y1} Q500 ${1010 - k} ${x0} ${y1} Q${-10 + k} 500 ${x0} ${y0}Z`;
+});
+
 export default function CrtScreen() {
   const [map, setMap] = useState<{ href: string; scale: number; w: number; h: number } | null>(null);
   const timer = useRef(0);
@@ -112,19 +119,21 @@ export default function CrtScreen() {
           fillRule="evenodd"
           d="M-20 -20H1020V1020H-20Z M18 26 Q500 -10 982 26 Q1010 500 982 974 Q500 1010 18 974 Q-10 500 18 26Z"
         />
-        {/* Glass rim: a thin light line just inside the bowed edge, so the curve
-            reads on the black sections too (brighter at the top, like a reflection). */}
+        {/* Glass rim: a soft white-to-transparent glow just inside the bowed
+            edge (stacked strokes, static vector, no filter), so the curve
+            reads on the black sections too. Brighter at the top. */}
         <defs>
           <linearGradient id="crt-rim" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="0.32" />
-            <stop offset="0.5" stopColor="#fff" stopOpacity="0.1" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0.2" />
+            <stop offset="0" stopColor="#fff" stopOpacity="1" />
+            <stop offset="0.5" stopColor="#fff" stopOpacity="0.35" />
+            <stop offset="1" stopColor="#fff" stopOpacity="0.7" />
           </linearGradient>
         </defs>
-        <path
-          className={styles.rim}
-          d="M22 30 Q500 -4 978 30 Q1004 500 978 970 Q500 1004 22 970 Q-4 500 22 30Z"
-        />
+        <g className={styles.rim}>
+          {RIM.map((d, i) => (
+            <path key={i} d={d} style={{ opacity: 0.09 * (1 - i / RIM.length) }} />
+          ))}
+        </g>
       </svg>
       <div className={styles.glare} aria-hidden="true" />
       <div className={styles.glass} aria-hidden="true" />
