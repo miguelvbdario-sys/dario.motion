@@ -5,6 +5,7 @@ import { TEAMS } from "@/content/scoreboard";
 import { CrestGrid } from "./BroadcastScoreboard";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * SHIELDS tab (Paulistão card): pick a crest in the grid and its animation
  * plays in the square on the right, in a loop: on the last (still) frame it
@@ -23,6 +24,7 @@ const animSrc = (slug: string, keyframes: boolean) =>
 const label = (slug: string) => TEAMS.find((t) => t.slug === slug)?.label ?? slug;
 
 export default function BroadcastShields({ active }: { active: boolean }) {
+  const t = useT();
   const [team, setTeam] = useState(TEAMS[0].slug);
   const [keyframes, setKeyframes] = useState(false);
   const video = useRef<HTMLVideoElement>(null);
@@ -65,7 +67,7 @@ export default function BroadcastShields({ active }: { active: boolean }) {
   return (
     <div className={styles.shields}>
       <div className={styles.boardSide}>
-        <p className={styles.sideLabel}>[ Shields ] Pick a crest</p>
+        <p className={styles.sideLabel}>{t("[ Shields ] Pick a crest")}</p>
         <CrestGrid side="home" team={team} busy={false} onTeam={setTeam} />
         <p className={styles.sideLabel}>{label(team)}</p>
       </div>
@@ -94,7 +96,7 @@ export default function BroadcastShields({ active }: { active: boolean }) {
             onClick={() => setKeyframes((k) => !k)}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel}>See keyframes</span>
+            <span className={styles.filterLabel}>{t("See keyframes")}</span>
           </button>
         </div>
       </div>

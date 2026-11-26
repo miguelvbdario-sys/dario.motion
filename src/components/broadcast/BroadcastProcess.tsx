@@ -1,7 +1,10 @@
+"use client";
+
 import { PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import BroadcastTrophy from "./BroadcastTrophy";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * PROCESS tab (Paulistão card): how the package was made, in short steps.
  * Static (the 3D trophy is the only interactive piece). Edit the copy here.
@@ -130,6 +133,7 @@ function StepBody({ s, i }: { s: (typeof STEPS)[number]; i: number }) {
 }
 
 export default function BroadcastProcess({ active }: { active: boolean }) {
+  const t = useT();
   return (
     <div className={styles.process}>
       <div className={styles.processSide}>
@@ -144,12 +148,12 @@ export default function BroadcastProcess({ active }: { active: boolean }) {
           {/* Full-width row under the four stats. */}
           <div className={styles.processTeam}>
             <dd>6</dd>
-            <dt>Member team</dt>
+            <dt>{t("Member team")}</dt>
           </div>
         </dl>
         {/* On air: the four broadcasters, 2 × 2 under the stats. */}
         <div className={styles.processChannels}>
-          <span className={styles.sideLabel}>[ On air ]</span>
+          <span className={styles.sideLabel}>{t("[ On air ]")}</span>
           {CHANNELS.map((c) => (
             <span key={c} className={styles.processChannel}>
               {c}
@@ -160,7 +164,7 @@ export default function BroadcastProcess({ active }: { active: boolean }) {
 
       <div className={styles.processMain}>
         <p className={styles.processLead}>
-          Three months of production, from the first sheet to the final whistle.
+          {t("Three months of production, from the first sheet to the final whistle.")}
         </p>
         <ol className={styles.processSteps}>
           {STEPS.slice(0, -2).map((s, i) => (

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Course from "@/components/course/Course";
+import { LangProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   title: "Motion Pro — Curso de After Effects | Miguel Dario",
@@ -8,5 +9,10 @@ export const metadata: Metadata = {
 };
 
 export default function CoursePage() {
-  return <Course />;
+  // The course is written in Portuguese: PT is its default language.
+  return (
+    <LangProvider source="pt">
+      <Course />
+    </LangProvider>
+  );
 }

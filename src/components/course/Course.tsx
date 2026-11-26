@@ -6,10 +6,12 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { ArrowLeft, ArrowRight, Plus, Play } from "lucide-react";
-import { COURSE } from "@/content/course";
+import { COURSE as COURSE_SRC } from "@/content/course";
+import { useT, useTr } from "@/lib/i18n";
 import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import styles from "./Course.module.css";
+import LangSwitch from "@/components/lang/LangSwitch";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -148,6 +150,9 @@ function FaqItem({ q, a, open, onToggle, i }: { q: string; a: string; open: bool
 }
 
 export default function Course() {
+  // Course text in the current language (written in PT; EN from src/content/en.ts).
+  const COURSE = useTr(COURSE_SRC);
+  const t = useT();
   const root = useRef<HTMLElement>(null);
   const [playing, setPlaying] = useState<Work | null>(null);
   const [faqOpen, setFaqOpen] = useState(0);
@@ -207,9 +212,12 @@ export default function Course() {
           dario.motion
         </a>
         <Image src={COURSE.logo.src} alt="Motion Pro" width={COURSE.logo.width} height={COURSE.logo.height} className={styles.topLogo} priority />
-        <a href={COURSE.checkout} target="_blank" rel="noopener noreferrer" className={styles.topCta}>
-          Garantir vaga
-        </a>
+        <div className={styles.topRight}>
+          <LangSwitch className={styles.langSwitch} />
+          <a href={COURSE.checkout} target="_blank" rel="noopener noreferrer" className={styles.topCta}>
+            {t("Garantir vaga")}
+          </a>
+        </div>
       </header>
 
       {/* ---------- Hero ---------- */}
@@ -247,10 +255,10 @@ export default function Course() {
           }
         >
           <Loop src={hero.video.loop} poster={hero.video.poster} />
-          <span className={styles.videoLabel}>Preview · Loop</span>
+          <span className={styles.videoLabel}>{t("Preview · Loop")}</span>
           <span className={styles.playBadge}>
             <Play aria-hidden="true" strokeWidth={2.5} />
-            Assistir com som
+            {t("Assistir com som")}
           </span>
         </button>
       </section>
@@ -262,7 +270,7 @@ export default function Course() {
 
       {/* ---------- Modules ---------- */}
       <section className={styles.block} aria-labelledby="modules-title">
-        <p className={styles.label}>[ Conteúdo ]</p>
+        <p className={styles.label}>{t("[ Conteúdo ]")}</p>
         <h2 id="modules-title" className={styles.title} data-rise>
           {modules.title}
         </h2>
@@ -290,7 +298,7 @@ export default function Course() {
                   <video src={m.video} poster={m.poster} muted loop playsInline preload="metadata" aria-hidden="true" />
                 </div>
                 <div className={styles.moduleHead}>
-                  <span className={styles.label}>[ Módulo ]</span>
+                  <span className={styles.label}>{t("[ Módulo ]")}</span>
                   <span className={styles.moduleNum}>{pad(mi + 1)}</span>
                 </div>
                 <ol className={styles.lessons}>
@@ -310,7 +318,7 @@ export default function Course() {
 
       {/* ---------- Offer ---------- */}
       <section className={styles.block} aria-labelledby="offer-title">
-        <p className={styles.label}>[ Inclui ]</p>
+        <p className={styles.label}>{t("[ Inclui ]")}</p>
         <h2 id="offer-title" className={styles.title} data-rise>
           {offer.title}
         </h2>
@@ -329,10 +337,10 @@ export default function Course() {
       <section className={styles.split} aria-labelledby="projects-title">
         <div className={styles.splitMedia} data-rise>
           <Loop src={projects.video.src} poster={projects.video.poster} />
-          <span className={styles.videoLabel}>Projetos · Loop</span>
+          <span className={styles.videoLabel}>{t("Projetos · Loop")}</span>
         </div>
         <div className={styles.splitText}>
-          <p className={styles.label}>[ Na prática ]</p>
+          <p className={styles.label}>{t("[ Na prática ]")}</p>
           <h2 id="projects-title" className={styles.title} data-rise>
             {projects.title}
           </h2>
@@ -378,14 +386,14 @@ export default function Course() {
               {pitch.cta}
               <ArrowRight aria-hidden="true" strokeWidth={2.5} />
             </a>
-            <p className={styles.payment}>{pitch.payment} · 7 dias de garantia</p>
+            <p className={styles.payment}>{pitch.payment} · {t("7 dias de garantia")}</p>
           </div>
         </div>
       </section>
 
       {/* ---------- Testimonials ---------- */}
       <section className={styles.block} aria-labelledby="test-title">
-        <p className={styles.label}>[ Depoimentos ]</p>
+        <p className={styles.label}>{t("[ Depoimentos ]")}</p>
         <h2 id="test-title" className={styles.title} data-rise>
           {testimonials.title}
         </h2>
@@ -408,7 +416,7 @@ export default function Course() {
 
       {/* ---------- Lesson clips ---------- */}
       <section className={styles.block} aria-labelledby="lessons-title">
-        <p className={styles.label}>[ Aulas ]</p>
+        <p className={styles.label}>{t("[ Aulas ]")}</p>
         <h2 id="lessons-title" className={styles.title} data-rise>
           {lessons.title}
         </h2>
@@ -429,7 +437,7 @@ export default function Course() {
           <img src={lessons.video.poster} alt="" width={1280} height={720} loading="lazy" />
           <span className={styles.playBadge}>
             <Play aria-hidden="true" strokeWidth={2.5} />
-            Assistir trechos
+            {t("Assistir trechos")}
           </span>
         </button>
       </section>
@@ -440,7 +448,7 @@ export default function Course() {
           <Image src={mentor.photo.src} alt="Miguel Dario" width={mentor.photo.width} height={mentor.photo.height} sizes="(max-width: 767px) 60vw, 280px" />
         </div>
         <div className={styles.splitText}>
-          <p className={styles.label}>[ Mentor ]</p>
+          <p className={styles.label}>{t("[ Mentor ]")}</p>
           <h2 id="mentor-title" className={styles.title} data-rise>
             {mentor.title}
           </h2>
@@ -454,7 +462,7 @@ export default function Course() {
 
       {/* ---------- FAQ ---------- */}
       <section className={styles.block} aria-labelledby="faq-title">
-        <p className={styles.label}>[ FAQ ]</p>
+        <p className={styles.label}>{t("[ FAQ ]")}</p>
         <h2 id="faq-title" className={styles.title} data-rise>
           {faq.title}
         </h2>
@@ -482,7 +490,7 @@ export default function Course() {
         {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
         <a href="/" className={styles.footBack}>
           <ArrowLeft aria-hidden="true" strokeWidth={2} />
-          Voltar ao portfólio
+          {t("Voltar ao portfólio")}
         </a>
       </section>
 

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import type Lenis from "lenis";
 import styles from "./Timeline.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * Scroll progress drawn like an After Effects timeline: a timecode on the left
  * (the page "plays" at 30 fps, one frame every FRAME_PX of scroll), a track
@@ -37,6 +38,7 @@ const timecode = (frames: number) => {
 };
 
 export default function Timeline() {
+  const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const head = useRef<HTMLDivElement>(null);
   const fill = useRef<HTMLDivElement>(null);
@@ -129,7 +131,7 @@ export default function Timeline() {
               onClick={() => go(m.id)}
               aria-label={`Go to ${m.label}`}
             >
-              <span className={styles.markerLabel}>{m.label}</span>
+              <span className={styles.markerLabel}>{t(m.label)}</span>
             </button>
           ))}
           <div ref={head} className={styles.playhead} aria-hidden="true" />

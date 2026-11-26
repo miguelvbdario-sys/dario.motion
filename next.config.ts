@@ -5,6 +5,22 @@ const nextConfig: NextConfig = {
   // Tailscale (private network between your devices): 100.x addresses and *.ts.net names.
   allowedDevOrigins: ["192.168.*.*", "10.*.*.*", "100.*.*.*", "**.ts.net"],
   cacheComponents: true,
+  // Basic protection headers on every page (no visual effect):
+  // no framing by other sites, no MIME sniffing, a short referrer, no camera/mic/location.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Content-Security-Policy", value: "frame-ancestors 'none'" },
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+        ],
+      },
+    ];
+  },
   partialPrefetching: true,
   turbopack: {
     rules: {

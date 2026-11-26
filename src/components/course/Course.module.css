@@ -1005,3 +1005,25 @@
 .factsWrap .facts li:hover .factIndex {
   color: var(--bg);
 }
+/* Top right: EN / PT switch (course violet) beside the CTA. */
+.topRight {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.topRight .langSwitch {
+  --switch-color: var(--violet);
+}
+
+@media (max-width: 767px) {
+  .topRight {
+    gap: 8px;
+  }
+  .topRight .langSwitch {
+    width: 76px;
+    height: 30px;
+    font-size: 11px;
+  }
+}

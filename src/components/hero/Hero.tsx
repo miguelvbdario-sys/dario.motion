@@ -13,6 +13,7 @@ import { onLoaded } from "@/lib/loader";
 import PixelTrail from "./PixelTrail";
 import styles from "./Hero.module.css";
 
+import { useT } from "@/lib/i18n";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // three.js only loads in the browser, after the hero text has painted.
@@ -22,7 +23,7 @@ const Emblem = dynamic(() => import("./Emblem"), { ssr: false });
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 /**
- * Head sequence folder (/sequence/hero-look, phones: hero-look-720) and the
+ * Head sequence folder (/sequence/hero-look-960, phones: hero-look-720; 1256px masters in D:/_SITE MASTERS) and the
  * length of the scroll scrub in playhead steps (also drives the arrow).
  */
 const HEAD = { folder: "hero-look", last: 65 };
@@ -95,6 +96,7 @@ const pad = (frame: number) => String(frame).padStart(3, "0");
 const at = (position: string) => ({ "--at": position }) as CSSProperties;
 
 export default function Hero() {
+  const t = useT();
   const root = useRef<HTMLElement>(null);
   const headCanvas = useRef<HTMLCanvasElement>(null);
   const arrowCanvas = useRef<HTMLCanvasElement>(null);
@@ -475,7 +477,7 @@ export default function Hero() {
                   target={external ? "_blank" : undefined}
                   rel={external ? "noopener noreferrer" : undefined}
                 >
-                  {pill.label}
+                  {t(pill.label)}
                 </a>
               );
             })}

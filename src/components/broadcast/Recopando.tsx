@@ -6,6 +6,7 @@ import styles from "./Recopando.module.css";
 import { Lightbox } from "./Showcase";
 import Marked from "@/components/effects/Marked";
 
+import { useT } from "@/lib/i18n";
 /** Intro text at the top of the tab (where to change it). */
 const INTRO =
   "Recopando replays the most memorable matches from past World Cups. The vignette is all about ==nostalgia==: a typical Brazilian bedroom from the 90s to the 00s, with the CRT TV and the PS2.";
@@ -32,6 +33,7 @@ const WIRE: Decade = "00s";
 const VIEW = { side: 0.15, up: 0.32, back: 0.95, lift: 0.12 };
 
 function Compare({ decade, active }: { decade: Decade; active: boolean }) {
+  const t = useT();
   const box = useRef<HTMLDivElement>(null);
   const main = useRef<HTMLVideoElement>(null);
   const wire = useRef<HTMLVideoElement>(null);
@@ -101,8 +103,8 @@ function Compare({ decade, active }: { decade: Decade; active: boolean }) {
           <span className={styles.handle} aria-hidden="true">
             <span>‹ ›</span>
           </span>
-          <span className={`${styles.tag} ${styles.tagLeft}`}>Final render</span>
-          <span className={`${styles.tag} ${styles.tagRight}`}>Blender wireframe</span>
+          <span className={`${styles.tag} ${styles.tagLeft}`}>{t("Final render")}</span>
+          <span className={`${styles.tag} ${styles.tagRight}`}>{t("Blender wireframe")}</span>
         </>
       )}
     </div>
@@ -110,6 +112,7 @@ function Compare({ decade, active }: { decade: Decade; active: boolean }) {
 }
 
 function Scene3D({ active }: { active: boolean }) {
+  const t = useT();
   const host = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"idle" | "loading" | "ready">("idle");
 
@@ -219,20 +222,21 @@ function Scene3D({ active }: { active: boolean }) {
   return (
     <div className={styles.scene} data-cursor="drag" data-lenis-prevent>
       <div ref={host} className={styles.canvas} />
-      {state !== "ready" && <span className={styles.loading}>Loading the 3D scene…</span>}
-      <span className={`${styles.tag} ${styles.tagLeft}`}>Blender scene · 00s</span>
-      <span className={styles.hint}>Drag to rotate · scroll to zoom</span>
+      {state !== "ready" && <span className={styles.loading}>{t("Loading the 3D scene…")}</span>}
+      <span className={`${styles.tag} ${styles.tagLeft}`}>{t("Blender scene · 00s")}</span>
+      <span className={styles.hint}>{t("Drag to rotate · scroll to zoom")}</span>
     </div>
   );
 }
 
 export default function Recopando({ active }: { active: boolean }) {
+  const t = useT();
   const [decade, setDecade] = useState<Decade>(WIRE);
   const [full, setFull] = useState(false);
   return (
     <div className={styles.root}>
       <p className={`${styles.note} ${styles.intro}`}>
-        <Marked text={INTRO} />
+        <Marked text={t(INTRO)} />
       </p>
       <Compare decade={decade} active={active} />
       {full && <Lightbox base={`${BASE}/vinheta-${decade}-full`} sound onClose={() => setFull(false)} />}
@@ -263,7 +267,7 @@ export default function Recopando({ active }: { active: boolean }) {
       {/* Desktop: the text on the left (right-aligned), the 3D scene on 60% of the width. */}
       <div className={styles.sceneRow}>
         <p className={styles.note}>
-          Everything in the vignette was composed and animated in Blender: the room, the TVs, the PS2, the trophies.
+          {t("Everything in the vignette was composed and animated in Blender: the room, the TVs, the PS2, the trophies.")}
         </p>
         <Scene3D active={active} />
       </div>

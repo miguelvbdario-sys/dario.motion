@@ -7,6 +7,7 @@ import type Lenis from "lenis";
 import type { Work } from "@/content/works";
 import styles from "./WorkPlayer.module.css";
 
+import { useT } from "@/lib/i18n";
 type WorkPlayerProps = {
   work: Work | null;
   onClose: () => void;
@@ -41,6 +42,7 @@ const originOf = (box: HTMLElement, origin: HTMLElement | null | undefined) => {
  * shrink the content instead of cutting.
  */
 export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
+  const t = useT();
   const dialog = useRef<HTMLDialogElement>(null);
   const inner = useRef<HTMLDivElement>(null);
   const video = useRef<HTMLVideoElement>(null);
@@ -187,14 +189,14 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
                 course videos don't). Placeholders until they are filled in. */}
             {(work.role || work.year) && (
             <aside className={styles.playerIndex} aria-label="Index">
-              <p className={styles.playerIndexLabel}>[ Index ]</p>
+              <p className={styles.playerIndexLabel}>{t("[ Index ]")}</p>
               <dl className={styles.playerIndexRows}>
                 <div>
-                  <dt>Details</dt>
+                  <dt>{t("Details")}</dt>
                   <dd>{work.role ?? "[Details]"}</dd>
                 </div>
                 <div>
-                  <dt>Year</dt>
+                  <dt>{t("Year")}</dt>
                   <dd>{work.year ?? "[Year]"}</dd>
                 </div>
               </dl>

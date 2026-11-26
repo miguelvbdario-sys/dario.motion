@@ -18,6 +18,7 @@ import { FOCUS_AT } from "./focus";
 import WordReveal from "@/components/effects/WordReveal";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
@@ -139,6 +140,7 @@ function ScreenSwipe({
   /** The screen's live examples: always between the screen and its title. */
   extras?: React.ReactNode;
 }) {
+  const t = useT();
   const view = useRef<HTMLDivElement>(null);
   const track = useRef<HTMLDivElement>(null);
   const title = useRef<HTMLDivElement>(null);
@@ -230,7 +232,7 @@ function ScreenSwipe({
           center ? (
             assets
           ) : (
-            <div className={styles.swipeAssetsCard}>All assets &gt;</div>
+            <div className={styles.swipeAssetsCard}>{t("All assets &gt;")}</div>
           )
         ) : sc.video ? (
           // Neighbours show their first frame (#t) and only play while sliding.
@@ -333,6 +335,7 @@ export default function BroadcastPanel({
   near: boolean;
   onPlay: (work: Work, origin: HTMLElement) => void;
 }) {
+  const t = useT();
   // Chosen video / filter; -1 = the "About the project" tab (where cards open).
   /** Classic layout (no "About the project" tab): videos tabs + preview beside the Index. */
   const classic = !!project.classic && !project.sections;
@@ -471,23 +474,23 @@ export default function BroadcastPanel({
 
   const index = (
     <div className={styles.index}>
-      <p className={styles.indexLabel}>[ Index ]</p>
+      <p className={styles.indexLabel}>{t("[ Index ]")}</p>
       <dl className={styles.indexRows}>
         <div>
-          <dt data-scramble>Client</dt>
+          <dt data-scramble>{t("Client")}</dt>
           <dd>{project.client}</dd>
         </div>
         <div>
-          <dt data-scramble>Details</dt>
+          <dt data-scramble>{t("Details")}</dt>
           <dd>{project.role}</dd>
         </div>
         <div>
-          <dt data-scramble>Year</dt>
+          <dt data-scramble>{t("Year")}</dt>
           <dd>{project.year}</dd>
         </div>
         {project.team && (
           <div>
-            <dt data-scramble>Team</dt>
+            <dt data-scramble>{t("Team")}</dt>
             <dd>{project.team}</dd>
           </div>
         )}
@@ -579,7 +582,7 @@ export default function BroadcastPanel({
         {!ab?.noIndex && index}
         {ab?.channels && (
           <div className={styles.aboutChannels}>
-            <span className={styles.sideLabel}>[ On air ]</span>
+            <span className={styles.sideLabel}>{t("[ On air ]")}</span>
             {ab.channels.map((c) => (
               <span key={c} className={styles.processChannel}>
                 {c}
@@ -594,7 +597,7 @@ export default function BroadcastPanel({
           {/* Desktop: jump to the Scoreboard tab (phones show the board right below). */}
           {!compact && boardTab >= 0 && (
             <button type="button" className={styles.aboutCta} onClick={discoverBoard}>
-              [ Discover the scoreboard ]
+              {t("[ Discover the scoreboard ]")}
             </button>
           )}
         </div>
@@ -664,7 +667,7 @@ export default function BroadcastPanel({
             <div className={styles.shields}>
               {/* Vertical list of screens on the left, the chosen one on the right. */}
               {!compact && <div className={styles.boardSide}>
-                <p className={styles.sideLabel}>[ Screens ] Pick a screen</p>
+                <p className={styles.sideLabel}>{t("[ Screens ] Pick a screen")}</p>
                 <div className={styles.screenList} role="radiogroup" aria-label="Broadcast screens">
                   {screens.map((s, i) => (
                     <button
@@ -826,9 +829,9 @@ export default function BroadcastPanel({
       </div>
 
       <div className={styles.labels}>
-        <span data-scramble>[ Broadcast ]</span>
+        <span data-scramble>{t("[ Broadcast ]")}</span>
         <span data-scramble>{project.meta}</span>
-        <span data-scramble>Live</span>
+        <span data-scramble>{t("Live")}</span>
         <span data-scramble>{project.year}</span>
       </div>
 
@@ -927,7 +930,7 @@ export default function BroadcastPanel({
       {project.onAir && (
         <section className={styles.onAir} aria-label="On air">
           <div className={styles.stripHead}>
-            <span>[ On air ] 24h live stream</span>
+            <span>{t("[ On air ] 24h live stream")}</span>
             <span>{pad(project.onAir.length)} loops</span>
           </div>
           <div className={styles.onAirGrid}>
@@ -945,8 +948,8 @@ export default function BroadcastPanel({
       {project.extras && (
         <section className={styles.extras} aria-label="Programs">
           <div className={styles.stripHead}>
-            <span>[ Programs vignettes ]</span>
-            <span>Sound on</span>
+            <span>{t("[ Programs vignettes ]")}</span>
+            <span>{t("Sound on")}</span>
           </div>
           <div className={styles.extrasGrid}>
             {project.extras.map((x) => (

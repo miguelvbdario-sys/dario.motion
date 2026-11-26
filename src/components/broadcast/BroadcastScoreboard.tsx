@@ -6,6 +6,7 @@ import { DEFAULT_AWAY, DEFAULT_HOME, SCOREBOARD_CROP, SCOREBOARD_FPS, TEAMS } fr
 import { ScoreboardEngine, type BoardStatus, type ShieldState, type Side } from "@/lib/scoreboardEngine";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * The interactive scoreboard, inside the PAULISTÃO BROADCAST card.
  * Same engine and rules as before (src/lib/scoreboardEngine.ts): IN/OUT, team
@@ -145,6 +146,7 @@ export function TeamSelect({
 }
 
 export default function BroadcastScoreboard({ active }: { active: boolean }) {
+  const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const engine = useRef<ScoreboardEngine | null>(null);
@@ -243,7 +245,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
       <div className={styles.boardReadouts}>
         <span aria-live="polite">
           <span className={styles.statusDot} data-status={status} aria-hidden="true" />
-          {ready ? STATUS_TEXT[status] : active ? "Loading…" : "Standby"}
+          {t(ready ? STATUS_TEXT[status] : active ? "Loading…" : "Standby")}
         </span>
         <span aria-hidden="true">
           TC <span ref={tcRef}>00:00:00:00</span>
@@ -259,7 +261,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
       <div className={styles.boardLayout}>
         {/* Home: crest grid + goal. */}
         <div className={styles.boardSide} data-side="home">
-          <p className={styles.sideLabel}>[ Home ]</p>
+          <p className={styles.sideLabel}>{t("[ Home ]")}</p>
           <CrestGrid side="home" team={home} busy={busy !== null} onTeam={(s) => changeTeam("home", s)} />
           <TeamSelect side="home" team={home} busy={busy !== null} onTeam={(s) => changeTeam("home", s)} />
           <button
@@ -269,7 +271,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             disabled={!goalEnabled}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel} aria-label="Goal home">Click to score</span>
+            <span className={styles.filterLabel} aria-label="Goal home">{t("Click to score")}</span>
             <span className={styles.count}>[{pad(score.home)}]</span>
           </button>
         </div>
@@ -277,7 +279,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
         {/* Centre: the board (half the width) and the program controls. */}
         <div className={styles.boardCentre}>
           {/* Invitation, right above the board. */}
-          <p className={`${styles.sideLabel} ${styles.boardPrompt}`}>[ Choose your team and score the goal ]</p>
+          <p className={`${styles.sideLabel} ${styles.boardPrompt}`}>{t("[ Choose your team and score the goal ]")}</p>
           <div className={styles.boardFrame}>
             <canvas
               ref={canvas}
@@ -303,7 +305,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
                 <span className={styles.goLiveRing} aria-hidden="true" />
                 <span className={styles.goLiveRing} aria-hidden="true" />
                 <span className={styles.goLiveDot} aria-hidden="true" />
-                {ready ? "Click here" : "Loading…"}
+                {t(ready ? "Click here" : "Loading…")}
               </button>
             </div>
           </div>
@@ -330,7 +332,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
               disabled={!ready || !onAir}
             >
               <span className={styles.square} aria-hidden="true" />
-              <span className={styles.filterLabel}>Out</span>
+              <span className={styles.filterLabel}>{t("Out")}</span>
             </button>
             <button
               type="button"
@@ -342,14 +344,14 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
               disabled={!ready || !canShield}
             >
               <span className={styles.square} aria-hidden="true" />
-              <span className={styles.filterLabel}>Shield mode</span>
+              <span className={styles.filterLabel}>{t("Shield mode")}</span>
             </button>
           </div>
         </div>
 
         {/* Away: crest grid + goal. */}
         <div className={styles.boardSide} data-side="away">
-          <p className={styles.sideLabel}>[ Away ]</p>
+          <p className={styles.sideLabel}>{t("[ Away ]")}</p>
           <CrestGrid side="away" team={away} busy={busy !== null} onTeam={(s) => changeTeam("away", s)} />
           <TeamSelect side="away" team={away} busy={busy !== null} onTeam={(s) => changeTeam("away", s)} />
           <button
@@ -359,7 +361,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             disabled={!goalEnabled}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel} aria-label="Goal away">Click to score</span>
+            <span className={styles.filterLabel} aria-label="Goal away">{t("Click to score")}</span>
             <span className={styles.count}>[{pad(score.away)}]</span>
           </button>
         </div>

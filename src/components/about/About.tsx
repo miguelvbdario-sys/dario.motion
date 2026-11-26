@@ -1,5 +1,8 @@
+"use client";
+
 import Image from "next/image";
-import { ABOUT } from "@/content/about";
+import { ABOUT as ABOUT_SRC } from "@/content/about";
+import { useTr } from "@/lib/i18n";
 import BoxReveal from "./BoxReveal";
 import CircleText from "./CircleText";
 import ContactButton from "./ContactButton";
@@ -11,6 +14,7 @@ import styles from "./About.module.css";
  * Photo and text rise in when the scroll transition before it (AboutIntro) ends.
  */
 export default function About() {
+  const ABOUT = useTr(ABOUT_SRC);
   return (
     <section id="about" className={styles.section} aria-labelledby="about-title">
       <h2 id="about-title" className={styles.srOnly}>

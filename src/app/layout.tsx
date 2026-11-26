@@ -7,6 +7,7 @@ import CustomCursor from "@/components/cursor/CustomCursor";
 import CrtScreen from "@/components/crt/CrtScreen";
 import Effects from "@/components/effects/Effects";
 import { SITE, SITE_URL } from "@/lib/site";
+import { LangProvider } from "@/lib/i18n";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -56,7 +57,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <noscript>
           <style>{`[data-reveal],[data-word],[data-head],[data-vline],[data-hline],[data-mark]{opacity:1!important}`}</style>
         </noscript>
-        <SmoothScroll>{children}</SmoothScroll>
+        <LangProvider>
+          <SmoothScroll>{children}</SmoothScroll>
+        </LangProvider>
         <CrtScreen />
         <CustomCursor />
         {/* Magnetic buttons and decoding labels. */}

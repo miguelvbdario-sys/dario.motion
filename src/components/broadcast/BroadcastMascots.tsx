@@ -5,6 +5,7 @@ import { TEAMS } from "@/content/scoreboard";
 import { TeamSelect } from "./BroadcastScoreboard";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * MASCOTS tab (Paulistão card): "Make the mascot break the goal". Every team's
  * goal animation, cropped to a thin band so all fit at once. Moving the mouse
@@ -30,6 +31,7 @@ const SWIPE_SCROLL = 10;
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
 
 function MascotRow({ slug, label }: { slug: string; label: string }) {
+  const t = useT();
   const video = useRef<HTMLVideoElement>(null);
   const track = useRef<HTMLInputElement>(null);
   const dragging = useRef(false);
@@ -137,7 +139,7 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
         />
         <span className={styles.mascotName}>{label}</span>
         <span className={styles.mascotHint} data-hidden={used || undefined} aria-hidden="true">
-          Drag <span>→</span>
+          {t("Drag")} <span>→</span>
         </span>
       </div>
       <label className={styles.mascotSlider}>
@@ -158,6 +160,7 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
 }
 
 export default function BroadcastMascots() {
+  const t = useT();
   // Phones: one goal at a time, picked from a team list (starts on the first).
   const [compact, setCompact] = useState(false);
   const [team, setTeam] = useState(TEAMS[0].slug);
@@ -171,7 +174,7 @@ export default function BroadcastMascots() {
   const shown = compact ? TEAMS.filter((t) => t.slug === team) : TEAMS;
   return (
     <div className={styles.mascots}>
-      <p className={styles.mascotsTitle}>Make the mascot break the goal</p>
+      <p className={styles.mascotsTitle}>{t("Make the mascot break the goal")}</p>
       <p className={styles.sideLabel}>
         {compact ? "[ Drag ] Slide the card left ↔ right to play and rewind" : "[ Hover ] Move across a card left ↔ right to play and rewind"}
       </p>

@@ -2786,6 +2786,7 @@
 
 /* Marquee strip at the top of the section, with room before the list. */
 .marqueeWrap {
+  position: relative;
   /* Room for the character's hands hanging below the strip. */
   margin-bottom: calc(var(--s) * 110);
 }
@@ -2868,4 +2869,19 @@
 /* Phones, Paris: the Index as the last block of the card. */
 .indexLast {
   margin-top: 16px;
+}
+
+/* EN / PT switch under the strip, right side (above the BROADCAST title). */
+.marqueeWrap .langSwitch {
+  position: absolute;
+  top: calc(100% + var(--s) * 28);
+  right: calc(var(--s) * 64);
+  z-index: 3;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .marqueeWrap .langSwitch {
+    top: calc(100% + 20px);
+    right: 20px;
+  }
 }

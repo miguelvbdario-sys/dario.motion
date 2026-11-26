@@ -5,6 +5,7 @@ import styles from "./MotionBranding.module.css";
 import Showcase, { Lightbox } from "./Showcase";
 import Marked from "@/components/effects/Marked";
 
+import { useT } from "@/lib/i18n";
 /*
  * MOTION BRANDING tab (2026 World Cup card).
  *
@@ -22,6 +23,7 @@ const TEXT =
 const APPLIED = ["quadro-1", "quadro-2", "quadro-3", "quadro-4", "transicao"].map((n) => `${BASE}/${n}`);
 
 export default function MotionBranding({ active, compact }: { active: boolean; compact: boolean }) {
+  const t = useT();
   const video = useRef<HTMLVideoElement>(null);
   const [full, setFull] = useState(false);
 
@@ -38,7 +40,7 @@ export default function MotionBranding({ active, compact }: { active: boolean; c
       <div className={styles.intro}>
         <div className={styles.copy}>
           <p className={styles.text}>
-            <Marked text={TEXT} />
+            <Marked text={t(TEXT)} />
           </p>
           {/* Identity assets: the paint wipe on the chair, the trophy turning to wireframe and back. */}
           <div className={styles.assets} aria-hidden="true">
@@ -68,14 +70,14 @@ export default function MotionBranding({ active, compact }: { active: boolean; c
             disablePictureInPicture
             aria-hidden="true"
           />
-          <span className={styles.tag}>Motion brand</span>
+          <span className={styles.tag}>{t("Motion brand")}</span>
           <span className={styles.play}>
             <span className={styles.playSquare} aria-hidden="true" />
-            Watch with sound
+            {t("Watch with sound")}
           </span>
         </div>
       </div>
-      <p className={styles.label}>[ On air ] Program openings and transitions</p>
+      <p className={styles.label}>{t("[ On air ] Program openings and transitions")}</p>
       <Showcase loops={APPLIED} verticals={[]} active={active} compact={compact} pairs />
       {full && <Lightbox src={`${BASE}/brand-full.mp4`} poster={`${BASE}/brand.jpg`} sound loop={false} onClose={() => setFull(false)} />}
     </div>

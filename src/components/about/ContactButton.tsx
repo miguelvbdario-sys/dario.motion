@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./ContactButton.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * "Contact me" button (ABOUT): opens a small pop-up with two ways to reach
  * Miguel, WhatsApp (straight into the chat) and e-mail.
@@ -37,6 +38,7 @@ function MailIcon() {
 }
 
 export default function ContactButton({ className, dotClass, label }: { className: string; dotClass: string; label: string }) {
+  const t = useT();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -79,7 +81,7 @@ export default function ContactButton({ className, dotClass, label }: { classNam
               <button type="button" className={styles.close} aria-label="Close" onClick={() => setOpen(false)} autoFocus>
                 ✕
               </button>
-              <p className={styles.label}>[ Contact ]</p>
+              <p className={styles.label}>{t("[ Contact ]")}</p>
               <h2 id="contact-title" className={styles.title}>
                 Let&apos;s talk
               </h2>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import styles from "./Broadcast.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * PROCESS tab (Paulistão card): the 3D trophy, small square, drag to rotate.
  * Model: /public/broadcast/paulistao/trophy/trophy.glb, exported from
@@ -27,6 +28,7 @@ const DECALS: Decal[] = [
 const GAP = 0.018;
 
 export default function BroadcastTrophy({ active }: { active: boolean }) {
+  const t = useT();
   const box = useRef<HTMLDivElement>(null);
   const [ready, setReady] = useState(false);
 
@@ -171,8 +173,8 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
   return (
     <div className={styles.trophyWrap}>
       <div ref={box} className={styles.trophy} aria-label="3D trophy, drag to rotate" role="img">
-        {!ready && <span className={styles.trophyLoading}>Loading 3D…</span>}
-        <span className={styles.previewLabel}>3D · Drag to rotate</span>
+        {!ready && <span className={styles.trophyLoading}>{t("Loading 3D…")}</span>}
+        <span className={styles.previewLabel}>{t("3D · Drag to rotate")}</span>
       </div>
     </div>
   );

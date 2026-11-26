@@ -9,6 +9,8 @@ import WorkPlayer from "@/components/works/WorkPlayer";
 import BroadcastPanel from "./BroadcastPanel";
 import Marquee from "@/components/marquee/Marquee";
 import ScrollType from "@/components/effects/ScrollType";
+import LangSwitch from "@/components/lang/LangSwitch";
+import { useTr, useT } from "@/lib/i18n";
 import { glide, isTouchLayout, onScrollFrame, progress, requestScrollFrame, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
 import styles from "./Broadcast.module.css";
@@ -97,6 +99,11 @@ function useThumbs() {
 }
 
 export default function Broadcast() {
+  const t = useT();
+  // The projects in the current language (EN / PT).
+  const LIST = useTr(BROADCAST);
+  const listRef = useRef(LIST);
+  listRef.current = LIST;
   const section = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const rows = useRef<(HTMLButtonElement | null)[]>([]);
@@ -209,22 +216,45 @@ export default function Broadcast() {
     });
   }, []);
 
-  // Thumbnails load and play only while their row is on screen (they used to
-  // download with the page and hold up the first paint on phones).
+  // Phone thumbnails: only ONE plays at a time, the row closest to the middle
+  // of the screen; the others show their poster. Four 16:9 videos decoding at
+  // once halved the frame rate on phones. Nothing loads before its row is near.
   useEffect(() => {
     if (!thumbs || !list.current) return;
-    const vids = list.current.querySelectorAll<HTMLVideoElement>(`.${styles.rowThumb} video`);
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          const v = e.target as HTMLVideoElement;
-          if (e.isIntersecting) v.play().catch(() => {});
-          else v.pause();
-        }),
-      { rootMargin: "100px 0px" },
-    );
-    vids.forEach((v) => io.observe(v));
-    return () => io.disconnect();
+    const vids = [...list.current.querySelectorAll<HTMLVideoElement>(`.${styles.rowThumb} video`)];
+    let raf = 0;
+    let current: HTMLVideoElement | null = null;
+    const pick = () => {
+      raf = 0;
+      const mid = window.innerHeight / 2;
+      let best: HTMLVideoElement | null = null;
+      let bestD = Infinity;
+      for (const v of vids) {
+        const r = v.getBoundingClientRect();
+        if (r.bottom < 0 || r.top > window.innerHeight || r.height === 0) continue;
+        const d = Math.abs(r.top + r.height / 2 - mid);
+        if (d < bestD) {
+          bestD = d;
+          best = v;
+        }
+      }
+      if (best === current) return;
+      current?.pause();
+      current = best;
+      best?.play().catch(() => {});
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(pick);
+    };
+    pick();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      vids.forEach((v) => v.pause());
+    };
   }, [thumbs]);
 
   const openRef = useRef<string | null>(null);
@@ -277,7 +307,7 @@ export default function Broadcast() {
       const wantVisible = to >= 0;
       if (wantVisible === c.visible && to === c.shown) return;
 
-      const project = to >= 0 ? BROADCAST[to] : null;
+      const project = to >= 0 ? listRef.current[to] : null;
 
       if (reduced.current) {
         // No flip: fade the single front face.
@@ -557,13 +587,15 @@ export default function Broadcast() {
       {/* White strip separating the hero from the rest of the site. */}
       <div className={styles.marqueeWrap}>
         <Marquee />
+        {/* Language switch: under the strip, on the right, in the black. */}
+        <LangSwitch className={styles.langSwitch} />
       </div>
 
       {/* Giant section title crossing the screen with the scroll. */}
       <ScrollType text="Broadcast" index="01" />
 
       <div ref={list} className={styles.list} onMouseMove={onMove} onMouseLeave={onLeave}>
-        {BROADCAST.map((project, i) => {
+        {LIST.map((project, i) => {
           const isOpen = openId === project.id;
           return (
             <Fragment key={project.id}>
@@ -635,7 +667,7 @@ export default function Broadcast() {
                 >
                   <video muted loop playsInline preload="none" disablePictureInPicture hidden tabIndex={-1} />
                   <div className={styles.stripes} data-stripes>
-                    <span>[ PREVIEW 16:9 ]</span>
+                    <span>{t("[ PREVIEW 16:9 ]")}</span>
                   </div>
                 </div>
               ))}

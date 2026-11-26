@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WORKS, type Work } from "@/content/works";
+import { useTr, useT } from "@/lib/i18n";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import SlotNumber from "@/components/effects/SlotNumber";
 import styles from "./WorksCarousel.module.css";
@@ -59,6 +60,9 @@ const smoothstep = (a: number, b: number, v: number) => {
 const TILT = 8;
 
 export default function WorksCarousel() {
+  const t = useT();
+  // Titles and credits in the current language (EN / PT).
+  const SHOWN = useTr(PANELS);
   const root = useRef<HTMLElement>(null);
   const stage = useRef<HTMLDivElement>(null);
   const panels = useRef<(HTMLDivElement | null)[]>([]);
@@ -360,12 +364,12 @@ export default function WorksCarousel() {
     <section ref={root} id="works-carousel" className={styles.section} aria-labelledby="works-carousel-title">
       {/* The visible title is the giant "MORE WORKS" above the section. */}
       <h2 id="works-carousel-title" className={styles.srOnly}>
-        More works
+        {t("More works")}
       </h2>
 
       <div ref={stage} className={styles.stage}>
         <div ref={ring} className={styles.ring}>
-          {PANELS.map((item, i) => (
+          {SHOWN.map((item, i) => (
             <div
               key={`${item.id}-${i}`}
               ref={(node) => {
@@ -441,7 +445,7 @@ export default function WorksCarousel() {
       <div className={styles.footer}>
         {/* Announces the centred piece to screen readers. */}
         <p className={styles.srOnly} aria-live="polite">
-          {PANELS[active].title}
+          {SHOWN[active].title}
         </p>
 
         <div className={styles.controls}>

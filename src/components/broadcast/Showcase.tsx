@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import styles from "./Showcase.module.css";
 import Marked from "@/components/effects/Marked";
 
+import { useT } from "@/lib/i18n";
 /*
  * Personal project gallery (e.g. World Cup Graphics).
  *
@@ -54,6 +55,7 @@ function Clip({ base, active }: { base: string; active: boolean }) {
 }
 
 function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
+  const t = useT();
   const ref = useRef<HTMLVideoElement>(null);
   const [i, setI] = useState(0);
   const [full, setFull] = useState(false);
@@ -127,7 +129,7 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
           </div>
         </>
       )}
-      <span className={styles.tag}>Process</span>
+      <span className={styles.tag}>{t("Process")}</span>
       {full && (
         <Lightbox
           base={videos[i]}

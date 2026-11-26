@@ -1,0 +1,65 @@
+/* EN / PT switch (LangSwitch.tsx). */
+
+.switch {
+  --switch-color: #e60000;
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 92px;
+  height: 36px;
+  padding: 3px;
+  border: 1px solid rgb(239 238 238 / 0.28);
+  border-radius: 999px;
+  background: #0b0000;
+  cursor: pointer;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  transition: border-color 0.2s ease;
+}
+
+.switch:hover {
+  border-color: var(--switch-color);
+}
+
+.switch:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: 3px;
+}
+
+/* The sliding knob under the active label. */
+.knob {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc(50% - 3px);
+  border-radius: 999px;
+  background: var(--switch-color);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--switch-color) 55%, transparent);
+  transition: translate 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.switch[data-pt] .knob {
+  translate: 100% 0;
+}
+
+.opt {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: rgb(239 238 238 / 0.5);
+  transition: color 0.2s ease;
+}
+
+.opt[data-on] {
+  color: #fff;
+  font-weight: 700;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knob {
+    transition: none;
+  }
+}

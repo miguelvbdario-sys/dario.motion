@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import { onScrollFrame } from "@/components/effects/scrollFx";
 import styles from "./CircleText.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * Round badge on the photo's corner: a sentence written around a circle that
  * turns with the scroll (DEG_PER_PX), backwards when scrolling up.
@@ -14,6 +15,7 @@ const TEXT = "Motion Designer • Sports • 8 Years • ";
 const DEG_PER_PX = 0.18;
 
 export default function CircleText() {
+  const t = useT();
   const ring = useRef<SVGSVGElement>(null);
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export default function CircleText() {
         </defs>
         <text className={styles.text}>
           <textPath href="#about-circle-path" textLength="488" lengthAdjust="spacing">
-            {TEXT}
+            {t(TEXT)}
           </textPath>
         </text>
       </svg>

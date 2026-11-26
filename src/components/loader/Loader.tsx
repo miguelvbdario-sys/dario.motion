@@ -7,6 +7,7 @@ import { markLoaded } from "@/lib/loader";
 import IntroCuts, { preloadCuts } from "./IntroCuts";
 import styles from "./Loader.module.css";
 
+import { useT } from "@/lib/i18n";
 /*
  * Loading screen: on black, the character's face, small, turning (a few frames
  * of the hero "look" render on a loop), then "Miguel Dario" and "motion
@@ -28,6 +29,7 @@ const pad = (n: number) => String(n).padStart(3, "0");
 const lenis = () => (window as unknown as { lenis?: Lenis }).lenis;
 
 export default function Loader() {
+  const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
   const [gone, setGone] = useState(false);
@@ -137,7 +139,7 @@ export default function Loader() {
     <div ref={root} className={styles.loader} role="status" aria-live="polite" aria-label="Loading">
       <canvas ref={canvas} className={styles.face} width={160} height={160} aria-hidden="true" />
       <p className={styles.name}>Miguel Dario</p>
-      <p className={styles.role}>senior motion designer</p>
+      <p className={styles.role}>{t("senior motion designer")}</p>
       <p className={styles.dots} aria-hidden="true">
         <span>.</span>
         <span>.</span>
