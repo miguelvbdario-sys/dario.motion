@@ -15,6 +15,8 @@ import styles from "./CrtScreen.module.css";
 
 /** Barrel strength: how far the corners bend (share of half the screen). */
 const BULGE = 0.035;
+/** The barrel distortion is very heavy for the GPU; kept off for performance. */
+const CURVE = false;
 
 /**
  * Displacement map: R/G = horizontal/vertical shift, 0.5 = none. Built at the
@@ -59,6 +61,7 @@ export default function CrtScreen() {
   const timer = useRef(0);
 
   useEffect(() => {
+    if (!CURVE) return;
     const build = () => {
       const w = window.innerWidth;
       const h = window.innerHeight;
@@ -98,7 +101,9 @@ export default function CrtScreen() {
         </defs>
       </svg>
 
-      {map && <div className={styles.bulge} aria-hidden="true" />}
+      {/* Bulge off: the full-screen SVG backdrop filter cost ~2/3 of every frame
+          (60 → 20 fps even on fast machines). Set CURVE = true to bring it back. */}
+      {CURVE && map && <div className={styles.bulge} aria-hidden="true" />}
       <div className={styles.glass} aria-hidden="true" />
     </>
   );
