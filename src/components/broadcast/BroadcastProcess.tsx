@@ -111,18 +111,19 @@ function ToolIcon({ tool }: { tool: string }) {
 }
 
 function StepBody({ s, i }: { s: (typeof STEPS)[number]; i: number }) {
+  const t = useT();
   return (
     <>
       <span className={styles.processNum}>{String(i + 1).padStart(2, "0")}</span>
       <div>
         <p className={styles.processTitle}>
-          {s.title}{" "}
+          {t(s.title)}{" "}
           <span className={styles.processTool}>
             <ToolIcon tool={s.tool} />
-            {s.tool}
+            {t(s.tool)}
           </span>
         </p>
-        <p className={styles.processText}>{s.text}</p>
+        <p className={styles.processText}>{t(s.text)}</p>
         {"img" in s && s.img && (
           // eslint-disable-next-line @next/next/no-img-element
           <img className={styles.processImg} src={s.img.src} alt={s.img.alt} width={640} height={360} loading="lazy" />
@@ -142,7 +143,7 @@ export default function BroadcastProcess({ active }: { active: boolean }) {
           {STATS.map((s) => (
             <div key={s.label}>
               <dd>{s.value}</dd>
-              <dt>{s.label}</dt>
+              <dt>{t(s.label)}</dt>
             </div>
           ))}
           {/* Full-width row under the four stats. */}

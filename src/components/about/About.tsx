@@ -57,8 +57,10 @@ export default function About() {
           <p id="about-lead" className={styles.lead} data-box="1">
             {ABOUT.lead}
           </p>
-          {ABOUT.paragraphs.map((p) => (
-            <p key={p} className={styles.body} data-box="2">
+          {/* Keyed by position: a key from the text remounted the paragraph on a
+              language change, and the box reveal lost track of it. */}
+          {ABOUT.paragraphs.map((p, i) => (
+            <p key={i} className={styles.body} data-box="2">
               {p}
             </p>
           ))}

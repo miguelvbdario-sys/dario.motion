@@ -6,14 +6,14 @@
 export const PT: Record<string, string> = {
   // ---------- Hero / timeline / section titles ----------
   Projects: "Projetos",
-  Standalones: "Avulsos",
+  Standalones: "Outros trabalhos",
   Contact: "Contato",
   Course: "Curso",
   Intro: "Intro",
   Broadcast: "Broadcast",
-  "More projects": "Mais projetos",
+  "More projects": "Outros trabalhos",
   About: "Sobre",
-  More: "Mais",
+  More: "Outros",
   Works: "Trabalhos",
   "About me": "Sobre mim",
   "senior motion designer": "motion designer sênior",
@@ -57,7 +57,7 @@ export const PT: Record<string, string> = {
   "Watch on YouTube": "Assistir no YouTube",
 
   // ---------- Paulistão ----------
-  "Paulistão Broadcast": "Transmissão do Paulistão",
+  "Paulistão Broadcast": "Paulistão 2026",
   "Scoreboard · Goal · Shields": "Placar · Gol · Escudos",
   "On air · HBO, TNT, Record, CazéTV": "No ar · HBO, TNT, Record, CazéTV",
   "Official Paulistão 2026 broadcast assets": "Assets oficiais da transmissão do Paulistão 2026",
@@ -96,12 +96,13 @@ export const PT: Record<string, string> = {
   "Going live": "Entrando no ar",
   "On air": "No ar",
   "Going off air": "Saindo do ar",
-  "More works": "Mais trabalhos",
+  "More works": "Outros trabalhos",
   "[ Home ]": "[ Mandante ]",
   "[ Away ]": "[ Visitante ]",
   "Click to score": "Clique para marcar",
   "[ Choose your team and score the goal ]": "[ Escolha seu time e marque o gol ]",
-  Out: "Sair",
+  Out: "Sai",
+  In: "Entra",
   "Shield mode": "Modo escudo",
   "[ Shields ] Pick a crest": "[ Escudos ] Escolha um escudo",
   "See keyframes": "Ver keyframes",
@@ -175,4 +176,29 @@ export const PT: Record<string, string> = {
   "Intro and ads for my motion design course, Motion PRO": "Abertura e anúncios do meu curso de motion design, o Motion PRO",
   "Personal Experimentations": "Experimentos pessoais",
   "Videos in my own style, made to learn": "Vídeos no meu próprio estilo, feitos para aprender",
+
+  // ---------- Process / hints ----------
+  "[ Drag ] Slide the card left ↔ right to play and rewind": "[ Arraste ] Deslize o card para a esquerda ↔ direita para tocar e voltar",
+  "[ Hover ] Move across a card left ↔ right to play and rewind": "[ Passe o mouse ] Mova sobre o card da esquerda ↔ direita para tocar e voltar",
+  "Watch full screen": "Ver em tela cheia",
+  Broadcasters: "Emissoras",
+  Sheet: "Planilha",
+  Install: "Instalação",
+  "Package list": "Lista do pacote",
+  "Every graphic of the season mapped in one production sheet: scoreboard, line-ups, stats, brackets, bands.":
+    "Todos os gráficos da temporada mapeados em uma planilha de produção: placar, escalações, estatísticas, chaveamentos, tarjas.",
+  Design: "Design",
+  "Layouts and static bases diagrammed in Figma, the reference for every animated piece.":
+    "Layouts e bases estáticas diagramados no Figma, a referência para cada peça animada.",
+  "One mascot per club drawn in Illustrator, built to break through the goal art.":
+    "Um mascote por clube desenhado no Illustrator, feito para atravessar a arte do gol.",
+  Animation: "Animação",
+  "Scoreboard in/out, team plates, goals, shields and stings, exported as frame sequences with matching lengths.":
+    "Entrada e saída do placar, placas dos times, gols, escudos e vinhetas, exportados como sequências de frames com durações iguais.",
+  "The trophy modelled and lit in Blender for the final scoreboard and the sting.":
+    "O troféu modelado e iluminado no Blender para o placar final e a vinheta.",
+  Delivery: "Entrega",
+  "Exports organised and installed in the broadcast graphics system, ready to be operated live.":
+    "Exportações organizadas e instaladas no sistema de gráficos da transmissão, prontas para operar ao vivo.",
+  "Broadcast across the championship, through to the final.": "No ar durante todo o campeonato, até a final.",
 };

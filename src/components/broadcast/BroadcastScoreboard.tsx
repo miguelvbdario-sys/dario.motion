@@ -321,7 +321,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
               disabled={!ready || onAir}
             >
               <span className={styles.square} aria-hidden="true" />
-              <span className={styles.filterLabel}>In</span>
+              <span className={styles.filterLabel}>{t("In")}</span>
             </button>
             <button
               type="button"

@@ -2876,12 +2876,20 @@
   position: absolute;
   top: calc(100% + var(--s) * 28);
   right: calc(var(--s) * 64);
-  z-index: 3;
+  z-index: 20;
+  /* A little bigger on desktop. */
+  width: 116px;
+  height: 44px;
+  font-size: 14px;
 }
 
+/* Phones: smaller and lower, clear of the character's hands (its drag area). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .marqueeWrap .langSwitch {
-    top: calc(100% + 20px);
-    right: 20px;
+    top: calc(100% + 58px);
+    right: 16px;
+    width: 72px;
+    height: 28px;
+    font-size: 10px;
   }
 }

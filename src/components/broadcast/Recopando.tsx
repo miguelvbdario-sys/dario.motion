@@ -261,7 +261,7 @@ export default function Recopando({ active }: { active: boolean }) {
         {/* The whole vignette alone (no wireframe), fullscreen with sound. */}
         <button type="button" className={styles.watch} data-cursor="view" onClick={() => setFull(true)}>
           <span className={styles.watchSquare} aria-hidden="true" />
-          Watch full screen · {decade}
+          {t("Watch full screen")} · {decade}
         </button>
       </div>
       {/* Desktop: the text on the left (right-aligned), the 3D scene on 60% of the width. */}

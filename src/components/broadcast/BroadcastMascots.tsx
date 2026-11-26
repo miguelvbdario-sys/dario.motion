@@ -176,7 +176,7 @@ export default function BroadcastMascots() {
     <div className={styles.mascots}>
       <p className={styles.mascotsTitle}>{t("Make the mascot break the goal")}</p>
       <p className={styles.sideLabel}>
-        {compact ? "[ Drag ] Slide the card left ↔ right to play and rewind" : "[ Hover ] Move across a card left ↔ right to play and rewind"}
+        {t(compact ? "[ Drag ] Slide the card left ↔ right to play and rewind" : "[ Hover ] Move across a card left ↔ right to play and rewind")}
       </p>
       {compact && <TeamSelect side="home" label="Team" team={team} busy={false} onTeam={setTeam} />}
       <div className={styles.mascotGrid}>

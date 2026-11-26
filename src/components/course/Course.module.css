@@ -213,6 +213,9 @@
   grid-column: 1;
   grid-row: 1;
   align-self: end;
+  /* The title is sized from this column's width (cqi), so the longest word
+     never runs into the video beside it. */
+  container-type: inline-size;
 }
 .heroText {
   grid-column: 1;
@@ -232,8 +235,8 @@
 }
 .heroTitle {
   font-family: var(--font-display);
-  /* "PROFISSIONAL!" is ~6.9em wide: sized to fill the left column. */
-  font-size: clamp(56px, 5.3vw, 104px);
+  /* "PROFISSIONAL!" is ~6.9em wide: fills the left column without touching the video. */
+  font-size: min(104px, 13.6cqi);
   line-height: 0.98;
   text-transform: uppercase;
 }
@@ -1025,5 +1028,82 @@
     width: 76px;
     height: 30px;
     font-size: 11px;
+  }
+}
+
+/* ---------- Phones: tighter course page ---------- */
+@media (max-width: 599px) {
+  /* Top bar: room between back link, switch and CTA. */
+  .top {
+    column-gap: 14px;
+    padding-inline: calc(var(--gutter) + 4px);
+  }
+  .back {
+    font-size: 10px;
+    gap: 5px;
+  }
+  .topRight {
+    gap: 10px;
+  }
+  .topCta {
+    font-size: 10px;
+    padding: 8px 10px;
+  }
+
+  /* Hero title: a bit of air so wrapped lines don't sit on each other. */
+  .heroTitle {
+    line-height: 1.26;
+  }
+
+  /* Hero video: smaller "Watch with sound" badge. */
+  .heroVideo .playBadge {
+    right: 10px;
+    bottom: 10px;
+    gap: 6px;
+    padding: 6px 9px;
+    font-size: 9.5px;
+  }
+  .heroVideo .playBadge svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* What you'll learn / What we offer: same layout, less empty space. */
+  .block {
+    padding-top: 52px;
+  }
+  .title {
+    margin-bottom: 12px;
+  }
+  .sub {
+    margin-bottom: 22px;
+  }
+  .modules,
+  .offer {
+    gap: 10px;
+  }
+  .module {
+    padding: 20px;
+  }
+  .offerItem {
+    padding: 18px;
+  }
+  .moduleNum {
+    font-size: 56px;
+  }
+
+  /* Price block: the title fits the width with air between the lines. */
+  .pitch {
+    padding: 24px 20px;
+  }
+  .pitchTitle {
+    font-size: 10vw;
+    line-height: 1.32;
+  }
+  .bigCta {
+    font-size: 22px;
+    gap: 10px;
+    padding: 16px 18px;
+    white-space: nowrap;
   }
 }
