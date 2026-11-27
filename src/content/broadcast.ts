@@ -112,13 +112,6 @@ export type BroadcastProject = {
   extras?: { title: string; video: string; poster: string }[];
 };
 
-/** Placeholder filters, until the real categories and counts exist. */
-const placeholderFilters = (): BroadcastFilter[] => [
-  { label: "[Category]", count: "[00]" }, // TODO: substituir
-  { label: "[Category]", count: "[00]" }, // TODO: substituir
-  { label: "[Category]", count: "[00]" }, // TODO: substituir
-];
-
 export const BROADCAST: BroadcastProject[] = [
   {
     id: "paulistao",

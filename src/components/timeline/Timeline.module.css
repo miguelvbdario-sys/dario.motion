@@ -238,3 +238,13 @@
     border-color: #e60000;
   }
 }
+
+/* Touch screens: the section markers draw at 22px; an invisible hit area
+   makes them a comfortable 40px to tap (they sit far apart on the bar). */
+@media (pointer: coarse) {
+  .marker::after {
+    content: "";
+    position: absolute;
+    inset: -9px;
+  }
+}

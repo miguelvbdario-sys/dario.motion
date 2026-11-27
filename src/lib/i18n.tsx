@@ -22,8 +22,16 @@ import { EN } from "@/content/en";
 export type Lang = "en" | "pt";
 const KEY = "site-lang";
 
-type Ctx = { lang: Lang; source: Lang; setLang: (l: Lang) => void };
-const LangContext = createContext<Ctx>({ lang: "en", source: "en", setLang: () => {} });
+type Ctx = { lang: Lang; source: Lang; setLang: (l: Lang) => void; depth: number };
+const LangContext = createContext<Ctx>({ lang: "en", source: "en", setLang: () => {}, depth: 0 });
+
+/** Language of each mounted provider, by nesting depth (see LangProvider). */
+const PAGE_LANGS = new Map<number, Lang>();
+function applyPageLang() {
+  if (!PAGE_LANGS.size) return;
+  const lang = PAGE_LANGS.get(Math.max(...PAGE_LANGS.keys()));
+  document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
+}
 
 export function LangProvider({ source = "en", children }: { source?: Lang; children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>(source);
@@ -37,9 +45,18 @@ export function LangProvider({ source = "en", children }: { source?: Lang; child
     if (saved === "pt" || saved === "en") setLangState(saved);
   }, []);
 
+  // The page's lang attribute follows the innermost provider: the course page
+  // nests its own (PT) inside the site's (EN), and the outer one's effect runs
+  // last, so it used to win and mark the Portuguese page as English.
+  const depth = useContext(LangContext).depth + 1;
   useEffect(() => {
-    document.documentElement.lang = lang === "pt" ? "pt-BR" : "en";
-  }, [lang]);
+    PAGE_LANGS.set(depth, lang);
+    applyPageLang();
+    return () => {
+      PAGE_LANGS.delete(depth);
+      applyPageLang();
+    };
+  }, [depth, lang]);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
@@ -48,7 +65,7 @@ export function LangProvider({ source = "en", children }: { source?: Lang; child
     } catch {}
   }, []);
 
-  return <LangContext.Provider value={{ lang, source, setLang }}>{children}</LangContext.Provider>;
+  return <LangContext.Provider value={{ lang, source, setLang, depth }}>{children}</LangContext.Provider>;
 }
 
 export const useLang = () => useContext(LangContext);

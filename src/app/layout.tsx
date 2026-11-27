@@ -54,7 +54,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             or Chrome restores the old scroll position first. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{history.scrollRestoration="manual";if(!location.hash)window.scrollTo(0,0)}catch(e){}` + CALM_BOOT,
+            __html: `try{history.scrollRestoration="manual";if(!location.hash)window.scrollTo(0,0)}catch(e){}` +
+              // The course is in Portuguese: say so before anything reads the page.
+              `if(location.pathname.indexOf("/course")===0)document.documentElement.lang="pt-BR";` + CALM_BOOT,
           }}
         />
         <script

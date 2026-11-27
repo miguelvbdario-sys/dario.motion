@@ -54,7 +54,10 @@ function Compare({ decade, active }: { decade: Decade; active: boolean }) {
     let raf = 0;
     const sync = () => {
       if (Math.abs(w.currentTime - m.currentTime) > 0.08) w.currentTime = m.currentTime;
-      if (m.paused !== w.paused) (m.paused ? w.pause() : w.play().catch(() => {}));
+      if (m.paused !== w.paused) {
+        if (m.paused) w.pause();
+        else w.play().catch(() => {});
+      }
       raf = requestAnimationFrame(sync);
     };
     raf = requestAnimationFrame(sync);

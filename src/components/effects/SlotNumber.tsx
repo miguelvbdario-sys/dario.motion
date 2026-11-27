@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./SlotNumber.module.css";
 import { reducedMotion } from "@/lib/motion";
 
@@ -18,6 +18,9 @@ function Reel({ digit, order }: { digit: number; order: number }) {
   const reel = useRef<HTMLSpanElement>(null);
   const pos = useRef(DIGITS + digit); // middle block of three
   const shown = useRef(digit);
+  // Starting position only: after that the effect moves the reel, so React
+  // never rewrites the transform mid-spin on a re-render.
+  const [start] = useState(() => DIGITS + digit);
 
   useEffect(() => {
     const el = reel.current;
@@ -43,7 +46,7 @@ function Reel({ digit, order }: { digit: number; order: number }) {
 
   return (
     <span className={styles.window}>
-      <span ref={reel} className={styles.reel} style={{ transform: `translateY(${-pos.current}em)` }}>
+      <span ref={reel} className={styles.reel} style={{ transform: `translateY(${-start}em)` }}>
         {Array.from({ length: DIGITS * (2 + LAPS) }, (_, i) => (
           <span key={i}>{i % DIGITS}</span>
         ))}

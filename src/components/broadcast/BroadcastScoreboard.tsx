@@ -165,6 +165,8 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
   const [busy, setBusy] = useState<Side | null>(null);
   const [canShield, setCanShield] = useState(false);
   const [shield, setShield] = useState<ShieldState>("off");
+  /** Shield mode pressed once: its hint pulse stops. */
+  const [shieldTried, setShieldTried] = useState(false);
   const [score, setScore] = useState({ home: 0, away: 0 });
   /** True once the visitor has put the board on air (goal animations then load). */
   const live = useRef(false);
@@ -243,6 +245,9 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
 
   const onAir = status === "shown" || status === "in";
   const goalEnabled = ready && canGoal;
+  // The goal buttons pulse twice the first time they can be pressed, until the
+  // first goal: it shows the visitor where to click (CSS: [data-hint]).
+  const hint = goalEnabled && score.home + score.away === 0;
 
   return (
     <div ref={root} className={styles.board}>
@@ -273,6 +278,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             className={`${styles.filter} ${styles.ctrl} ${styles.ready}`}
             onClick={() => engine.current?.playGoal("home")}
             disabled={!goalEnabled}
+            data-hint={hint || undefined}
           >
             <span className={styles.square} aria-hidden="true" />
             <span className={styles.filterLabel} aria-label="Goal home">{t("Click to score")}</span>
@@ -340,12 +346,16 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             </button>
             <button
               type="button"
-              className={`${styles.filter} ${styles.ctrl}`}
+              className={`${styles.filter} ${styles.ctrl} ${styles.ready}`}
               data-active={shield === "on" || shield === "turning-on" || undefined}
               data-moving={shield === "turning-on" || shield === "turning-off" || undefined}
               aria-pressed={shield === "on" || shield === "turning-on"}
-              onClick={() => engine.current?.toggleShield()}
+              onClick={() => {
+                setShieldTried(true);
+                engine.current?.toggleShield();
+              }}
               disabled={!ready || !canShield}
+              data-hint={(goalEnabled && canShield && !shieldTried) || undefined}
             >
               <span className={styles.square} aria-hidden="true" />
               <span className={styles.filterLabel}>{t("Shield mode")}</span>
@@ -363,6 +373,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
             className={`${styles.filter} ${styles.ctrl} ${styles.ready}`}
             onClick={() => engine.current?.playGoal("away")}
             disabled={!goalEnabled}
+            data-hint={hint || undefined}
           >
             <span className={styles.square} aria-hidden="true" />
             <span className={styles.filterLabel} aria-label="Goal away">{t("Click to score")}</span>

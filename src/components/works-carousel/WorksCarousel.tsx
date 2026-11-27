@@ -9,6 +9,7 @@ import WorkPlayer from "@/components/works/WorkPlayer";
 import SlotNumber from "@/components/effects/SlotNumber";
 import styles from "./WorksCarousel.module.css";
 import { loopsPaused, reducedMotion } from "@/lib/motion";
+import { isLite } from "@/lib/lite";
 
 /*
  * Concave carousel: a wall of video panels that curves around the viewer,
@@ -101,6 +102,8 @@ export default function WorksCarousel() {
     /** No drift with animations off; the loops still play (loopsPaused). */
     const still = reducedMotion();
     const paused = loopsPaused();
+    // Touch screens (no real hover) count as phones/tablets: one video.
+    const touch = window.matchMedia("(hover: none)");
     let width = 0;
     let inView = false;
     let lastActive = -1;
@@ -207,9 +210,15 @@ export default function WorksCarousel() {
           caption.style.opacity = String(show);
         }
 
-        // One video at a time: the hovered (zoomed) panel while the mouse is on
-        // one, otherwise the centre panel. The others hold their frame.
-        const shouldPlay = !hidden && !paused && (m.hovered >= 0 ? i === m.hovered : i === centre);
+        // While the mouse is on a panel, only that (zoomed) one plays.
+        // Otherwise desktops play the three middle panels; phones and lite
+        // mode (devices measured slow) only the centre one. isLite() is read
+        // every frame, so a device that turns lite later drops to one video.
+        const few = touch.matches || isLite();
+        const shouldPlay =
+          !hidden &&
+          !paused &&
+          (m.hovered >= 0 ? i === m.hovered : few ? i === centre : Math.abs(rel) < 1.5);
         if (shouldPlay !== isPlaying[i]) {
           isPlaying[i] = shouldPlay;
           panel.toggleAttribute("data-still", !shouldPlay);

@@ -1119,3 +1119,21 @@
     scale: 1.03;
   }
 }
+
+/* Phones / tablets: in "3 projetos guiados" the video comes after the title
+   and the text, right above the project list. */
+@media (max-width: 1023px) {
+  .split {
+    row-gap: 0;
+  }
+  .split > .splitText {
+    display: contents;
+  }
+  .split > .splitMedia {
+    order: 1;
+    margin: 8px 0 22px;
+  }
+  .split .projectList {
+    order: 2;
+  }
+}

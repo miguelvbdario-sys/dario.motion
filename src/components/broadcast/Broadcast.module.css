@@ -222,7 +222,12 @@
   --ink: #efeeee;
 }
 /* Dark copy stays on the bone-white pills and buttons. */
-.panel[data-theme] :is(.filter:hover, .watch:hover, .extra:hover, .goLive:hover, .accItem[data-open] > .accHeader, .tabBar > .filter[data-active], .filter.ready) {
+@media (hover: hover) {
+  .panel[data-theme] .filter:hover {
+    --ink: #140000;
+  }
+}
+.panel[data-theme] :is(.watch:hover, .extra:hover, .goLive:hover, .accItem[data-open] > .accHeader, .tabBar > .filter[data-active], .filter.ready) {
   --ink: #140000;
 }
 .panel[data-theme="world-cup-2026"] .guides > span,
@@ -389,18 +394,22 @@
     opacity 0.25s;
 }
 
-/* Hover: a bone-white pill with dark text (stronger than the active state). */
-.filter:hover:not(:disabled) {
-  background: #efeeee;
-  color: var(--ink);
-}
+/* Hover: a bone-white pill with dark text (stronger than the active state).
+   Mouse only: on phones a tapped button kept this look after release (Shield
+   mode looked switched on after turning it off). */
+@media (hover: hover) {
+  .filter:hover:not(:disabled) {
+    background: #efeeee;
+    color: var(--ink);
+  }
 
-.filter:hover:not(:disabled) .square {
-  background: var(--red);
-}
+  .filter:hover:not(:disabled) .square {
+    background: var(--red);
+  }
 
-.filter:hover:not(:disabled) .count {
-  color: var(--red);
+  .filter:hover:not(:disabled) .count {
+    color: var(--red);
+  }
 }
 
 .filter[data-active] {
@@ -2448,6 +2457,12 @@
   .row[data-open][data-thumb] .content {
     padding-right: 14px;
   }
+
+  /* No "+" over the thumbnail while the row is closed (the World Cup one
+     showed on top of its video). */
+  .row[data-thumb]:not([data-open]) .rowIcon {
+    visibility: hidden;
+  }
 }
 
 /* ---------- "About the project" tab ---------- */
@@ -2635,8 +2650,9 @@
 
 /* Phones: rows with a thumbnail get a smaller title so it never runs under it. */
 @media (max-width: 767px), (hover: none) {
+  /* --fit (Broadcast.tsx) shrinks a title whose longest word wouldn't fit. */
   .row[data-thumb] .title {
-    font-size: min(30px, 7.6vw);
+    font-size: var(--fit, min(30px, 7.6vw));
   }
 }
 
@@ -3193,19 +3209,21 @@
   text-align: center;
 }
 
-/* Click to score / Shield mode: bone-white whenever they can be pressed. */
+/* Click to score: the Paulistão pink → orange gradient whenever it can be
+   pressed, white copy. */
 .filter.ready:not(:disabled) {
-  background: #efeeee;
-  color: var(--ink);
+  border-color: transparent;
+  background: linear-gradient(90deg, #ff2079, #ff3568 30%, #ff4c44 62%, #ff5a00);
+  color: #fff;
 }
 
 .filter.ready:not(:disabled) .square,
 .filter.ready:not(:disabled) .count {
-  color: var(--red);
+  color: #fff;
 }
 
 .filter.ready:not(:disabled) .square {
-  background: var(--red);
+  background: #fff;
 }
 
 /* Pager arrows: white with a black arrow on hover / press. */
@@ -3709,7 +3727,7 @@
   }
   .rowLogo {
     height: 30px;
-    max-width: 56px;
+    max-width: 46px;
   }
 }
 /* Phones: the open Personal Projects row turns black with white copy (the
@@ -3731,5 +3749,77 @@
 @media (max-width: 767px) {
   .rowLogo[src*="fifa"] {
     height: 42px;
+  }
+}
+
+/* Shield mode while it's on: bone white with dark copy (pink = can be pressed). */
+.filter.ready[data-active]:not(:disabled) {
+  background: #efeeee;
+  color: #140000;
+}
+.filter.ready[data-active]:not(:disabled) .square {
+  background: var(--red);
+}
+
+/* Hint pulses on the buttons to press (Click to score until the first goal,
+   Shield mode until it's first pressed): two quick dips with a pink ring, then
+   ~5s of rest, looping. Left goal, right goal, then Shield mode, staggered.
+   CSS only: nothing to download, and the rest phase changes nothing. */
+.filter.ready[data-hint]:not(:disabled) {
+  animation: goalHint 7.2s linear 0.3s infinite;
+}
+.boardSide[data-side="away"] > .filter.ready[data-hint]:not(:disabled) {
+  animation-delay: 0.65s;
+}
+.filters > .filter.ready[data-hint]:not(:disabled) {
+  animation-delay: 1s;
+}
+
+@keyframes goalHint {
+  0%,
+  15.3% {
+    box-shadow: 0 0 0 0 rgb(255 53 104 / 0.75);
+    scale: 1;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  4.6%,
+  19.9% {
+    scale: 0.95;
+  }
+  15.2%,
+  30.5%,
+  100% {
+    box-shadow: 0 0 0 14px rgb(255 53 104 / 0);
+    scale: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter[data-hint]:not(:disabled) {
+    animation: none;
+  }
+}
+
+:global(html[data-calm]) .filter[data-hint]:not(:disabled) {
+  animation: none;
+}
+
+/* "Go to scoreboard" under the closing line of About (desktop only), centred
+   on its own row, pulsing like the other buttons to press. */
+.outroCentered:has(> .toBoard) {
+  flex-direction: column;
+}
+.toBoard {
+  margin-top: 8px;
+  padding-inline: 28px;
+}
+/* With the button there, the pager comes up closer under it. */
+.panel:has(.toBoard) .pageNav {
+  margin-top: calc(var(--s) * 24);
+  text-transform: uppercase;
+}
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .toBoard {
+    display: none !important;
   }
 }

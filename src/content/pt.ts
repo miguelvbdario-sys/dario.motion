@@ -53,6 +53,7 @@ export const PT: Record<string, string> = {
   "Three months of production, from the first sheet to the final whistle.":
     "Três meses de produção, da primeira folha ao apito final.",
   "About the project": "Sobre o projeto",
+  "Go to scoreboard": "Ir para o placar",
   "This portfolio is interactive, enjoy, take your time and click on all!":
     "Este portfólio é interativo: aproveite, vá com calma e clique em tudo!",
   "Watch on YouTube": "Assistir no YouTube",

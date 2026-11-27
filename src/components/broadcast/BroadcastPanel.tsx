@@ -467,6 +467,8 @@ export default function BroadcastPanel({
       { height: prev, overflow: "hidden" },
       { height: next, duration: 0.5, ease: "power3.inOut", clearProps: "height,overflow" },
     );
+    // compact is read but not a trigger: switching layouts must not animate.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, screen]);
 
   // About: its blocks cascade in (stagger) each time it comes on screen: when
@@ -582,6 +584,12 @@ export default function BroadcastPanel({
   const outroRow = ab?.outro && (
     <div className={`${styles.aboutOutroRow} ${styles.outroCentered}`}>
       <p className={styles.aboutOutro}>{t(ab.outro)}</p>
+      {/* Desktop: a pulsing shortcut to the interactive scoreboard tab. */}
+      {boardTab >= 0 && (
+        <button type="button" className={`${styles.filter} ${styles.ctrl} ${styles.ready} ${styles.toBoard}`} data-hint onClick={discoverBoard}>
+          {t("Go to scoreboard")}
+        </button>
+      )}
     </div>
   );
   /** Bottom pager: next/previous tab (wraps), then back to the top of the tabs. */

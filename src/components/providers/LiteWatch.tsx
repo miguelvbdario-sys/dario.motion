@@ -121,7 +121,8 @@ export default function LiteWatch() {
   useEffect(() => {
     startLiteWatch();
 
-    document.querySelectorAll("video").forEach(quiet);
+    // The video attributes wait until the page has finished hydrating (idle
+    // after load): set earlier, React saw them as a server/client mismatch.
     const mo = new MutationObserver((records) => {
       for (const r of records) {
         r.addedNodes.forEach((n) => {
@@ -130,11 +131,22 @@ export default function LiteWatch() {
         });
       }
     });
-    mo.observe(document.body, { childList: true, subtree: true });
+    let idle = 0;
+    const startQuiet = () => {
+      const ric = window.requestIdleCallback ?? ((cb: () => void) => window.setTimeout(cb, 200));
+      idle = ric(() => {
+        document.querySelectorAll("video").forEach(quiet);
+        mo.observe(document.body, { childList: true, subtree: true });
+      });
+    };
+    if (document.readyState === "complete") startQuiet();
+    else window.addEventListener("load", startQuiet, { once: true });
     const debug = new URLSearchParams(location.search).has("debug");
     if (debug) applyOff();
     const stopMeter = debug ? startDebugMeter() : null;
     return () => {
+      window.removeEventListener("load", startQuiet);
+      (window.cancelIdleCallback ?? clearTimeout)(idle);
       mo.disconnect();
       stopMeter?.();
     };

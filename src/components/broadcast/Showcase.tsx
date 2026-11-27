@@ -350,7 +350,13 @@ export default function Showcase({
   if (compact) {
     return (
       <div className={styles.mobile}>
-        {/* Phones: the arrows and counter sit above the screens. */}
+        {/* Phones: the process video first, then the landscape loops. */}
+        {verticals.length > 0 && (
+          <div className={styles.verticalSmall}>
+            <Vertical videos={verticals} active={active} />
+          </div>
+        )}
+        {/* The arrows and counter sit above the screens. */}
         <div className={styles.counter}>
           <button type="button" aria-label="Previous" onClick={() => go(cur - 1)} disabled={cur === 0}>
             ‹
@@ -380,11 +386,6 @@ export default function Showcase({
               ))
             : loops.map((b, n) => cell(b, active && Math.abs(n - cur) <= 1))}
         </div>
-        {verticals.length > 0 && (
-          <div className={styles.verticalSmall}>
-            <Vertical videos={verticals} active={active} />
-          </div>
-        )}
         {footer}
         {lightbox}
       </div>

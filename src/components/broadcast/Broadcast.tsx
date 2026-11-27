@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { CustomEase } from "gsap/CustomEase";
 import { BROADCAST, type BroadcastProject } from "@/content/broadcast";
@@ -115,6 +115,50 @@ function fillFace(face: HTMLDivElement | null, project: BroadcastProject | null)
   }
 }
 
+/**
+ * Glide a row to the focus line once the visitor's scroll has settled: no
+ * finger on the screen and no scroll for SETTLE_MS (phones: a scripted scroll
+ * on top of the finger's momentum fights it). Gives up after 4s, or if the row
+ * has left the screen by then. Returns a cancel function.
+ */
+const SETTLE_MS = 160;
+function followWhenSettled(row: HTMLElement) {
+  let timer = 0;
+  let touching = false;
+  const giveUp = window.setTimeout(() => cancel(), 4000);
+  const go = () => {
+    cancel();
+    const r = row.getBoundingClientRect();
+    if (r.bottom > 0 && r.top < window.innerHeight) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
+  };
+  const arm = () => {
+    clearTimeout(timer);
+    if (!touching) timer = window.setTimeout(go, SETTLE_MS);
+  };
+  const down = () => {
+    touching = true;
+    clearTimeout(timer);
+  };
+  const up = () => {
+    touching = false;
+    arm();
+  };
+  const cancel = () => {
+    clearTimeout(timer);
+    clearTimeout(giveUp);
+    window.removeEventListener("scroll", arm);
+    window.removeEventListener("touchstart", down);
+    window.removeEventListener("touchend", up);
+    window.removeEventListener("touchcancel", up);
+  };
+  window.addEventListener("scroll", arm, { passive: true });
+  window.addEventListener("touchstart", down, { passive: true });
+  window.addEventListener("touchend", up, { passive: true });
+  window.addEventListener("touchcancel", up, { passive: true });
+  arm();
+  return cancel;
+}
+
 /** Same query as .rowThumb in the CSS: the row thumbnails only exist there. */
 const THUMB_QUERY = "(max-width: 767px), (hover: none)";
 function useThumbs() {
@@ -136,7 +180,9 @@ export default function Broadcast() {
   // The projects in the current language (EN / PT).
   const LIST = useTr(BROADCAST);
   const listRef = useRef(LIST);
-  listRef.current = LIST;
+  useLayoutEffect(() => {
+    listRef.current = LIST;
+  }, [LIST]);
   const section = useRef<HTMLElement>(null);
   const list = useRef<HTMLDivElement>(null);
   const rows = useRef<(HTMLButtonElement | null)[]>([]);
@@ -289,6 +335,40 @@ export default function Broadcast() {
       vids.forEach((v) => v.pause());
     };
   }, [thumbs]);
+
+  // Phones: rows with a thumbnail shrink their title only when its longest
+  // word would run under the thumbnail (PAULISTÃO, OLIMPÍADAS...). Measured
+  // per row, per language, after the fonts load and on resize (--fit).
+  useLayoutEffect(() => {
+    const mq = window.matchMedia(THUMB_QUERY);
+    const fit = () => {
+      rows.current.forEach((row) => {
+        if (!row) return;
+        row.style.removeProperty("--fit");
+        if (!mq.matches || row.dataset.thumb === undefined) return;
+        const title = row.querySelector<HTMLElement>(`:scope > .${styles.content} .${styles.title}`);
+        if (!title) return;
+        // The thumbnail's left edge (CSS: right 10px, width 34%) minus 10px,
+        // read from the row so it holds while the row is open too.
+        const r = row.getBoundingClientRect();
+        const edge = r.right - 20 - r.width * 0.34;
+        const box = title.getBoundingClientRect();
+        const width = Math.max(box.width, title.scrollWidth);
+        const room = edge - box.left;
+        if (width <= room) return;
+        const size = parseFloat(getComputedStyle(title).fontSize);
+        row.style.setProperty("--fit", `${Math.max(18, Math.floor((size * room) / width))}px`);
+      });
+    };
+    fit();
+    document.fonts?.ready.then(fit);
+    mq.addEventListener("change", fit);
+    window.addEventListener("resize", fit);
+    return () => {
+      mq.removeEventListener("change", fit);
+      window.removeEventListener("resize", fit);
+    };
+  }, [LIST]);
 
   const openRef = useRef<string | null>(null);
   const hovered = useRef(-1);
@@ -485,6 +565,9 @@ export default function Broadcast() {
   // ---------- Open / close ----------
   /** The next opening comes from the automatic Paulistão open (no glide). */
   const autoOpening = useRef(false);
+  /** Cancels a pending "glide once the scroll settles" (phones, automatic open). */
+  const settleFollow = useRef<(() => void) | null>(null);
+  useEffect(() => () => settleFollow.current?.(), []);
   const toggle = (project: BroadcastProject) => {
     setOpenId((current) => (current === project.id ? null : project.id));
     setMounted((m) => (m.has(project.id) ? m : new Set(m).add(project.id)));
@@ -576,10 +659,14 @@ export default function Broadcast() {
     // The automatic opening (Paulistão at 35%) does not glide: the visitor is
     // scrolling right then, and a scripted scroll on top of their momentum made
     // the page flicker. The row is already near the focus line anyway.
-    if (openId && !autoOpening.current) {
-      const row = rows.current[BROADCAST.findIndex((p) => p.id === openId)];
-      if (row) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
-    }
+    // Phones: the finger's momentum carried the row past the screen, so there
+    // the automatic opening glides too, but only once the scroll has settled
+    // (no finger on the screen, no scroll for a moment).
+    settleFollow.current?.();
+    settleFollow.current = null;
+    const row = openId ? rows.current[BROADCAST.findIndex((p) => p.id === openId)] : null;
+    if (row && !autoOpening.current) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
+    else if (row && isTouchLayout()) settleFollow.current = followWhenSettled(row);
     autoOpening.current = false;
   }, [openId, setBars, targetFor, transition]);
 
