@@ -214,6 +214,96 @@
   isolation: isolate;
 }
 
+/* TEST: each project's own identity behind its card (Personal Projects keeps
+   the red). Only the background changes; the copy turns light to stay legible. */
+.panel[data-theme="world-cup-2026"],
+.panel[data-theme="paulistao"],
+.panel[data-theme="olympics-paris-2024"] {
+  --ink: #efeeee;
+}
+/* Dark copy stays on the bone-white pills and buttons. */
+.panel[data-theme] :is(.filter:hover, .watch:hover, .extra:hover, .goLive:hover, .accItem[data-open] > .accHeader, .tabBar > .filter[data-active], .filter.ready) {
+  --ink: #140000;
+}
+.panel[data-theme="world-cup-2026"] .guides > span,
+.panel[data-theme="paulistao"] .guides > span,
+.panel[data-theme="olympics-paris-2024"] .guides > span {
+  border-left-color: rgb(255 255 255 / 0.12);
+}
+.panel[data-theme="world-cup-2026"] .desc,
+.panel[data-theme="paulistao"] .desc,
+.panel[data-theme="olympics-paris-2024"] .desc {
+  color: rgb(239 238 238 / 0.85);
+}
+.panel[data-theme] .processLead {
+  color: #efeeee;
+}
+.panel[data-theme="world-cup-2026"] .dot,
+.panel[data-theme="paulistao"] .dot,
+.panel[data-theme="olympics-paris-2024"] .dot {
+  background: #efeeee;
+}
+/* Each project's identity: background layers (--theme-bg), accent colour
+   (--red, replaces the red of play/zoom buttons, active tab marks, etc.) and
+   the gradient of pills, highlights and the closing bar (--pills, below).
+   Shared by the open card and its row in the list (the bars that close over
+   the row on selection show the same background). */
+:is(.panel, .row)[data-theme="world-cup-2026"] {
+  --theme-bg: url("/broadcast/themes/world-cup.webp") center / cover, #2b4bdf;
+  --red: #3eb45f;
+}
+/* Paulistão: pure electric blue with darker diagonal sweeps (the package's background). */
+:is(.panel, .row)[data-theme="paulistao"] {
+  --theme-bg:
+    linear-gradient(168deg, transparent 0 38%, rgb(0 0 70 / 0.35) 38% 52%, transparent 70%),
+    linear-gradient(172deg, transparent 0 18%, rgb(0 0 90 / 0.28) 18% 30%, transparent 46%),
+    linear-gradient(100deg, #0000eb 0%, #0000b8 22%, #00009a 34%, #0000cc 52%, #0000e5 72%, #0000ff 100%);
+  --red: #ff3568;
+}
+/* Paris 2024: navy track with the pink and blue diagonal lanes of the key visual. */
+:is(.panel, .row)[data-theme="olympics-paris-2024"] {
+  --theme-bg:
+    linear-gradient(118deg, transparent 0 58%, rgb(255 168 220 / 0.85) 58% calc(58% + 3px), transparent calc(58% + 3px) 100%),
+    linear-gradient(118deg, transparent 0 34%, rgb(120 190 255 / 0.55) 34% calc(34% + 2px), transparent calc(34% + 2px) 100%),
+    radial-gradient(ellipse at 85% 10%, rgb(30 110 170 / 0.55), transparent 55%),
+    linear-gradient(160deg, #06173a 0%, #0a2a5c 55%, #031029 100%);
+  --red: #ff2d9b;
+}
+.panel[data-theme] {
+  background:
+    repeating-linear-gradient(0deg, rgb(0 0 0 / 0.07) 0 1px, transparent 1px 4px),
+    var(--theme-bg);
+}
+/* Bar closing every themed card, in its pills gradient. */
+.panel[data-theme]::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  height: calc(var(--s) * 14);
+  background: var(--bar, var(--pills));
+  pointer-events: none;
+}
+/* The row in the list: the sweep and the two bars that close over it show the
+   project's background (sized to the full row, so it doesn't squash while the
+   bars grow); the copy inside them stays light. */
+.row[data-theme] > .wipe,
+.row[data-theme] > .bar {
+  background: var(--theme-bg);
+  background-size: 100% auto;
+  background-position: center;
+}
+.row[data-theme] .content[data-black] .title {
+  color: #efeeee;
+}
+.row[data-theme] .content[data-black] .meta {
+  color: #efeeee;
+}
+/* Paris: thin accent outline on the live loops and the Index row. */
+.panel[data-theme] .onAirTile,
+.panel[data-theme] .indexWide .index {
+  box-shadow: inset 0 0 0 1px var(--red);
+}
+
 .guides {
   position: absolute;
   inset: 0 calc(var(--s) * 40 + 15px);
@@ -3208,7 +3298,7 @@
   min-height: 24px;
   margin: 0 calc(var(--s) * 22) 0 calc(var(--s) * 4);
   border-radius: 50%;
-  background: #e60000;
+  background: var(--red);
   color: #fff;
   transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
@@ -3423,4 +3513,223 @@
 /* Same with "turn off animations" on (src/lib/motion.ts). */
 :global(html[data-calm]) .stepsHint {
   animation: none;
+}
+
+/* Paris layout (videos with a `top` banner): banner art above the video and the
+   footer art under it. The arts are transparent: the card background shows. */
+.paper {
+  display: flex;
+  flex-direction: column;
+}
+/* Desktop: no Index; the card is only as wide as the arts, centred. */
+.mediaGrid[data-paper] {
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: calc(var(--s) * 32);
+  align-items: center;
+}
+/* The three live loops stacked on the right of the video. */
+.mediaGrid[data-paper] > .onAir {
+  margin: 0;
+}
+.mediaGrid[data-paper] .onAirGrid {
+  grid-template-columns: 1fr;
+}
+.paperTop,
+.paperBottom {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  user-select: none;
+}
+/* The video sits flush between the two blue bands: no corners, no hover zoom. */
+.paper > .preview,
+.paper > .preview:hover {
+  border-radius: 0;
+  scale: none;
+}
+/* Narrow column: the heading on one line, without the loop count. */
+.mediaGrid[data-paper] .stripHead {
+  white-space: nowrap;
+}
+.mediaGrid[data-paper] .stripHead > span:last-child {
+  display: none;
+}
+
+/* Paris: the Index as one horizontal row (label, then the four rows side by side). */
+.indexWide {
+  margin-top: calc(var(--s) * 28);
+}
+.indexWide .index {
+  flex-direction: row;
+  align-items: center;
+  gap: calc(var(--s) * 28);
+}
+.indexWide .indexRows {
+  flex: 1;
+  flex-direction: row;
+}
+.indexWide .indexRows > div,
+.indexWide .indexRows > div:last-child {
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 0 calc(var(--s) * 20);
+  border: 0;
+  border-left: 1px solid rgb(239 238 238 / 0.12);
+}
+.indexWide .indexRows dd {
+  text-align: left;
+}
+@media (max-width: 767px) {
+  .indexWide .index {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .indexWide .indexRows {
+    flex-wrap: wrap;
+    row-gap: 14px;
+  }
+  .indexWide .indexRows > div,
+  .indexWide .indexRows > div:last-child {
+    flex: 1 1 45%;
+    padding: 0 0 0 10px;
+  }
+}
+
+/* Unselected pills share one gradient across the row, per project:
+   Paulistão pink → orange, World Cup the green of its background, Paris pink. */
+.panel[data-theme="paulistao"] {
+  --pills: linear-gradient(90deg, #ff2079, #ff3568 30%, #ff4c44 62%, #ff5a00);
+}
+.panel[data-theme="world-cup-2026"] {
+  --pills: linear-gradient(90deg, #7ec829, #6dcd4d 35%, #3eb45f 70%, #40b99c);
+  --pills-ink: #0b1a10;
+}
+.panel[data-theme="olympics-paris-2024"] {
+  --pills: linear-gradient(90deg, #ff2d9b, #ff4fb4 50%, #ff78c8);
+}
+.panel[data-theme] .tabBar > .filter:not([data-active]):not(:hover) {
+  background: var(--pills);
+  background-size: var(--gw, 100%) 100%;
+  background-position: calc(var(--gx, 0px) * -1) 0;
+  color: var(--pills-ink, #fff);
+}
+.panel[data-theme] .tabBar > .filter:not([data-active]):not(:hover) .count {
+  color: var(--pills-ink, #fff);
+  opacity: 0.75;
+}
+.panel[data-theme] .tabBar > .filter:not([data-active]):not(:hover) .square {
+  background: var(--pills-ink, #fff);
+  opacity: 0.75;
+}
+
+/* Paulistão: "Click here" (Broadcast Screens) in the same gradient, pink ring. */
+.panel[data-theme] .goLive:not(:hover) {
+  background: var(--pills);
+}
+
+/* Highlighted words: the same gradient as that project's tab pills. */
+.panel[data-theme] mark {
+  background-image: var(--pills);
+  color: var(--pills-ink, #fff);
+}
+
+/* Personal Projects: stays red, softer than Paulistão — a single darker cut
+   across the middle; dark copy, mostly-black pills that end in red, black
+   highlights with red text, black → red → orange closing bar. */
+:is(.panel, .row)[data-theme="led-displays"] {
+  --theme-bg:
+    linear-gradient(170deg, transparent 0 44%, rgb(70 0 0 / 0.42) 44% 58%, transparent 78%),
+    linear-gradient(105deg, #ff1a00, #d40000 45%, #e60000 75%, #ff2a00);
+  --pills: linear-gradient(90deg, #0b0000, #140000 72%, #6a0000 88%, #e60000);
+  --bar: linear-gradient(90deg, #140000, #7a0000 30%, #e60000 65%, #ff5a00);
+}
+.panel[data-theme="led-displays"] mark {
+  background-image: linear-gradient(#140000, #140000);
+  color: #ff3b1f;
+}
+
+/* Paulistão and the others: the wide stat tile (e.g. "6 member team") in the
+   project's gradient, and the "[ On air ]" label legible on the dark background. */
+.panel[data-theme]:not([data-theme="led-displays"]) .aboutStats > div:last-child:nth-child(odd) {
+  grid-column: 1 / -1;
+  background: var(--pills);
+}
+.panel[data-theme]:not([data-theme="led-displays"]) .aboutStats > div:last-child:nth-child(odd) dt {
+  color: var(--pills-ink, #fff);
+  opacity: 0.8;
+}
+.panel[data-theme]:not([data-theme="led-displays"]) .aboutChannels .sideLabel {
+  color: #efeeee;
+}
+/* "On air" channels (TNT, HBO…): white copy on the project's gradient. */
+.panel[data-theme]:not([data-theme="led-displays"]) .aboutSide .aboutChannels > .sideLabel {
+  color: #efeeee;
+}
+.panel[data-theme]:not([data-theme="led-displays"]) .aboutChannels .processChannel {
+  background: var(--pills);
+  color: var(--pills-ink, #fff);
+}
+/* Paulistão "About" (BroadcastProcess): team tile and broadcasters in the
+   project's gradient, white copy, light "[ On air ]" label. */
+.panel[data-theme]:not([data-theme="led-displays"]) .processStats > .processTeam,
+.panel[data-theme]:not([data-theme="led-displays"]) .processChannels > .processChannel {
+  background: var(--pills);
+  color: var(--pills-ink, #fff);
+}
+.panel[data-theme]:not([data-theme="led-displays"]) .processStats > .processTeam dd,
+.panel[data-theme]:not([data-theme="led-displays"]) .processStats > .processTeam dt {
+  color: var(--pills-ink, #fff);
+}
+.panel[data-theme]:not([data-theme="led-displays"]) .processChannels > .sideLabel {
+  color: #efeeee;
+}
+
+/* List rows: the project's white logo just before the title. */
+.titleGroup {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--s) * 18);
+}
+.rowLogo {
+  display: block;
+  width: auto;
+  height: calc(var(--s) * 44);
+  max-width: calc(var(--s) * 150);
+  object-fit: contain;
+  flex: none;
+}
+/* Phones: logos stay small so the title keeps the room (the wide Paulistão
+   logo shrinks the most). */
+@media (max-width: 767px) {
+  .titleGroup {
+    gap: 10px;
+  }
+  .rowLogo {
+    height: 30px;
+    max-width: 56px;
+  }
+}
+/* Phones: the open Personal Projects row turns black with white copy (the
+   others turn their accent colour). */
+@media (max-width: 767px) {
+  .row[data-theme="led-displays"][data-open] {
+    background: #0b0000;
+    box-shadow: inset 0 0 0 2px #e60000;
+  }
+  .row[data-theme="led-displays"][data-open] .title,
+  .row[data-theme="led-displays"][data-open] .meta {
+    color: #e60000;
+  }
+}
+/* The FIFA logo is tall and narrow: a bit bigger so it weighs like the others. */
+.rowLogo[src*="fifa"] {
+  height: calc(var(--s) * 62);
+}
+@media (max-width: 767px) {
+  .rowLogo[src*="fifa"] {
+    height: 42px;
+  }
 }

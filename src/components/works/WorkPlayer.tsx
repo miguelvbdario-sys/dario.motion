@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useCallback, useEffect, useRef } from "react";
+import { START_VOLUME, vimeoStartVolume } from "@/lib/volume";
 import gsap from "gsap";
 import { X } from "lucide-react";
 import type Lenis from "lenis";
@@ -172,6 +173,7 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
                 style={{ border: 0 }}
+                onLoad={(e) => vimeoStartVolume(e.currentTarget)}
               />
             ) : (
               <video
@@ -184,6 +186,9 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
                 loop
                 playsInline
                 preload="auto"
+                onLoadedMetadata={(e) => {
+                  e.currentTarget.volume = START_VOLUME;
+                }}
               />
             )}
 

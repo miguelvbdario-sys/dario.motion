@@ -56,7 +56,7 @@
   height: 46px;
   translate: -50% -50%;
   border-radius: 50%;
-  background: #e60000;
+  background: var(--red, #e60000);
   color: #efeeee;
   font-family: var(--font-mono, monospace);
   font-size: 14px;
@@ -120,7 +120,7 @@
 .watchSquare {
   width: 6px;
   height: 6px;
-  background: #e60000;
+  background: var(--red, #e60000);
 }
 
 /* ---- Decade switch ---- */
@@ -164,7 +164,7 @@
   font-size: 10px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #e60000;
+  color: var(--red, #e60000);
 }
 
 /* ---- 3D scene ---- */
@@ -323,4 +323,9 @@
   .moveHint[data-side="left"] {
     transform: translate(28px, -50%);
   }
+}
+
+/* TEST: project backgrounds (see Broadcast.module.css .panel[data-theme]). */
+:global([data-theme]:not([data-theme="led-displays"])) .note {
+  color: #efeeee;
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { START_VOLUME } from "@/lib/volume";
 import { createPortal } from "react-dom";
 import styles from "./Showcase.module.css";
 import Marked from "@/components/effects/Marked";
@@ -234,7 +235,10 @@ export function Lightbox({
           loop={loop}
           playsInline
           onEnded={onEnded}
-          onLoadedMetadata={(e) => setWide(e.currentTarget.videoWidth >= e.currentTarget.videoHeight)}
+          onLoadedMetadata={(e) => {
+            e.currentTarget.volume = START_VOLUME;
+            setWide(e.currentTarget.videoWidth >= e.currentTarget.videoHeight);
+          }}
         />
         {onPrev && (
           <button type="button" className={`${styles.lbArrow} ${styles.lbPrev}`} aria-label="Previous video" onClick={onPrev}>

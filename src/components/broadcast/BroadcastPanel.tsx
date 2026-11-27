@@ -309,8 +309,28 @@ function PillBar({
   label: string;
   tabs?: boolean;
 }) {
+  // One gradient across the whole row (Paulistão): each pill gets its offset
+  // from the first one (--gx) and the row's width (--gw), so the gradient
+  // starts on the left pill and ends on the right one.
+  const bar = useRef<HTMLDivElement>(null);
+  useLayoutEffect(() => {
+    const el = bar.current;
+    if (!el) return;
+    const measure = () => {
+      const pills = Array.from(el.children) as HTMLElement[];
+      if (!pills.length) return;
+      const x0 = pills[0].offsetLeft;
+      const last = pills[pills.length - 1];
+      el.style.setProperty("--gw", `${last.offsetLeft + last.offsetWidth - x0}px`);
+      for (const pill of pills) pill.style.setProperty("--gx", `${pill.offsetLeft - x0}px`);
+    };
+    measure();
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [items]);
   return (
-    <div className={`${styles.filters} ${styles.tabBar}`} role={tabs ? "tablist" : "group"} aria-label={label}>
+    <div ref={bar} className={`${styles.filters} ${styles.tabBar}`} role={tabs ? "tablist" : "group"} aria-label={label}>
       {items.map((item, i) => (
         <button
           key={item.key}
@@ -860,7 +880,7 @@ export default function BroadcastPanel({
         </div>
   ) : null;
 
-  const mediaPreview = (
+  const previewEl = (
           <div className={styles.preview}>
             {current ? (
               live && embedReady ? (
@@ -904,6 +924,38 @@ export default function BroadcastPanel({
             </span>
           </div>
   );
+  // "On air" loops: under the card, or (desktop, Paris banners) stacked beside the video.
+  const sideOnAir = !compact && classic && !!current?.top;
+  const onAirEl = project.onAir ? (
+      <section className={styles.onAir} aria-label="On air">
+        <div className={styles.stripHead}>
+          <span>{t("[ On air ] 24h live stream")}</span>
+          <span>{pad(project.onAir.length)} loops</span>
+        </div>
+        <div className={styles.onAirGrid}>
+          {project.onAir.map((m, i) => (
+            <div key={m.src} className={styles.onAirTile}>
+              {near ? <Loop src={m.src} poster={m.poster} active={live} /> : <Placeholder169 label="" />}
+              <span className={styles.previewLabel}>Live {pad(i + 1)}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+  ) : null;
+  // Paris layout: the tab's banner art above the video and the footer art under it.
+  const mediaPreview = current?.top ? (
+    <div className={styles.paper}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className={styles.paperTop} src={current.top} alt="" />
+      {previewEl}
+      {(current.bottom ?? project.frameBottom) && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className={styles.paperBottom} src={current.bottom ?? project.frameBottom} alt="" />
+      )}
+    </div>
+  ) : (
+    previewEl
+  );
 
   /** Phones: every card's choices as a vertical accordion (sections, videos or categories). */
   // (Paulistão: the scoreboard is always shown on phones, so it isn't a tab.)
@@ -934,7 +986,7 @@ export default function BroadcastPanel({
   const accBody = sections ? stackEl : active === -1 ? aboutEl : mediaPreview;
 
   return (
-    <div className={styles.panel}>
+    <div className={styles.panel} data-theme={project.id}>
       <div className={styles.guides} aria-hidden="true">
         <span />
         <span />
@@ -1034,31 +1086,19 @@ export default function BroadcastPanel({
       ) : (
         classic ? (
           <>
-            <div className={styles.mediaGrid}>
+            <div className={styles.mediaGrid} data-paper={current?.top ? "" : undefined}>
               {mediaPreview}
-              {index}
+              {current?.top ? sideOnAir && onAirEl : index}
             </div>
           </>
         ) : active === -1 ? aboutEl : mediaPreview
       )}
 
-      {/* How it looked live. */}
-      {project.onAir && (
-        <section className={styles.onAir} aria-label="On air">
-          <div className={styles.stripHead}>
-            <span>{t("[ On air ] 24h live stream")}</span>
-            <span>{pad(project.onAir.length)} loops</span>
-          </div>
-          <div className={styles.onAirGrid}>
-            {project.onAir.map((m, i) => (
-              <div key={m.src} className={styles.onAirTile}>
-                {near ? <Loop src={m.src} poster={m.poster} active={live} /> : <Placeholder169 label="" />}
-                <span className={styles.previewLabel}>Live {pad(i + 1)}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+      {/* How it looked live (Paris with banners: beside the video instead). */}
+      {project.onAir && !(sideOnAir) && onAirEl}
+
+      {/* Paris with banners: the Index as one horizontal row, before the programs. */}
+      {classic && current?.top && <div className={styles.indexWide}>{index}</div>}
 
       {/* Small extras (program vignettes), with sound in the player. */}
       {project.extras && (
@@ -1093,7 +1133,7 @@ export default function BroadcastPanel({
       {!compact && classic && pager}
 
       {/* Phones, classic layout (Paris): the Index closes the card. */}
-      {compact && classic && <div className={styles.indexLast}>{index}</div>}
+      {compact && classic && !current?.top && <div className={styles.indexLast}>{index}</div>}
     </div>
   );
 }

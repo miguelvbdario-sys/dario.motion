@@ -79,7 +79,13 @@ const BAR_FULL = "calc(50% + 1px)";
 function RowContent({ project, black }: { project: BroadcastProject; black?: boolean }) {
   return (
     <span className={styles.content} data-meta-first={project.metaFirst || undefined} data-black={black || undefined}>
-      <span className={styles.title}>{project.title}</span>
+      <span className={styles.titleGroup}>
+        {project.logo && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className={styles.rowLogo} src={project.logo} alt="" aria-hidden="true" />
+        )}
+        <span className={styles.title}>{project.title}</span>
+      </span>
       <span className={styles.meta} data-scramble>{project.meta}</span>
     </span>
   );
@@ -671,6 +677,7 @@ export default function Broadcast() {
                 className={styles.row}
                 data-row={i}
                 data-align={project.align}
+                data-theme={project.id}
                 data-thumb={project.preview ? "" : undefined}
                 data-open={isOpen || undefined}
                 style={{ "--offset": project.offset } as React.CSSProperties}

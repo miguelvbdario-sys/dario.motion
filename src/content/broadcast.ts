@@ -23,6 +23,8 @@ export type BroadcastProject = {
   id: string;
   title: string;
   meta: string;
+  /** White logo shown next to the title in the list row. */
+  logo?: string;
   /** Side of the zig-zag. */
   align: "left" | "right";
   /** Extra indent from the left, in design px (1920 wide). */
@@ -82,7 +84,9 @@ export type BroadcastProject = {
    * Several videos of equal weight: they replace the filters as a selector;
    * the chosen one plays in the preview and opens in "Watch full" (Vimeo).
    */
-  videos?: { title: string; vimeo: string }[];
+  videos?: { title: string; vimeo: string; /** Banner art shown above the video (Paris layout). */ top?: string; /** Own footer art (else the card's frameBottom). */ bottom?: string }[];
+  /** Art shown under the video when the videos have a `top` banner. */
+  frameBottom?: string;
   /** "On air" strip: short loops of how it looked live. */
   onAir?: { src: string; poster: string }[];
   /**
@@ -118,6 +122,7 @@ const placeholderFilters = (): BroadcastFilter[] => [
 export const BROADCAST: BroadcastProject[] = [
   {
     id: "paulistao",
+    logo: "/broadcast/logos/paulistao.webp",
     title: "Paulistão Broadcast",
     meta: "Scoreboard · Goal · Shields",
     align: "left",
@@ -204,6 +209,7 @@ export const BROADCAST: BroadcastProject[] = [
   },
   {
     id: "world-cup-2026",
+    logo: "/broadcast/logos/fifa.webp",
     title: "2026 World Cup",
     meta: "CazéTV Live",
     align: "right",
@@ -247,6 +253,7 @@ export const BROADCAST: BroadcastProject[] = [
   },
   {
     id: "olympics-paris-2024",
+    logo: "/broadcast/logos/olympics.svg",
     title: "2024 Olympics Paris",
     meta: "CazéTV Live",
     align: "left",
@@ -265,16 +272,17 @@ export const BROADCAST: BroadcastProject[] = [
     classic: true,
     filters: [],
     fullVideo: null,
+    frameBottom: "/broadcast/olympics/frame-bottom-alpha.webp",
     videos: [
-      { title: "Athlete Screens", vimeo: "1063778200" },
-      { title: "Template Paris", vimeo: "1057375328" },
-      { title: "Medal Screens", vimeo: "1057375881" },
-      { title: "Ceremonies", vimeo: "1063911393" },
+      { title: "Medal Screens", vimeo: "1057375881", top: "/broadcast/olympics/frame-medal-alpha.webp" },
+      { title: "Template Paris", vimeo: "1057375328", top: "/broadcast/olympics/frame-template-alpha.webp" },
+      { title: "Athlete Screens", vimeo: "1063778200", top: "/broadcast/olympics/frame-athlete-alpha.webp" },
+      { title: "Ceremonies", vimeo: "1063911393", top: "/broadcast/olympics/frame-ceremonies-alpha.webp" },
     ],
     onAir: [
-      { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
-      { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
       { src: "/broadcast/olympics/on-air-03.mp4", poster: "/broadcast/olympics/on-air-03.webp" },
+      { src: "/broadcast/olympics/on-air-02.mp4", poster: "/broadcast/olympics/on-air-02.webp" },
+      { src: "/broadcast/olympics/on-air-01.mp4", poster: "/broadcast/olympics/on-air-01.webp" },
     ],
     extras: [
       { title: "Tamo em Paris", video: "/broadcast/olympics/tamo-em-paris.mp4", poster: "/broadcast/olympics/tamo-em-paris.webp" },
@@ -283,6 +291,7 @@ export const BROADCAST: BroadcastProject[] = [
   },
   {
     id: "led-displays",
+    logo: "/broadcast/logos/personal.webp",
     title: "Personal Projects",
     meta: "NBA · World Cup · Champions",
     align: "left",

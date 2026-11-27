@@ -75,7 +75,7 @@
 }
 
 .bar[data-on] {
-  background: #e60000;
+  background: var(--red, #e60000);
 }
 
 /* Arrows: the whole side strip of the player is the hit area (easy to hit);
@@ -109,7 +109,7 @@
 
 .arrow:hover span,
 .arrow:focus-visible span {
-  background: #e60000;
+  background: var(--red, #e60000);
   transform: scale(1.08);
 }
 
@@ -273,7 +273,7 @@
 
 .cell[data-zoom]:hover .zoomIcon {
   opacity: 1;
-  background: #e60000;
+  background: var(--red, #e60000);
 }
 
 .lightbox {
@@ -322,12 +322,12 @@
 }
 
 .close:focus-visible {
-  outline: 3px solid #e60000;
+  outline: 3px solid var(--red, #e60000);
   outline-offset: 3px;
 }
 
 .close:hover {
-  background: #e60000;
+  background: var(--red, #e60000);
   color: #efeeee;
   transform: scale(1.06);
 }
@@ -419,7 +419,7 @@
 .ctaSquare {
   width: 6px;
   height: 6px;
-  background: #e60000;
+  background: var(--red, #e60000);
 }
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
@@ -468,7 +468,7 @@
 }
 
 .lbArrow:hover {
-  background: #e60000;
+  background: var(--red, #e60000);
 }
 
 .lbPrev {
@@ -534,5 +534,11 @@
 
 *:hover > .zoomIcon {
   opacity: 1;
-  background: #e60000;
+  background: var(--red, #e60000);
+}
+
+/* TEST: project backgrounds (see Broadcast.module.css .panel[data-theme]). */
+:global([data-theme]:not([data-theme="led-displays"])) .counter,
+:global([data-theme]:not([data-theme="led-displays"])) .note {
+  color: #efeeee;
 }
