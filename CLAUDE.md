@@ -75,8 +75,8 @@ https://www.dario-motion.com (main page, English by default) and /course
 
 ## Open items
 
-- Link preview image proposal: `src/assets/og-hero-proposta.png` (not approved,
-  not committed). He asked for a version without the CRT curve/borders and
-  without the 3D pig. Current share image: `src/app/opengraph-image.tsx`.
+- Share image: `src/app/opengraph-image.png` is live and approved (black, big
+  MIGUEL DARIO, red/white, the head). `src/assets/og-hero-proposta.png` is an
+  old unused proposal (untracked).
 - Miguel's Chrome has hardware acceleration OFF (his "Opera" is Opera GX); told
   him to turn it on. Waiting for his Safari (Mac) `?debug` fps after this deploy.
