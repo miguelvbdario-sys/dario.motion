@@ -1,11 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { Play } from "lucide-react";
 import type { BroadcastProject } from "@/content/broadcast";
 import type { Work } from "@/content/works";
-import Showcase, { Lightbox } from "./Showcase";
+import Showcase, { Lightbox, ZoomIcon } from "./Showcase";
 import Recopando from "./Recopando";
 import MotionBranding from "./MotionBranding";
 import Marked, { Mark, splitMarks } from "@/components/effects/Marked";
@@ -15,10 +15,12 @@ import BroadcastMascots from "./BroadcastMascots";
 import BroadcastProcess from "./BroadcastProcess";
 import { PAULISTAO_ASSETS, PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import { FOCUS_AT } from "./focus";
+import { followScroll } from "@/lib/followScroll";
 import WordReveal from "@/components/effects/WordReveal";
 import styles from "./Broadcast.module.css";
 
 import { useT } from "@/lib/i18n";
+import { useInView } from "@/lib/useInView";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
@@ -83,14 +85,16 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
   const ref = useRef<HTMLVideoElement>(null);
   /** Click: the loop opens fullscreen (muted), like the other zoomable media. */
   const [open, setOpen] = useState(false);
+  /** Only plays while on screen (off-screen loops decoded video for nothing). */
+  const seen = useInView(ref);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     // Reduced motion: loops stay on their first frame / poster.
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (active && !reduced) v.play().catch(() => {});
+    if (active && seen && !reduced) v.play().catch(() => {});
     else v.pause();
-  }, [active]);
+  }, [active, seen]);
   return (
     <>
       <video
@@ -110,6 +114,7 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
           setOpen(true);
         }}
       />
+      <ZoomIcon />
       {open && <Lightbox src={src.split("#")[0]} poster={poster} onClose={() => setOpen(false)} />}
     </>
   );
@@ -246,22 +251,23 @@ function ScreenSwipe({
 
   return (
     <div className={styles.swipe}>
+      {/* The swipe works on the screen and on the live examples under it. */}
       <div
-        ref={view}
-        className={styles.swipeView}
-        data-assets={screens[index]?.assets || undefined}
+        className={styles.swipeArea}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}
         onPointerCancel={onUp}
       >
-        <div ref={track} className={styles.swipeTrack}>
-          {n > 1 && slide(wrap(index - 1), -1)}
-          {slide(index, 0)}
-          {n > 1 && slide(wrap(index + 1), 1)}
+        <div ref={view} className={styles.swipeView} data-assets={screens[index]?.assets || undefined}>
+          <div ref={track} className={styles.swipeTrack}>
+            {n > 1 && slide(wrap(index - 1), -1)}
+            {slide(index, 0)}
+            {n > 1 && slide(wrap(index + 1), 1)}
+          </div>
         </div>
+        {extras}
       </div>
-      {extras}
       <div ref={title} className={styles.swipeMeta} aria-live="polite">
         <p className={styles.swipeTitle}>{screens[index]?.label}</p>
         <p className={styles.swipeSub}>
@@ -302,7 +308,7 @@ function PillBar({
   tabs?: boolean;
 }) {
   return (
-    <div className={styles.filters} role={tabs ? "tablist" : "group"} aria-label={label}>
+    <div className={`${styles.filters} ${styles.tabBar}`} role={tabs ? "tablist" : "group"} aria-label={label}>
       {items.map((item, i) => (
         <button
           key={item.key}
@@ -345,6 +351,21 @@ export default function BroadcastPanel({
   const stack = useRef<HTMLDivElement>(null);
   const stackH = useRef(0);
   const live = open && near;
+  /**
+   * Embedded players (Vimeo / YouTube) are created only once the card has
+   * finished opening: creating an iframe costs a long main-thread pause, and
+   * doing it mid-animation froze the glide to the row for a few frames.
+   */
+  const [embedReady, setEmbedReady] = useState(false);
+  useEffect(() => {
+    if (!live) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setEmbedReady(false);
+      return;
+    }
+    const id = window.setTimeout(() => setEmbedReady(true), 950);
+    return () => clearTimeout(id);
+  }, [live]);
   const { videos, sections } = project;
   const current = videos?.[active];
   const kind = sections?.[tab]?.kind;
@@ -364,6 +385,24 @@ export default function BroadcastPanel({
   /** Phones: accordion items, and whether the next open should scroll to it. */
   const accRefs = useRef<(HTMLDivElement | null)[]>([]);
   const accJump = useRef(false);
+  /** Phones: the tapped header and where it was on screen, to keep it in place. */
+  const accAnchor = useRef<{ el: HTMLElement; top: number } | null>(null);
+
+  // The tab that was open above the tapped one disappears at once; before the
+  // browser paints, scroll by the same amount so the tapped header stays
+  // exactly where the finger was (nothing jumps), then the glide below
+  // brings it to the focus line.
+  useLayoutEffect(() => {
+    const a = accAnchor.current;
+    accAnchor.current = null;
+    if (!a) return;
+    const delta = a.el.getBoundingClientRect().top - a.top;
+    if (Math.abs(delta) < 1) return;
+    const y = window.scrollY + delta;
+    const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+    if (lenis) lenis.scrollTo(y, { immediate: true, force: true });
+    else window.scrollTo(0, y);
+  }, [tab, active]);
 
 
   // Phones: opening a tab scrolls its header to the middle of the screen (the
@@ -373,15 +412,11 @@ export default function BroadcastPanel({
     accJump.current = false;
     const el = accRefs.current[sections ? tab : active];
     if (!el) return;
-    requestAnimationFrame(() => {
-      // The clicked tab's header lands at FOCUS_AT (35%) of the screen height.
-      const head = el.firstElementChild as HTMLElement | null;
-      const h = head?.offsetHeight ?? 0;
-      const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + h / 2;
-      const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
-      if (lenis) lenis.scrollTo(y, { duration: 0.7 });
-      else window.scrollTo({ top: y, behavior: "auto" });
-    });
+    // The clicked tab's header lands at FOCUS_AT of the screen height. Its
+    // position is re-read every frame (the tab above may still be folding),
+    // so the glide follows it instead of aiming at a stale spot.
+    const head = (el.firstElementChild as HTMLElement | null) ?? el;
+    followScroll(head, FOCUS_AT, 0.7);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab, active]);
 
@@ -522,7 +557,50 @@ export default function BroadcastPanel({
     if (lenis) lenis.scrollTo(y, { duration: 0.9 });
     else window.scrollTo({ top: y, behavior: "auto" });
   };
-  const aboutEl = (
+  const outroRow = ab?.outro && (
+    <div className={`${styles.aboutOutroRow} ${styles.outroCentered}`}>
+      <p className={styles.aboutOutro}>{t(ab.outro)}</p>
+    </div>
+  );
+  /** Bottom pager: next/previous tab (wraps), then back to the top of the tabs. */
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const pageTo = (i: number) => {
+    if (!pageCount) return;
+    const next = (i + pageCount) % pageCount;
+    if (sections) setTab(next);
+    else setActive(next);
+    const el = tabsRef.current;
+    if (!el) return;
+    const y = el.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.12;
+    const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
+    if (lenis) lenis.scrollTo(y, { duration: 0.8 });
+    else window.scrollTo({ top: y, behavior: "auto" });
+  };
+  /** Tabs of this card for the bottom pager: sections, or (classic) the videos. */
+  const pageCount = sections ? sections.length : classic && videos ? videos.length : 0;
+  const pageCur = sections ? tab : active;
+  const pager = pageCount > 1 && (
+    <div className={`${styles.screenNavRow} ${styles.pageNav}`}>
+      <button type="button" className={styles.screenArrow} onClick={() => pageTo(pageCur - 1)} aria-label="Previous tab">
+        ‹
+      </button>
+      <span className={styles.screenCount}>
+        {pad(pageCur + 1)} <span>/</span> {pad(pageCount)}
+      </span>
+      <button type="button" className={styles.screenArrow} onClick={() => pageTo(pageCur + 1)} aria-label="Next tab">
+        ›
+      </button>
+    </div>
+  );
+  const aboutEl = ab?.process ? (
+    <div ref={aboutRef} className={styles.aboutProcess}>
+      <BroadcastProcess
+        active={live}
+        lead="Paulistão is São Paulo's state football championship, the biggest in Brazil. We made the ==graphics package== and the ==animations== for its official broadcast."
+      />
+      {outroRow}
+    </div>
+  ) : (
     <div ref={aboutRef} className={styles.about}>
       <div className={styles.aboutMain}>
         {/* "\n" in the lead: a paragraph break on desktop, a plain space on phones. */}
@@ -650,7 +728,7 @@ export default function BroadcastPanel({
           {kind === "process" && <BroadcastProcess active={live} />}
           {kind === "youtube" && (
             <div className={styles.preview} data-zoom-soft>
-              {live ? (
+              {live && embedReady ? (
                 <iframe
                   className={styles.previewFrame}
                   src={`https://www.youtube-nocookie.com/embed/${sections?.[tab]?.youtube}?rel=0`}
@@ -685,6 +763,12 @@ export default function BroadcastPanel({
                     </button>
                   ))}
                 </div>
+                {sections?.[tab]?.live && (
+                  <a className={styles.liveLink} href={sections[tab].live} target="_blank" rel="noopener noreferrer">
+                    <span className={styles.liveDot} aria-hidden="true" />
+                    {t("Watch on Live")} <span aria-hidden="true">&gt;</span>
+                  </a>
+                )}
               </div>}
               {compact ? (
                 // Phones: swipe carousel (the screen follows the finger), its title right
@@ -707,7 +791,14 @@ export default function BroadcastPanel({
                     )
                   }
                 />
-              ) : (
+              ) : null}
+              {compact && sections?.[tab]?.live && (
+                <a className={styles.liveLink} href={sections[tab].live} target="_blank" rel="noopener noreferrer">
+                  <span className={styles.liveDot} aria-hidden="true" />
+                    {t("Watch on Live")} <span aria-hidden="true">&gt;</span>
+                </a>
+              )}
+              {compact ? null : (
               <div
                 className={`${styles.preview} ${styles.screenStage}`}
                 data-assets={screens[screen]?.assets || undefined}
@@ -757,7 +848,7 @@ export default function BroadcastPanel({
   const mediaPreview = (
           <div className={styles.preview}>
             {current ? (
-              live ? (
+              live && embedReady ? (
                 // The chosen video, muted and looping (Vimeo), only while the card is open.
                 <iframe
                   key={current.vimeo}
@@ -767,6 +858,14 @@ export default function BroadcastPanel({
                   allow="autoplay; picture-in-picture"
                   tabIndex={-1}
                 />
+              ) : live ? (
+                // While the card opens: the cover still (the player follows a moment later).
+                project.img ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img className={styles.previewFrame} src={project.img} alt="" style={{ objectFit: "cover" }} />
+                ) : (
+                  <div className={styles.previewFrame} style={{ background: "#000" }} />
+                )
               ) : (
                 <Placeholder169 />
               )
@@ -828,14 +927,6 @@ export default function BroadcastPanel({
         <span />
       </div>
 
-      <div className={styles.labels}>
-        <span data-scramble>{t("[ Broadcast ]")}</span>
-        <span data-scramble>{project.meta}</span>
-        <span data-scramble>{t("Live")}</span>
-        <span data-scramble>{project.year}</span>
-      </div>
-
-      <span className={styles.dot} aria-hidden="true" />
       <h3 className={styles.bigTitle}>{project.title}</h3>
       <p className={styles.desc}>
         <Marked text={project.desc} />
@@ -863,11 +954,12 @@ export default function BroadcastPanel({
                       type="button"
                       className={styles.accHeader}
                       aria-expanded={isOpen}
-                      onClick={() => {
+                      onClick={(e) => {
                         if (closing) return;
                         if (i === accActive && tabOpen) setClosing(true);
                         else {
                           accJump.current = true;
+                          accAnchor.current = { el: e.currentTarget, top: e.currentTarget.getBoundingClientRect().top };
                           if (sections) setTab(i);
                           else setActive(i);
                           setTabOpen(true);
@@ -894,6 +986,7 @@ export default function BroadcastPanel({
           )}
         </>
       ) : sections ? (
+        <div ref={tabsRef}>
         <PillBar
           tabs
           label={`${project.title} sections`}
@@ -901,7 +994,9 @@ export default function BroadcastPanel({
           active={tab}
           onSelect={setTab}
         />
+        </div>
       ) : (
+        <div ref={tabsRef}>
         <PillBar
           label={`${project.title} tabs`}
           items={[
@@ -913,16 +1008,22 @@ export default function BroadcastPanel({
           active={classic ? active : active + 1}
           onSelect={(i) => setActive(classic ? i : i - 1)}
         />
+        </div>
       )}
 
       {compact ? null : sections ? (
-        stackEl
+        <>
+          {stackEl}
+          {pager}
+        </>
       ) : (
         classic ? (
-          <div className={styles.mediaGrid}>
-            {mediaPreview}
-            {index}
-          </div>
+          <>
+            <div className={styles.mediaGrid}>
+              {mediaPreview}
+              {index}
+            </div>
+          </>
         ) : active === -1 ? aboutEl : mediaPreview
       )}
 
@@ -972,6 +1073,9 @@ export default function BroadcastPanel({
           </div>
         </section>
       )}
+
+      {/* Desktop, classic layout (Paris): the pager closes the card. */}
+      {!compact && classic && pager}
 
       {/* Phones, classic layout (Paris): the Index closes the card. */}
       {compact && classic && <div className={styles.indexLast}>{index}</div>}

@@ -37,6 +37,7 @@ export function CrestGrid({
   busy,
   onTeam,
   available,
+  first,
 }: {
   side: Side;
   team: string;
@@ -44,11 +45,14 @@ export function CrestGrid({
   onTeam: (slug: string) => void;
   /** Only these teams can be picked (others stay disabled). Default: all. */
   available?: string[];
+  /** Slugs shown first, in this order (the rest keep TEAMS order). */
+  first?: string[];
 }) {
+  const list = first ? [...first.map((f) => TEAMS.find((x) => x.slug === f)!), ...TEAMS.filter((x) => !first.includes(x.slug))] : TEAMS;
   const sideName = side === "home" ? "Home" : "Away";
   return (
     <div className={styles.crests} role="radiogroup" aria-label={`${sideName} team`}>
-      {TEAMS.map((t) => (
+      {list.map((t) => (
         <button
           key={t.slug}
           type="button"
@@ -266,7 +270,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
           <TeamSelect side="home" team={home} busy={busy !== null} onTeam={(s) => changeTeam("home", s)} />
           <button
             type="button"
-            className={`${styles.filter} ${styles.ctrl}`}
+            className={`${styles.filter} ${styles.ctrl} ${styles.ready}`}
             onClick={() => engine.current?.playGoal("home")}
             disabled={!goalEnabled}
           >
@@ -356,7 +360,7 @@ export default function BroadcastScoreboard({ active }: { active: boolean }) {
           <TeamSelect side="away" team={away} busy={busy !== null} onTeam={(s) => changeTeam("away", s)} />
           <button
             type="button"
-            className={`${styles.filter} ${styles.ctrl}`}
+            className={`${styles.filter} ${styles.ctrl} ${styles.ready}`}
             onClick={() => engine.current?.playGoal("away")}
             disabled={!goalEnabled}
           >

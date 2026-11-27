@@ -2,6 +2,7 @@
 
 import { PAULISTAO_ASSET_COUNT } from "@/content/paulistaoAssets";
 import BroadcastTrophy from "./BroadcastTrophy";
+import Marked from "@/components/effects/Marked";
 import styles from "./Broadcast.module.css";
 
 import { useT } from "@/lib/i18n";
@@ -133,7 +134,7 @@ function StepBody({ s, i }: { s: (typeof STEPS)[number]; i: number }) {
   );
 }
 
-export default function BroadcastProcess({ active }: { active: boolean }) {
+export default function BroadcastProcess({ active, lead }: { active: boolean; lead?: string }) {
   const t = useT();
   return (
     <div className={styles.process}>
@@ -165,7 +166,7 @@ export default function BroadcastProcess({ active }: { active: boolean }) {
 
       <div className={styles.processMain}>
         <p className={styles.processLead}>
-          {t("Three months of production, from the first sheet to the final whistle.")}
+          <Marked text={t(lead ?? "Three months of production, from the first sheet to the final whistle.")} />
         </p>
         <ol className={styles.processSteps}>
           {STEPS.slice(0, -2).map((s, i) => (

@@ -214,3 +214,14 @@
     align-self: center;
   }
 }
+
+/* Phones: no Index, the video centred on the screen. */
+@media (max-width: 899px) {
+  .playerIndex {
+    display: none;
+  }
+
+  .player[open] {
+    align-items: center;
+  }
+}

@@ -10,18 +10,30 @@
  * of them have settled.
  */
 
-type Fn = (vh: number) => boolean | void;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Fn = (vh: number, measured: any) => boolean | void;
 
-const subs = new Set<Fn>();
+/*
+ * Two phases per frame: every subscriber's `measure` (the layout reads, e.g.
+ * getBoundingClientRect) runs first, then every `fn` (the style writes) with
+ * what was measured. Interleaving reads and writes forced the browser to redo
+ * the page layout once per subscriber per frame, which stuttered on slower
+ * machines; reading everything first costs a single layout.
+ */
+const subs = new Map<Fn, (() => unknown) | undefined>();
 let raf = 0;
 let bound = false;
 
 const run = () => {
   raf = 0;
   const vh = window.innerHeight;
+  const measured = new Map<Fn, unknown>();
+  subs.forEach((measure, fn) => {
+    if (measure) measured.set(fn, measure());
+  });
   let more = false;
-  subs.forEach((fn) => {
-    if (fn(vh)) more = true;
+  subs.forEach((_, fn) => {
+    if (fn(vh, measured.get(fn))) more = true;
   });
   if (more) kick();
 };
@@ -29,8 +41,9 @@ const kick = () => {
   if (!raf) raf = requestAnimationFrame(run);
 };
 
-export function onScrollFrame(fn: Fn) {
-  subs.add(fn);
+/** `measure` (optional): layout reads, done for all subscribers before any `fn` runs. */
+export function onScrollFrame<M = undefined>(fn: (vh: number, measured: M) => boolean | void, measure?: () => M) {
+  subs.set(fn as Fn, measure);
   if (!bound) {
     bound = true;
     window.addEventListener("scroll", kick, { passive: true });
@@ -38,7 +51,7 @@ export function onScrollFrame(fn: Fn) {
   }
   kick();
   return () => {
-    subs.delete(fn);
+    subs.delete(fn as Fn);
   };
 }
 

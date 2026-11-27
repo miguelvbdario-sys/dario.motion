@@ -406,7 +406,7 @@
     color 0.35s,
     box-shadow 0.35s;
 }
-.module:hover,
+.module[data-on],
 .offerItem:hover,
 .quote:hover {
   scale: 1.1;
@@ -420,13 +420,13 @@
 .offerItem:hover .offerIndex,
 .offerItem:hover .offerTitle,
 .offerItem:hover .offerText,
-.module:hover .label,
-.module:hover .moduleNum,
-.module:hover .lessonNum,
-.module:hover .moduleNote {
+.module[data-on] .label,
+.module[data-on] .moduleNum,
+.module[data-on] .lessonNum,
+.module[data-on] .moduleNote {
   color: var(--bg);
 }
-.module:hover .lessons li {
+.module[data-on] .lessons li {
   border-top-color: rgb(13 0 29 / 0.18);
 }
 .moduleImage {
@@ -444,7 +444,7 @@
     transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
     filter 0.5s;
 }
-.module:hover .moduleImage video {
+.module[data-on] .moduleImage video {
   transform: scale(1.08);
   filter: none;
 }
@@ -1105,5 +1105,12 @@
     gap: 10px;
     padding: 16px 18px;
     white-space: nowrap;
+  }
+}
+
+/* Phones: a selected module grows only a little (stays inside the screen). */
+@media (max-width: 599px) {
+  .module[data-on] {
+    scale: 1.03;
   }
 }

@@ -134,3 +134,21 @@
     animation: none;
   }
 }
+
+/* "Contact me" in About: bone-white until picked, then inverted (hover / open). */
+.trigger {
+  background: #efeeee !important;
+  color: #140000 !important;
+}
+
+.trigger[data-open] {
+  background: #140000 !important;
+  color: #efeeee !important;
+}
+
+@media (hover: hover) {
+  .trigger:hover {
+    background: #140000 !important;
+    color: #efeeee !important;
+  }
+}

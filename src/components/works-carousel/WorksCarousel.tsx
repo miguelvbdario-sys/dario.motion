@@ -8,6 +8,7 @@ import { useTr, useT } from "@/lib/i18n";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import SlotNumber from "@/components/effects/SlotNumber";
 import styles from "./WorksCarousel.module.css";
+import { isLite } from "@/lib/lite";
 
 /*
  * Concave carousel: a wall of video panels that curves around the viewer,
@@ -173,7 +174,13 @@ export default function WorksCarousel() {
         if (dim) dim.style.opacity = (1 - focus).toFixed(3);
 
         panel.style.transform = `translate3d(${x.toFixed(2)}px,0,${z.toFixed(2)}px) rotateY(${(-phi).toFixed(4)}rad) scale(${(1 + FOCUS_ZOOM * focus).toFixed(4)})`;
-        panel.style.opacity = hidden ? "0" : String(1 - DIM * smoothstep(0.25, MAX_ANGLE, Math.abs(phi)));
+        // Opacity by place on the wall: centre 100%, its neighbours 85%, the
+        // outer pair 70% (they hold still), blended as the wall drifts. Panels
+        // beyond the outer pair keep fading out toward the edge as before.
+        const ar = Math.abs(rel);
+        const level = ar <= 1 ? 1 - 0.15 * ar : Math.max(0.7, 0.85 - 0.15 * (ar - 1));
+        const edge = 1 - DIM * smoothstep(MAX_ANGLE * 0.75, MAX_ANGLE, Math.abs(phi));
+        panel.style.opacity = hidden ? "0" : (level * edge).toFixed(3);
         panel.style.visibility = hidden ? "hidden" : "visible";
         // Closest to the centre on top. The hovered panel jumps in front of
         // everything and stays there until its 1.5s zoom-out has finished.
@@ -199,10 +206,13 @@ export default function WorksCarousel() {
           caption.style.opacity = String(show);
         }
 
-        // Desktop plays the panels in view; phones only the centre one.
-        const shouldPlay = !hidden && !reducedMotion && (touch.matches ? i === centre : Math.abs(rel) < 2.6);
+        // Desktop plays the centre panel and its two neighbours (the outer pair
+        // holds still: five videos decoding at once halved the frame rate);
+        // phones and lite mode (weak devices) only the centre one.
+        const shouldPlay = !hidden && !reducedMotion && (touch.matches || isLite() ? i === centre : Math.abs(rel) < 1.5);
         if (shouldPlay !== isPlaying[i]) {
           isPlaying[i] = shouldPlay;
+          panel.toggleAttribute("data-still", !shouldPlay);
           const video = videos.current[i];
           if (video) {
             if (shouldPlay) {

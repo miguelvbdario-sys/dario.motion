@@ -57,7 +57,8 @@ export default function ContactButton({ className, dotClass, label }: { classNam
     <>
       <a
         href="#contact"
-        className={className}
+        className={`${className} ${styles.trigger}`}
+        data-open={open || undefined}
         data-magnetic
         aria-haspopup="dialog"
         onClick={(e) => {

@@ -2893,3 +2893,396 @@
     font-size: 10px;
   }
 }
+
+/* Card tabs: separate buttons with a small gap (no shared bar). */
+.filters.tabBar {
+  gap: 4px;
+  padding: 0;
+  background: transparent;
+}
+
+.tabBar > .filter {
+  background: rgb(20 0 0 / 0.86);
+  border-radius: 5px;
+}
+
+.tabBar > .filter[data-active] {
+  background: rgb(52 8 8 / 0.95);
+}
+
+.tabBar > .filter:hover:not(:disabled) {
+  background: #efeeee;
+}
+
+/* Scoreboard: no status / timecode readouts. */
+.boardReadouts {
+  display: none !important;
+}
+
+/* About (Paulistão): the process block, then the invitation + button. */
+.aboutProcess {
+  display: grid;
+  gap: calc(var(--s) * 36);
+}
+
+.aboutProcess .aboutOutro {
+  font-size: calc(var(--s) * 28);
+  font-weight: 700;
+}
+
+@media (min-width: 768px) and (min-aspect-ratio: 3/4) {
+  .aboutProcess .aboutOutroRow {
+    flex-wrap: nowrap;
+  }
+
+  .aboutProcess .aboutCta {
+    flex: none;
+    white-space: nowrap;
+  }
+}
+
+/* Arrow after "all!", pointing at the button. */
+.outroArrow {
+  display: inline-block;
+  width: 1.4em;
+  height: 0.6em;
+  margin-left: 0.4em;
+  vertical-align: middle;
+  animation: outroNudge 1.4s ease-in-out infinite;
+}
+
+@keyframes outroNudge {
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .outroArrow {
+    animation: none;
+  }
+}
+
+/* "Watch on Live >" under the screen list. */
+.liveLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+  padding: 14px 18px;
+  border-radius: 5px;
+  background: #111;
+  color: #efeeee;
+  font-family: var(--font-mono);
+  font-size: calc(var(--s) * 15);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.liveLink:hover {
+  background: #efeeee;
+  color: #111;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .liveLink {
+    width: 100%;
+    margin-top: 12px;
+    font-size: 13px;
+  }
+}
+
+/* Open tab: bone-white, like the hover. */
+.tabBar > .filter[data-active] {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.tabBar > .filter[data-active] .square {
+  background: var(--red);
+}
+
+.tabBar > .filter[data-active] .count {
+  color: var(--red);
+}
+
+/* End-of-card pager (desktop): ‹ 01 / 05 › on a dark pill, centred. */
+.pageNav {
+  justify-content: center;
+  width: fit-content;
+  margin: calc(var(--s) * 40) auto 0;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #0a0a0a;
+}
+
+/* Lead with highlighter: enough line spacing that a marked line never covers the one above. */
+.processLead {
+  line-height: 1.3 !important;
+}
+
+/* About outro: centred over the pager, no button. */
+.outroCentered {
+  justify-content: center;
+  text-align: center;
+}
+
+/* Click to score / Shield mode: bone-white whenever they can be pressed. */
+.filter.ready:not(:disabled) {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+.filter.ready:not(:disabled) .square,
+.filter.ready:not(:disabled) .count {
+  color: var(--red);
+}
+
+.filter.ready:not(:disabled) .square {
+  background: var(--red);
+}
+
+/* Pager arrows: white with a black arrow on hover / press. */
+.pageNav .screenArrow {
+  transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.pageNav .screenArrow:active,
+.pageNav .screenArrow:focus-visible {
+  background: #efeeee;
+  border-color: #efeeee;
+  color: #000;
+}
+
+@media (hover: hover) {
+  .pageNav .screenArrow:hover {
+    background: #efeeee;
+    border-color: #efeeee;
+    color: #000;
+  }
+}
+
+/* Watch on Live: white with a pulsing red "live" dot; black on hover / press. */
+.liveLink {
+  background: #efeeee;
+  color: #111;
+}
+
+.liveLink:active,
+.liveLink:focus-visible {
+  background: #111;
+  color: #efeeee;
+}
+
+@media (hover: hover) {
+  .liveLink:hover {
+    background: #111;
+    color: #efeeee;
+  }
+}
+
+@media (hover: none) {
+  .liveLink:hover {
+    background: #efeeee;
+    color: #111;
+  }
+}
+
+.liveDot {
+  width: 9px;
+  height: 9px;
+  flex: none;
+  border-radius: 50%;
+  background: #e60000;
+  animation: livePulse 1.6s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .liveDot {
+    animation: none;
+  }
+}
+
+.liveLink:active {
+  background: #111;
+  color: #efeeee;
+}
+
+/* Row open/close mark (Broadcast.tsx): red "+", black "−" once the card is open. */
+.rowIcon {
+  position: relative;
+  z-index: 5;
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: calc(var(--s) * 34);
+  height: calc(var(--s) * 34);
+  min-width: 24px;
+  min-height: 24px;
+  margin: 0 calc(var(--s) * 22) 0 calc(var(--s) * 4);
+  border-radius: 50%;
+  background: #e60000;
+  color: #fff;
+  transition: background-color 0.2s ease, transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.rowIcon[data-open] {
+  background: #000;
+  color: #fff;
+}
+
+.rowIcon svg {
+  display: block;
+  width: 50%;
+  height: 50%;
+}
+
+@media (hover: hover) {
+  .row:hover .rowIcon:not([data-open]) {
+    transform: rotate(90deg) scale(1.08);
+  }
+}
+
+/* White buttons invert on hover: black with white text. */
+@media (hover: hover) {
+  .filter.ready:not(:disabled):hover {
+    background: #111;
+    color: #efeeee;
+  }
+}
+
+/* The open tab keeps its white look on hover. */
+.tabBar > .filter[data-active]:hover {
+  background: #efeeee;
+  color: var(--ink);
+}
+
+/* Card texts span the card's full width (no short measure). */
+.desc,
+.processLead,
+.aboutLead {
+  max-width: none !important;
+}
+
+/* Open row: the black copy of the title stops before the +/− mark, so it sits
+   exactly over the white one (otherwise right-side rows shift under the mark). */
+.bar > .content {
+  right: calc(max(24px, var(--s) * 34) + var(--s) * 26);
+}
+
+/* Phones: team names and goal buttons always on one line, so the two halves
+   stay aligned whatever team is picked (long names shrink, then ellipsis). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .boardSide[data-side] .teamSelect > .teamOption > span:not(.teamChevron) {
+    min-width: 0;
+    overflow: hidden;
+    font-size: min(13px, 3.3vw);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .boardSide[data-side] > .ctrl {
+    gap: 6px;
+    padding-inline: 4px;
+    font-size: min(12px, 3vw);
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .boardSide[data-side] > .ctrl .square {
+    display: none;
+  }
+}
+
+.swipeArea {
+  touch-action: pan-y;
+}
+
+/* ---------- Phones: About (Paulistão) lighter to scroll past ---------- */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* Smaller trophy box, narrower than the column: more red around it to scroll on. */
+  .processSide > .trophyWrap {
+    justify-content: center;
+  }
+
+  .trophyWrap > .trophy {
+    width: 58%;
+  }
+
+  .processLead {
+    font-size: 21px !important;
+    line-height: 1.32 !important;
+  }
+
+  /* Steps: one row that scrolls sideways (snap per card), instead of a tall stack. */
+  .processSteps {
+    display: flex;
+    gap: 8px;
+    margin: 0 -16px;
+    padding: 0 16px 4px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scroll-padding: 0 16px;
+    scrollbar-width: none;
+  }
+
+  .processSteps::-webkit-scrollbar {
+    display: none;
+  }
+
+  .processSteps > li {
+    flex: 0 0 78%;
+    scroll-snap-align: start;
+  }
+
+  .processStep:hover {
+    scale: none;
+  }
+}
+
+/* Trophy: the turntable video (or still), and the 3D canvas fading in over it. */
+.trophyMedia {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.trophy .trophyCanvas {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transition: opacity 0.35s ease;
+}
+
+.trophy .trophyCanvas[data-on] {
+  opacity: 1;
+}
+
+.trophyMedia {
+  transition: opacity 0.35s ease;
+}
+
+.trophyMedia[data-off] {
+  opacity: 0;
+}
+
+/* Card contents never serve as the browser's scroll anchor: when a card's
+   media finish loading and it grows, Chrome would shift the page to keep
+   something inside it still, fighting the glide to the clicked row. With the
+   contents excluded, the browser anchors on the rows instead. */
+.panelWrap,
+.accItem > :not(.accHeader) {
+  overflow-anchor: none;
+}

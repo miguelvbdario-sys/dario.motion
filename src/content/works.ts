@@ -1,4 +1,4 @@
-﻿export type Work = {
+export type Work = {
   id: string;
   /** Shown on hover and in the player. */
   title: string;
@@ -32,28 +32,6 @@
  */
 export const WORKS: Work[] = [
   {
-    id: "cazetv-tenis",
-    title: "CazéTV Tênis",
-    meta: "Tennis livestream",
-    preview: "/projects/cazetv-tenis-preview.mp4",
-    poster: "/projects/cazetv-tenis-poster.webp",
-    video: "/projects/cazetv-tenis.mp4",
-    hasAudio: true,
-    role: "Program dedicated to streaming tennis matches",
-    year: "2026",
-  },
-  {
-    id: "br360",
-    title: "BR360",
-    meta: "Program vignette",
-    preview: "/projects/br360-preview.mp4",
-    poster: "/projects/br360-poster.webp",
-    video: "/projects/br360.mp4",
-    hasAudio: true,
-    role: "Program during the Brasileirão Championship",
-    year: "2026",
-  },
-  {
     id: "secadores",
     title: "CaféTV",
     meta: "Program vignette",
@@ -63,17 +41,6 @@ export const WORKS: Work[] = [
     hasAudio: true,
     role: "Morning program during the 2025 FIFA Club World Cup",
     year: "2025",
-  },
-  {
-    id: "geral-cazetv",
-    title: "Geral CazéTV",
-    meta: "Bumpers and LED screen",
-    preview: "/projects/geral-cazetv-preview.mp4",
-    poster: "/projects/geral-cazetv-poster.webp",
-    video: "/projects/geral-cazetv.mp4",
-    hasAudio: true,
-    role: "Program during the Brasileirão Championship",
-    year: "2024",
   },
   {
     id: "vini-jr-hala-madrid",

@@ -166,7 +166,7 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
               <iframe
                 key={work.id}
                 className={styles.playerVideo}
-                src={`https://player.vimeo.com/video/${work.vimeo}?autoplay=1&title=0&byline=0&portrait=0&dnt=1`}
+                src={`https://player.vimeo.com/video/${work.vimeo}?autoplay=1&loop=1&title=0&byline=0&portrait=0&dnt=1`}
                 title={work.title}
                 allow="autoplay; fullscreen; picture-in-picture"
                 allowFullScreen
@@ -180,6 +180,7 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
                 src={work.video}
                 poster={work.poster}
                 controls
+                loop
                 playsInline
                 preload="auto"
               />

@@ -127,8 +127,7 @@ export default function BoxReveal() {
     };
 
     hide();
-    const unsub = onScrollFrame((vh) => {
-      const top = first.getBoundingClientRect().top;
+    const unsub = onScrollFrame((vh, top: number) => {
       // With the scroll sequence before ABOUT, wait until its red screen has handed over.
       const clear = !document.querySelector("[data-stage]") || section.dataset.handed !== undefined;
       if (state === "hidden" && clear && top < vh * TRIGGER) {
@@ -138,7 +137,7 @@ export default function BoxReveal() {
         state = "hidden";
         hide();
       }
-    });
+    }, () => first.getBoundingClientRect().top);
     return () => {
       unsub();
       hide();

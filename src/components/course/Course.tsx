@@ -156,6 +156,18 @@ export default function Course() {
   const root = useRef<HTMLElement>(null);
   const [playing, setPlaying] = useState<Work | null>(null);
   const [faqOpen, setFaqOpen] = useState(0);
+  /** Selected module card (hover with a mouse, tap to toggle on touch); its video plays. */
+  const [onModule, setOnModule] = useState<number | null>(null);
+  const modulesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    modulesRef.current?.querySelectorAll("video").forEach((v, i) => {
+      if (i === onModule) v.play().catch(() => {});
+      else if (!v.paused || v.currentTime) {
+        v.pause();
+        v.currentTime = 0;
+      }
+    });
+  }, [onModule]);
   const opener = useRef<HTMLElement | null>(null);
 
   const play = useCallback((work: Work, origin: HTMLElement) => {
@@ -277,7 +289,7 @@ export default function Course() {
         <p className={styles.sub} data-rise>
           {modules.text}
         </p>
-        <div className={styles.modules}>
+        <div ref={modulesRef} className={styles.modules}>
           {modules.list.map((m, mi) => {
             const start = modules.list.slice(0, mi).reduce((n, x) => n + x.lessons.length, 0);
             return (
@@ -285,13 +297,12 @@ export default function Course() {
                 key={mi}
                 className={styles.module}
                 data-rise
-                onMouseEnter={(e) => e.currentTarget.querySelector("video")?.play().catch(() => {})}
-                onMouseLeave={(e) => {
-                  const v = e.currentTarget.querySelector("video");
-                  if (v) {
-                    v.pause();
-                    v.currentTime = 0;
-                  }
+                data-on={onModule === mi || undefined}
+                // Mouse: selected while hovered. Touch: a tap selects, a second tap unselects.
+                onPointerEnter={(e) => e.pointerType === "mouse" && setOnModule(mi)}
+                onPointerLeave={(e) => e.pointerType === "mouse" && setOnModule((c) => (c === mi ? null : c))}
+                onPointerUp={(e) => {
+                  if (e.pointerType !== "mouse") setOnModule((c) => (c === mi ? null : mi));
                 }}
               >
                 <div className={styles.moduleImage}>

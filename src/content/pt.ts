@@ -106,6 +106,11 @@ export const PT: Record<string, string> = {
   "Shield mode": "Modo escudo",
   "[ Shields ] Pick a crest": "[ Escudos ] Escolha um escudo",
   "See keyframes": "Ver keyframes",
+  "Remove keyframes": "Remover keyframes",
+  "Paulistão is São Paulo's state football championship, the biggest in Brazil. We made the ==graphics package== and the ==animations== for its official broadcast.":
+    "O Paulistão é o campeonato estadual de futebol de São Paulo, o maior do Brasil. Fizemos o ==pacote gráfico== e as ==animações== da transmissão oficial.",
+  "Watch on Live": "Assistir ao vivo",
+  "Move the line": "Mova a linha",
   "Make the mascot break the goal": "Faça o mascote quebrar o gol",
   Drag: "Arraste",
   "Loading 3D…": "Carregando 3D…",

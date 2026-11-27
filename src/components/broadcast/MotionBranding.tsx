@@ -6,6 +6,7 @@ import Showcase, { Lightbox } from "./Showcase";
 import Marked from "@/components/effects/Marked";
 
 import { useT } from "@/lib/i18n";
+import { useInView } from "@/lib/useInView";
 /*
  * MOTION BRANDING tab (2026 World Cup card).
  *
@@ -26,14 +27,15 @@ export default function MotionBranding({ active, compact }: { active: boolean; c
   const t = useT();
   const video = useRef<HTMLVideoElement>(null);
   const [full, setFull] = useState(false);
+  const seen = useInView(video);
 
   useEffect(() => {
     const v = video.current;
     if (!v) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (active && !still && !full) v.play().catch(() => {});
+    if (active && seen && !still && !full) v.play().catch(() => {});
     else v.pause();
-  }, [active, full]);
+  }, [active, seen, full]);
 
   return (
     <div className={styles.root}>

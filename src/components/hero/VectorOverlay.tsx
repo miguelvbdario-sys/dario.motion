@@ -186,7 +186,10 @@ export default function VectorOverlay({
         // Nothing to do while the hero is off screen (and the box has faded).
         if (!heroOnScreen && frameOn < 0.01 && glow.on < 0.01) return;
         const dt = Math.min(deltaMs / 1000, 0.1);
-        const s = section.getBoundingClientRect();
+        // The section's box, read only when something below needs it (a layout
+        // read here, right after the scroll effects' writes, forced a relayout).
+        let sRect: DOMRect | null = null;
+        const sec = () => (sRect ??= section.getBoundingClientRect());
         const ease = (from: number, to: number, rate: number) => from + (to - from) * (1 - Math.exp(-dt * rate));
 
         // Priority: emblem, then labelled elements, then a letter, then the character.
@@ -210,6 +213,7 @@ export default function VectorOverlay({
 
         // ---- Background light following the mouse ----
         if (inside) {
+          const s = sec();
           glow.x = ease(glow.x, ((pointerX - s.left) / s.width) * 100, GLOW_FOLLOW);
           glow.y = ease(glow.y, ((pointerY - s.top) / s.height) * 100, GLOW_FOLLOW);
         }
@@ -219,9 +223,12 @@ export default function VectorOverlay({
         const gx = `${glow.x.toFixed(1)}%`;
         const gy = `${glow.y.toFixed(1)}%`;
         const go = glow.on.toFixed(2);
-        if (gx !== written.gx) section.style.setProperty("--gx", (written.gx = gx));
-        if (gy !== written.gy) section.style.setProperty("--gy", (written.gy = gy));
-        if (go !== written.go) section.style.setProperty("--go", (written.go = go));
+        // (--gx/--gy/--go were written on the whole hero section here; nothing
+        // renders .bgFollow any more, so the writes only forced a restyle of
+        // the hero on every frame. Kept as values for whoever needs them.)
+        void gx;
+        void gy;
+        void go;
         // The background scanlines bend like a lens under the same light.
         // Scanlines stay straight (the lens that bent them under the mouse is off).
         scanlines.current?.draw(0.5, 0.5, 0);
@@ -236,6 +243,7 @@ export default function VectorOverlay({
         frameOn = ease(frameOn, target ? 1 : 0, target ? 12 : 6);
         if (target) {
           const p = padded ? PAD : 0;
+          const s = sec();
           const goal = {
             left: target.left - s.left - p,
             top: target.top - s.top - p,

@@ -46,8 +46,7 @@ export default function ScrollType({
     const K = isTouchLayout() ? SMOOTH_TOUCH : 1;
     let cur = -1;
     let lit = false;
-    return onScrollFrame((vh) => {
-      const r = el.getBoundingClientRect();
+    return onScrollFrame((vh, r: DOMRect) => {
       if (r.bottom < -200 || r.top > vh + 200) {
         cur = -1;
         return;
@@ -65,7 +64,7 @@ export default function ScrollType({
         el.toggleAttribute("data-lit", lit);
       }
       return p !== target;
-    });
+    }, () => el.getBoundingClientRect());
   }, [dir]);
 
   return (

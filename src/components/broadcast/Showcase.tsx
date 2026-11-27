@@ -6,6 +6,8 @@ import styles from "./Showcase.module.css";
 import Marked from "@/components/effects/Marked";
 
 import { useT } from "@/lib/i18n";
+import { useInView } from "@/lib/useInView";
+import { inlineSrc } from "@/content/videoVariants";
 /*
  * Personal project gallery (e.g. World Cup Graphics).
  *
@@ -25,19 +27,20 @@ const SWIPE_PX = 40;
 
 function Clip({ base, active }: { base: string; active: boolean }) {
   const ref = useRef<HTMLVideoElement>(null);
+  const seen = useInView(ref);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     // Metadata may already be in (cached) before React attached onLoadedMetadata.
     if (v.readyState >= 1 && v.videoWidth / v.videoHeight > 2.2) v.parentElement?.setAttribute("data-strip", "");
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (active && !still) v.play().catch(() => {});
+    if (active && seen && !still) v.play().catch(() => {});
     else v.pause();
-  }, [active]);
+  }, [active, seen]);
   return (
     <video
       ref={ref}
-      src={`${base}.mp4`}
+      src={inlineSrc(base)}
       poster={`${base}.jpg`}
       muted
       loop
@@ -64,15 +67,18 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
   // Finger swipe: a sideways drag past SWIPE_PX changes video.
   const start = useRef<{ x: number; y: number } | null>(null);
   const swiped = useRef(false);
+  const box = useRef<HTMLDivElement>(null);
+  const seen = useInView(box);
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
     const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (active && !still) v.play().catch(() => {});
+    if (active && seen && !still) v.play().catch(() => {});
     else v.pause();
-  }, [active, i]);
+  }, [active, seen, i]);
   return (
     <div
+      ref={box}
       className={styles.vertical}
       onTouchStart={(e) => (start.current = { x: e.touches[0].clientX, y: e.touches[0].clientY })}
       onTouchEnd={(e) => {
@@ -146,6 +152,17 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
 }
 
 /** Fullscreen view of one loop: click anywhere, ✕ or Esc closes. `sound`: plays with audio and controls. */
+/** "Open fullscreen" mark on clickable videos (SVG, so it stays centred on every device). */
+export function ZoomIcon() {
+  return (
+    <span className={styles.zoomIcon} aria-hidden="true">
+      <svg viewBox="0 0 16 16" width="14" height="14">
+        <path d="M9.5 2.5h4v4M13.5 2.5 9 7M6.5 13.5h-4v-4M2.5 13.5 7 9" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+      </svg>
+    </span>
+  );
+}
+
 export function Lightbox({
   base,
   src,
@@ -298,7 +315,7 @@ export default function Showcase({
         })}
       >
         <Clip base={b} active={on} />
-        {z && <span className={styles.zoomIcon} aria-hidden="true">⤢</span>}
+        {z && <ZoomIcon />}
       </div>
     );
   };

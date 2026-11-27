@@ -13,6 +13,7 @@ import LangSwitch from "@/components/lang/LangSwitch";
 import { useTr, useT } from "@/lib/i18n";
 import { glide, isTouchLayout, onScrollFrame, progress, requestScrollFrame, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
+import { followScroll } from "@/lib/followScroll";
 import styles from "./Broadcast.module.css";
 
 gsap.registerPlugin(CustomEase);
@@ -189,11 +190,11 @@ export default function Broadcast() {
     const SPAN = touch ? 0.5 : 0.36;
     const K = touch ? SMOOTH_TOUCH : 1;
     const cur = new Map<HTMLElement, number>();
-    return onScrollFrame((vh) => {
+    return onScrollFrame((vh, tops: number[]) => {
       let moving = false;
-      rows.current.forEach((row) => {
+      rows.current.forEach((row, i) => {
         if (!row) return;
-        const top = row.getBoundingClientRect().top;
+        const top = tops[i];
         // 0 when the row's top is at 98% of the screen, 1 at 98% − SPAN.
         const target = row.dataset.open !== undefined ? 1 : progress(vh * 0.98 - top, 0, vh * SPAN);
         // An open row shows at once (no glide).
@@ -213,7 +214,7 @@ export default function Broadcast() {
         row.style.setProperty("--b", easeInOut(progress(t, 0.45, 1)).toFixed(4));
       });
       return moving;
-    });
+    }, () => rows.current.map((row) => (row ? row.getBoundingClientRect().top : 0)));
   }, []);
 
   // Phone thumbnails: only ONE plays at a time, the row closest to the middle
@@ -510,38 +511,41 @@ export default function Broadcast() {
     // The card never sits over the open row.
     transition(targetFor(hovered.current));
 
-    // Opening a card: scroll to its row. If another open card above it is
-    // collapsing, its height is taken off the target so we land on the row
-    // (before, the collapse shifted the page and you ended up far below).
+    // Opening a card: glide so the clicked row's centre lands at FOCUS_AT of
+    // the screen. The previous card (above or below) closes with its own
+    // animation at the same time; the glide re-reads the row's position every
+    // frame, so a card collapsing above it is followed smoothly and the row
+    // still lands exactly in place (no instant collapse, no jump).
     if (openId) {
-      const i = BROADCAST.findIndex((p) => p.id === openId);
-      const row = rows.current[i];
-      if (row) {
-        const prevIdx = prev ? BROADCAST.findIndex((p) => p.id === prev) : -1;
-        const lenis = (window as unknown as { lenis?: { scrollTo: (t: number, o?: object) => void } }).lenis;
-        // An open card ABOVE the new one: close it at once and shift the page by
-        // its height in the same frame, so nothing on screen moves; then glide
-        // to the new row. (Collapsing it while scrolling made the page bounce.)
-        const above = prevIdx >= 0 && prevIdx < i ? panels.current[prevIdx] : null;
-        if (above) {
-          const h = above.offsetHeight;
-          gsap.killTweensOf(above);
-          gsap.set(above, { height: 0 });
-          const inner = above.firstElementChild as HTMLElement | null;
-          if (inner) gsap.set(inner, { opacity: 0 });
-          const top = window.scrollY - h;
-          if (lenis) lenis.scrollTo(top, { immediate: true, force: true });
-          else window.scrollTo(0, top);
-        }
-        // The clicked row's centre ends up at FOCUS_AT of the screen height.
-        const y = row.getBoundingClientRect().top + window.scrollY - window.innerHeight * FOCUS_AT + row.offsetHeight / 2;
-        if (lenis) lenis.scrollTo(y, { duration: OPEN_TIME });
-        else window.scrollTo({ top: y, behavior: "auto" });
-      }
+      const row = rows.current[BROADCAST.findIndex((p) => p.id === openId)];
+      if (row) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
     }
   }, [openId, setBars, targetFor, transition]);
 
-  // Esc closes the open card.
+  // Paulistão (first card) opens by itself the first time its row reaches 35%
+  // of the screen from the top. Only once per visit; the others need a click.
+  const autoOpened = useRef(false);
+  useEffect(() => {
+    const onScroll = () => {
+      if (autoOpened.current) return;
+      const i = BROADCAST.findIndex((p) => p.id === "paulistao");
+      const row = rows.current[i];
+      if (!row) return;
+      const top = row.getBoundingClientRect().top;
+      if (top > 0 && top <= window.innerHeight * 0.35) {
+        autoOpened.current = true;
+        window.removeEventListener("scroll", onScroll);
+        if (!openRef.current) {
+          setMounted((m) => (m.has("paulistao") ? m : new Set(m).add("paulistao")));
+          setOpenId("paulistao");
+        }
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+    // Esc closes the open card.
   useEffect(() => {
     if (!openId) return;
     const onKey = (e: KeyboardEvent) => {
@@ -615,6 +619,12 @@ export default function Broadcast() {
                 onClick={() => toggle(project)}
               >
                 <RowContent project={project} />
+                {/* Open / close mark: red "+" while closed, black "−" while open. */}
+                <span className={styles.rowIcon} data-open={isOpen || undefined} aria-hidden="true">
+                  <svg viewBox="0 0 16 16" width="16" height="16">
+                    <path d={isOpen ? "M3 8h10" : "M3 8h10M8 3v10"} fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+                  </svg>
+                </span>
                 {/* Phones: the card's loop on the right of the row (hidden once it's open). */}
                 {thumbs && project.preview && (
                   <span className={styles.rowThumb} aria-hidden="true">

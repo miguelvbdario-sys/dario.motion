@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Highlighter: ==words== in a desc / lead / note get the yellow marker (Marked.tsx).
  *
  * BROADCAST section (#broadcast): the four broadcast projects, in display order.
@@ -63,6 +63,8 @@ export type BroadcastProject = {
     pairs?: boolean;
     /** kind "youtube": the video id shown in the player. */
     youtube?: string;
+    /** kind "screens": link of the "Watch on Live" button under the list. */
+    live?: string;
     /**
      * kind "screens": a selector of broadcast screens. Each shows its art in the
      * big 16:9 stage (null = striped placeholder) and, optionally, live loops
@@ -99,6 +101,8 @@ export type BroadcastProject = {
     /** Muted loops: mp4 + poster. */
     loops?: { src: string; poster: string }[];
     channels?: string[];
+    /** Show the Process block (3D trophy, stats, steps) with this lead instead of the points. */
+    process?: boolean;
   };
   /** Small extras (e.g. program vignettes), played with sound in the player. */
   extras?: { title: string; video: string; poster: string }[];
@@ -158,6 +162,7 @@ export const BROADCAST: BroadcastProject[] = [
       ],
       outro: "This portfolio is interactive, enjoy, take your time and click on all!",
       noIndex: true,
+      process: true,
       channels: ["TNT", "HBO", "Record", "CazéTV"],
     },
     filters: [], // the tabs below take their place
@@ -165,11 +170,14 @@ export const BROADCAST: BroadcastProject[] = [
     sections: [
       { label: "About the project", kind: "about" },
       // Loops: /public/broadcast/paulistao/live (cut from match highlights).
-      { label: "Scoreboard", kind: "scoreboard", loops: [3, 4].map((n) => `/broadcast/paulistao/live/scoreboard-${n}`) },
+      { label: "Scoreboard", kind: "scoreboard", loops: ["/broadcast/paulistao/live/goals-all", "/broadcast/paulistao/live/scoreboard-3"] },
       { label: "Shields", kind: "shields" },
+      { label: "Mascots", kind: "mascots" },
       {
         label: "Broadcast Screens",
         kind: "screens",
+        // "Watch on Live" button under the screen list.
+        live: "https://www.youtube.com/watch?v=pMxhbLuqH3c",
         // Art in /public/broadcast/paulistao/screens, live loops in .../lineups.
         screens: [
           { label: "Sting", video: "/broadcast/paulistao/screens/sting.mp4" },
@@ -192,9 +200,6 @@ export const BROADCAST: BroadcastProject[] = [
           { label: "All assets", video: null, assets: true },
         ],
       },
-      { label: "Mascots", kind: "mascots" },
-      { label: "Process", kind: "process" }, // 3D trophy (BroadcastTrophy.tsx)
-      { label: "Live", kind: "youtube", youtube: "pMxhbLuqH3c" },
     ],
   },
   {
@@ -233,6 +238,7 @@ export const BROADCAST: BroadcastProject[] = [
         zoom: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
         sound: ["vinheta", "bumper"].map((n) => `/broadcast/bora-copar/${n}`),
         note: "Bora Copar is CazéTV's World Cup show: squad call-ups, behind the scenes of the Brazil team and everything around the tournament. I was responsible for the ==LED screens and the vignettes==.",
+        pairs: true,
       },
       // The vignette made in Blender: render × wireframe + the 3D set.
       { label: "Recopando", kind: "recopando" },
@@ -283,7 +289,7 @@ export const BROADCAST: BroadcastProject[] = [
     offset: 0,
     metaFirst: false,
     img: "/broadcast/nba-style/final-flamengo.jpg",
-    preview: "/broadcast/nba-style/final-flamengo.mp4",
+    preview: "/broadcast/nba-style/final-flamengo-sm.mp4",
     client: "Personal",
     role: "Experiments in my own style",
     year: "2026",
@@ -322,7 +328,6 @@ export const BROADCAST: BroadcastProject[] = [
         verticals: [1, 2].map((n) => `/broadcast/champions/process-${n}`),
         zoom: ["placar", "halftime", "escudo-city"].map((n) => `/broadcast/champions/${n}`),
         note: "==Recreating the scoreboard and the line-up==, and teaching them in my course, from the principles of motion to the final animations.",
-        cta: { label: "Course page", href: "/course" },
       },
     ],
     fullVideo: null, // TODO: substituir

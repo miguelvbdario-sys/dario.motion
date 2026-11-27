@@ -4,8 +4,20 @@ import { useEffect, useRef, useState } from "react";
 import styles from "./Broadcast.module.css";
 
 import { useT } from "@/lib/i18n";
+import { useLite } from "@/lib/lite";
+import { useInView } from "@/lib/useInView";
 /*
- * PROCESS tab (Paulistão card): the 3D trophy, small square, drag to rotate.
+ * The trophy square (Paulistão About), drag to rotate.
+ *
+ * Performance: by default it is a VIDEO of the turntable (turntable.mp4,
+ * rendered from this same scene at the same speed), so opening the card
+ * builds no 3D scene. The real 3D loads only when the visitor clicks / taps
+ * it, starting at the angle the video was showing, and fades in over the
+ * video: full rotation in every direction is kept. Closing the card goes back
+ * to the video for the next time it opens.
+ * Lite mode (weak devices, src/lib/lite.ts): a still image (first frame).
+ *
+ * 3D:
  * Model: /public/broadcast/paulistao/trophy/trophy.glb, exported from
  * "TAÇA 3D.blend" (textures cut to 1K, Draco-compressed mesh; the Draco
  * decoder files sit in the same folder). three.js is loaded only when this
@@ -30,11 +42,33 @@ const GAP = 0.018;
 export default function BroadcastTrophy({ active }: { active: boolean }) {
   const t = useT();
   const box = useRef<HTMLDivElement>(null);
+  const video = useRef<HTMLVideoElement>(null);
+  const lite = useLite();
+  const seen = useInView(box);
+  /** The visitor reached for the trophy: load the real 3D. */
+  const [want3D, setWant3D] = useState(false);
+  /** The 3D is on screen (the video is hidden and paused). */
   const [ready, setReady] = useState(false);
+
+  // Card closed: back to the video for the next opening.
+  useEffect(() => {
+    if (active) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setWant3D(false);
+    setReady(false);
+  }, [active]);
+
+    // The turntable video plays while the square is on screen.
+  useEffect(() => {
+    const v = video.current;
+    if (!v) return;
+    if (active && seen && !ready && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) v.play().catch(() => {});
+    else v.pause();
+  }, [active, seen, ready]);
 
   useEffect(() => {
     const host = box.current;
-    if (!host || !active) return;
+    if (!host || !active || !want3D || lite) return;
     let disposed = false;
     let cleanup = () => {};
 
@@ -50,6 +84,7 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
       renderer.outputColorSpace = THREE.SRGBColorSpace;
+      renderer.domElement.className = styles.trophyCanvas;
       host.appendChild(renderer.domElement);
 
       const scene = new THREE.Scene();
@@ -127,10 +162,18 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
 
       const dist = (size.y / 2 / Math.tan((camera.fov * Math.PI) / 360)) * 1.25;
       camera.position.set(0, size.y * 0.1, dist);
+      // Same angle as the video at this moment (the video turns the camera by
+      // -2π over its length, like autoRotate does).
+      const v = video.current;
+      if (v && v.duration) {
+        const angle = ((v.currentTime % v.duration) / v.duration) * Math.PI * 2;
+        const sph = new THREE.Spherical().setFromVector3(camera.position);
+        sph.theta -= angle;
+        camera.position.setFromSpherical(sph);
+      }
       controls.minDistance = dist * 0.6;
       controls.maxDistance = dist * 1.6;
       controls.update();
-      setReady(true);
 
       const resize = () => {
         const w = host.clientWidth;
@@ -146,10 +189,17 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
       let onScreen = true;
       const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting));
       io.observe(host);
+      let shown = false;
       renderer.setAnimationLoop(() => {
         if (!onScreen) return;
         controls.update();
         renderer.render(scene, camera);
+        if (!shown) {
+          // First frame drawn: fade the 3D in over the video.
+          shown = true;
+          renderer.domElement.setAttribute("data-on", "");
+          setReady(true);
+        }
       });
 
       cleanup = () => {
@@ -168,13 +218,40 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
       disposed = true;
       cleanup();
     };
-  }, [active]);
+  }, [active, want3D, lite]);
+
+  const reach = () => {
+    if (!lite) setWant3D(true);
+  };
 
   return (
     <div className={styles.trophyWrap}>
-      <div ref={box} className={styles.trophy} aria-label="3D trophy, drag to rotate" role="img">
-        {!ready && <span className={styles.trophyLoading}>{t("Loading 3D…")}</span>}
-        <span className={styles.previewLabel}>{t("3D · Drag to rotate")}</span>
+      <div
+        ref={box}
+        className={styles.trophy}
+        aria-label="3D trophy, drag to rotate"
+        role="img"
+        onPointerDown={reach}
+      >
+        {lite ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className={styles.trophyMedia} src={`${DIR}turntable.jpg`} alt="" />
+        ) : (
+          <video
+            ref={video}
+            className={styles.trophyMedia}
+            src={`${DIR}turntable.mp4`}
+            poster={`${DIR}turntable.jpg`}
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            disablePictureInPicture
+            aria-hidden="true"
+            data-off={ready || undefined}
+          />
+        )}
+        <span className={styles.previewLabel}>{t(lite ? "3D" : "3D · Drag to rotate")}</span>
       </div>
     </div>
   );

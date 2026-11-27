@@ -312,3 +312,18 @@
     opacity: 1;
   }
 }
+
+/* A panel that holds still (outer pair) is a touch more transparent; when it
+   moves in and starts playing, it fades up softly instead of snapping. */
+.media {
+  transition: opacity 0.6s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.panel[data-still] .media {
+  opacity: 0.88;
+}
+
+/* Lite mode (weak devices only): no floor reflection. */
+:global(html[data-lite]) .card {
+  -webkit-box-reflect: unset; /* "none" is not accepted by Chrome here */
+}

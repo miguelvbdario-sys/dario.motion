@@ -251,7 +251,9 @@
   border-radius: 50%;
   background: rgb(20 0 0 / 0.8);
   color: #efeeee;
-  font-size: 15px;
+  line-height: 0;
+  pointer-events: none;
+  z-index: 2;
   opacity: 0.75;
   transition: opacity 0.15s ease, background-color 0.15s ease;
 }
@@ -500,4 +502,13 @@
   flex-direction: column;
   gap: 8px;
   scroll-snap-align: start;
+}
+
+.zoomIcon svg {
+  display: block;
+}
+
+*:hover > .zoomIcon {
+  opacity: 1;
+  background: #e60000;
 }

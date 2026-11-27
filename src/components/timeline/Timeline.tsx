@@ -86,8 +86,8 @@ export default function Timeline() {
       if (fill.current) fill.current.style.setProperty("--p", String(p));
       if (tc.current) tc.current.textContent = timecode(y / FRAME_PX);
       const s = y > SHOW_AFTER;
-      // Only at the very end of the page (full scroll done).
-      const pa = y >= document.documentElement.scrollHeight - window.innerHeight - 40;
+      // Always there once the page has left the very top.
+      const pa = y > window.innerHeight * 0.5;
       if (s !== shownNow) setShown((shownNow = s));
       if (pa !== pastNow) setPast((pastNow = pa));
     };
@@ -137,7 +137,7 @@ export default function Timeline() {
           <div ref={head} className={styles.playhead} aria-hidden="true" />
         </nav>
       </div>
-      {/* Back to the top (phones and desktop), only once the page has been scrolled to the end. */}
+      {/* Back to the top (phones and desktop), top-left, once the page has left the top. */}
       <button
         type="button"
         className={styles.toTop}

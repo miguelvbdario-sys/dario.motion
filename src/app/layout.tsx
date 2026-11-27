@@ -5,6 +5,7 @@ import { inter, mono, tusker, wildest } from "./fonts";
 import SmoothScroll from "@/components/providers/SmoothScroll";
 import CustomCursor from "@/components/cursor/CustomCursor";
 import CrtScreen from "@/components/crt/CrtScreen";
+import LiteWatch from "@/components/providers/LiteWatch";
 import Effects from "@/components/effects/Effects";
 import { SITE, SITE_URL } from "@/lib/site";
 import { LangProvider } from "@/lib/i18n";
@@ -61,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SmoothScroll>{children}</SmoothScroll>
         </LangProvider>
         <CrtScreen />
+        <LiteWatch />
         <CustomCursor />
         {/* Magnetic buttons and decoding labels. */}
         <Effects />

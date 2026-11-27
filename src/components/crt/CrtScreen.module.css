@@ -68,3 +68,14 @@
   stroke-width: 3px;
   vector-effect: non-scaling-stroke;
 }
+
+/* Lite mode (src/lib/lite.ts, weak devices only): no glare, no rim glow and
+   no scanlines; the curved screen shape stays. */
+:global(html[data-lite]) .glare,
+:global(html[data-lite]) .rim {
+  display: none;
+}
+
+:global(html[data-lite]) .glass {
+  background: none;
+}

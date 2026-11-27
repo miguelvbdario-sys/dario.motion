@@ -7,13 +7,14 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useGSAP } from "@gsap/react";
 import { FrameSequence } from "@/lib/frameSequence";
 import VectorOverlay from "./VectorOverlay";
+import CameraReticle from "./CameraReticle";
 import { ScanlineField } from "@/lib/scanlineField";
 import { ABOUT } from "@/content/about";
 import { onLoaded } from "@/lib/loader";
-import PixelTrail from "./PixelTrail";
 import styles from "./Hero.module.css";
 
 import { useT } from "@/lib/i18n";
+import { useLite } from "@/lib/lite";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // three.js only loads in the browser, after the hero text has painted.
@@ -95,8 +96,20 @@ const goTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
 const pad = (frame: number) => String(frame).padStart(3, "0");
 const at = (position: string) => ({ "--at": position }) as CSSProperties;
 
+/** Lite mode: the emblem's first pose as an image (no WebGL). */
+function EmblemStill({ src, label }: { src: string; label: string }) {
+  return (
+    <div className={styles.emblemCanvas} role="img" aria-label={label}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }} />
+    </div>
+  );
+}
+
 export default function Hero() {
   const t = useT();
+  /** Weak devices (src/lib/lite.ts): the 3D emblems become still images (their first pose). */
+  const lite = useLite();
   const root = useRef<HTMLElement>(null);
   const headCanvas = useRef<HTMLCanvasElement>(null);
   const arrowCanvas = useRef<HTMLCanvasElement>(null);
@@ -401,10 +414,11 @@ export default function Hero() {
     <section id="hero" ref={root} className={styles.stage}>
       <div className={styles.bg} aria-hidden="true">
         <div className={styles.bgCore} />
-        {/* Mouse trail: pixel squares split into RGB, fading out (desktop). */}
-        <PixelTrail className={styles.bgTrail} />
         <canvas ref={scanCanvas} className={styles.bgScan} />
       </div>
+      {/* Camera reticle following the mouse, over the hero (light: transforms
+          only; the old pixel trail added ~25% to every frame and was removed). */}
+      <CameraReticle />
 
       <div className={styles.grid} aria-hidden="true">
         {V_LINES.map((x) => (
@@ -453,10 +467,18 @@ export default function Hero() {
 
 
           <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal data-nodrag>
-            <Emblem id="left" src="/3d/emblem-left.glb" label="Chrome 3D pig emblem" speed={0.75} />
+            {lite ? (
+              <EmblemStill src="/3d/emblem-left-still.webp" label="Chrome 3D pig emblem" />
+            ) : (
+              <Emblem id="left" src="/3d/emblem-left.glb" label="Chrome 3D pig emblem" speed={0.75} />
+            )}
           </div>
           <div className={`${styles.emblem} ${styles.emblemRight}`} data-reveal data-nodrag>
-            <Emblem id="right" src="/3d/emblem-right.glb" label="Chrome 3D vulture emblem" speed={-0.6} />
+            {lite ? (
+              <EmblemStill src="/3d/emblem-right-still.webp" label="Chrome 3D vulture emblem" />
+            ) : (
+              <Emblem id="right" src="/3d/emblem-right.glb" label="Chrome 3D vulture emblem" speed={-0.6} />
+            )}
           </div>
 
           {/* Navigation: each pill scrolls to its section (Course opens /course in the same tab). */}

@@ -10,17 +10,19 @@ import ScrollType from "@/components/effects/ScrollType";
 export default function Home() {
   return (
     <main id="main">
-      {/* First portrait frame, fetched before the scripts run. Queries mirror Hero.module.css. */}
+      {/* First portrait frame, fetched before the scripts run (as=fetch: the frame player downloads with fetch()). Queries mirror Hero.module.css. */}
       <link
         rel="preload"
-        as="image"
+        as="fetch"
+        crossOrigin="anonymous"
         href="/sequence/hero-look-960/LOOK_049.webp"
         media="(min-width: 768px) and (min-aspect-ratio: 751/1000)"
         fetchPriority="high"
       />
       <link
         rel="preload"
-        as="image"
+        as="fetch"
+        crossOrigin="anonymous"
         href="/sequence/hero-look-720/LOOK_049.webp"
         media="(max-width: 767px), (max-aspect-ratio: 3/4)"
         fetchPriority="high"

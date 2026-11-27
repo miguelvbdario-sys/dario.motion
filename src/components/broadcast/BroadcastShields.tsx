@@ -25,8 +25,8 @@ const label = (slug: string) => TEAMS.find((t) => t.slug === slug)?.label ?? slu
 
 export default function BroadcastShields({ active }: { active: boolean }) {
   const t = useT();
-  const [team, setTeam] = useState(TEAMS[0].slug);
-  const [keyframes, setKeyframes] = useState(false);
+  const [team, setTeam] = useState("botafogo-sp");
+  const [keyframes, setKeyframes] = useState(true);
   const video = useRef<HTMLVideoElement>(null);
   const hold = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -68,7 +68,7 @@ export default function BroadcastShields({ active }: { active: boolean }) {
     <div className={styles.shields}>
       <div className={styles.boardSide}>
         <p className={styles.sideLabel}>{t("[ Shields ] Pick a crest")}</p>
-        <CrestGrid side="home" team={team} busy={false} onTeam={setTeam} />
+        <CrestGrid side="home" team={team} busy={false} onTeam={setTeam} first={["botafogo-sp"]} />
         <p className={styles.sideLabel}>{label(team)}</p>
       </div>
       <div className={styles.shieldStage}>
@@ -89,14 +89,12 @@ export default function BroadcastShields({ active }: { active: boolean }) {
         <div className={styles.stageControls}>
           <button
             type="button"
-            role="checkbox"
-            aria-checked={keyframes}
+            aria-pressed={!keyframes}
             className={`${styles.filter} ${styles.ctrl} ${styles.kfToggle}`}
-            data-active={keyframes || undefined}
             onClick={() => setKeyframes((k) => !k)}
           >
             <span className={styles.square} aria-hidden="true" />
-            <span className={styles.filterLabel}>{t("See keyframes")}</span>
+            <span className={styles.filterLabel}>{t(keyframes ? "Remove keyframes" : "See keyframes")}</span>
           </button>
         </div>
       </div>

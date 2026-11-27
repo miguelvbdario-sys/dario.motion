@@ -77,8 +77,7 @@ export default function AboutIntro() {
       shown = idx;
     };
 
-    const unsub = onScrollFrame((vh) => {
-      const r = root.getBoundingClientRect();
+    const unsub = onScrollFrame((vh, r: DOMRect) => {
       if (!loaded && r.top < vh * 2.5) {
         loaded = true;
         vids.forEach((v, i) => {
@@ -144,7 +143,7 @@ export default function AboutIntro() {
       });
 
       return p !== target;
-    });
+    }, () => root.getBoundingClientRect());
     return () => {
       unsub();
       frames.forEach((f) => {

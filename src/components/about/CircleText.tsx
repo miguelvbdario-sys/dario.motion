@@ -21,11 +21,10 @@ export default function CircleText() {
   useEffect(() => {
     const el = ring.current;
     if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    return onScrollFrame((vh) => {
-      const r = el.getBoundingClientRect();
+    return onScrollFrame((vh, r: DOMRect) => {
       if (r.bottom < -100 || r.top > vh + 100) return;
       el.style.transform = `rotate(${(window.scrollY * DEG_PER_PX) % 360}deg)`;
-    });
+    }, () => el.getBoundingClientRect());
   }, []);
 
   // Enters first (AboutIntro slides [data-enter] in by --i), the photo after.
