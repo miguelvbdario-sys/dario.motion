@@ -118,18 +118,21 @@ function fillFace(face: HTMLDivElement | null, project: BroadcastProject | null)
 /**
  * Glide a row to the focus line once the visitor's scroll has settled: no
  * finger on the screen and no scroll for SETTLE_MS (phones: a scripted scroll
- * on top of the finger's momentum fights it). Gives up after 4s, or if the row
- * has left the screen by then. Returns a cancel function.
+ * on top of the finger's momentum fights it). The finger's momentum usually
+ * carries the row itself off the top of the screen, so it still glides back as
+ * long as any part of its open card (row + panel) is on screen. Gives up after
+ * 8s, or once the whole card has left the screen. Returns a cancel function.
  */
 const SETTLE_MS = 160;
-function followWhenSettled(row: HTMLElement) {
+function followWhenSettled(row: HTMLElement, panel: HTMLElement | null) {
   let timer = 0;
   let touching = false;
-  const giveUp = window.setTimeout(() => cancel(), 4000);
+  const giveUp = window.setTimeout(() => cancel(), 8000);
   const go = () => {
     cancel();
-    const r = row.getBoundingClientRect();
-    if (r.bottom > 0 && r.top < window.innerHeight) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
+    const top = row.getBoundingClientRect().top;
+    const bottom = (panel ?? row).getBoundingClientRect().bottom;
+    if (bottom > 0 && top < window.innerHeight) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
   };
   const arm = () => {
     clearTimeout(timer);
@@ -664,9 +667,10 @@ export default function Broadcast() {
     // (no finger on the screen, no scroll for a moment).
     settleFollow.current?.();
     settleFollow.current = null;
-    const row = openId ? rows.current[BROADCAST.findIndex((p) => p.id === openId)] : null;
+    const openIdx = openId ? BROADCAST.findIndex((p) => p.id === openId) : -1;
+    const row = openIdx >= 0 ? rows.current[openIdx] : null;
     if (row && !autoOpening.current) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
-    else if (row && isTouchLayout()) settleFollow.current = followWhenSettled(row);
+    else if (row && isTouchLayout()) settleFollow.current = followWhenSettled(row, panels.current[openIdx] ?? null);
     autoOpening.current = false;
   }, [openId, setBars, targetFor, transition]);
 
