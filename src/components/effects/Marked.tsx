@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import styles from "./Marked.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Text with highlighter marks: write ==words== in the text and those words get
@@ -23,7 +24,7 @@ export function Mark({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const m = el.current;
     if (!m) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion()) {
       m.dataset.on = "";
       return;
     }

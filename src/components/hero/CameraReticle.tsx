@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import styles from "./Hero.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Camera reticle (desktop): four corner brackets, like a camera's focus frame,
@@ -18,8 +19,9 @@ export default function CameraReticle() {
     const area = el?.parentElement;
     if (!el || !area) return;
     if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const dur = reduced ? 0 : 0.35;
+    // Animations off: no reticle following the mouse.
+    if (reducedMotion()) return;
+    const dur = 0.35;
     const x = gsap.quickTo(el, "x", { duration: dur, ease: "power3.out" });
     const y = gsap.quickTo(el, "y", { duration: dur, ease: "power3.out" });
     let shown = false;

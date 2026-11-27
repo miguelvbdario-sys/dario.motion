@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { reducedMotion } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -31,7 +32,7 @@ export default function WordReveal({
   useEffect(() => {
     const el = root.current;
     if (!el || mode !== "scroll") return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const words = el.querySelectorAll<HTMLElement>("[data-w]");
     const tween = gsap.fromTo(
       words,
@@ -53,7 +54,7 @@ export default function WordReveal({
   useEffect(() => {
     const el = root.current;
     if (!el || mode !== "play" || !play) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const words = el.querySelectorAll<HTMLElement>("[data-w]");
     // Whole sentence in about 0.9s however long it is.
     const each = Math.min(0.05, 0.9 / Math.max(1, words.length));

@@ -254,7 +254,8 @@
  */
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) {
-    .script {
+    /* Not with "turn off animations" (src/lib/motion.ts). */
+    :global(html:not([data-calm])) .script {
       animation: aboutScriptDrift linear both;
       animation-timeline: view();
       animation-range: entry 0% exit 100%;

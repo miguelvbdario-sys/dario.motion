@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import styles from "./SlotNumber.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Number that rolls like a slot machine when it changes: each digit is a reel
@@ -21,7 +22,7 @@ function Reel({ digit, order }: { digit: number; order: number }) {
   useEffect(() => {
     const el = reel.current;
     if (!el || digit === shown.current) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = reducedMotion();
     const step = ((digit - shown.current + DIGITS) % DIGITS) + (still ? 0 : LAPS * DIGITS);
     shown.current = digit;
     pos.current += step;

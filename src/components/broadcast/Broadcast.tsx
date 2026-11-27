@@ -10,11 +10,13 @@ import BroadcastPanel from "./BroadcastPanel";
 import Marquee from "@/components/marquee/Marquee";
 import ScrollType from "@/components/effects/ScrollType";
 import LangSwitch from "@/components/lang/LangSwitch";
+import MotionSwitch from "@/components/lang/MotionSwitch";
 import { useTr, useT } from "@/lib/i18n";
 import { glide, isTouchLayout, onScrollFrame, progress, requestScrollFrame, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import { FOCUS_AT } from "./focus";
 import { followScroll } from "@/lib/followScroll";
 import styles from "./Broadcast.module.css";
+import { loopsPaused, reducedMotion } from "@/lib/motion";
 
 gsap.registerPlugin(CustomEase);
 
@@ -39,6 +41,30 @@ const FLIP_TIME = 0.6;
 /** A flip in progress blocks media swaps and other flips for this long. */
 const FLIP_LOCK_MS = 620;
 const OPEN_TIME = 0.85;
+
+/**
+ * Keeps an opening card's animation from being skipped by a long frame.
+ * The GSAP ticker runs without lag smoothing (Lenis needs real time), so when
+ * a frame stalls right as a card opens (its content mounting; Opera also
+ * processes every new <video>), the open tween jumped straight to its end and
+ * the card appeared without animation. For the next ~2.5 s, any frame longer
+ * than LAG_MS pushes these tweens' start later by the time lost, so they
+ * resume where they were instead of jumping ahead.
+ */
+const LAG_MS = 90;
+function lagSafe(...tweens: gsap.core.Tween[]) {
+  let left = 2500;
+  const tick = (_time: number, deltaMs: number) => {
+    if (deltaMs > LAG_MS) {
+      const lost = (deltaMs - 1000 / 60) / 1000;
+      for (const tw of tweens) tw.startTime(tw.startTime() + lost);
+    }
+    left -= deltaMs;
+    if (left <= 0) gsap.ticker.remove(tick);
+  };
+  // Prioritised: runs before GSAP renders this frame.
+  gsap.ticker.add(tick, false, true);
+}
 /** Length of the glitch burst when a card opens (ms). */
 const GLITCH_MS = 280;
 /** Floating card offset from the cursor (px). */
@@ -89,8 +115,8 @@ function useThumbs() {
   const [on, setOn] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia(THUMB_QUERY);
-    // Reduced motion: no thumbnails loops at all (the row reads fine without).
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    // Thumbnail loops play in every mode (src/lib/motion.ts, loopsPaused).
+    const still = loopsPaused();
     const set = () => setOn(mq.matches && !still);
     set();
     mq.addEventListener("change", set);
@@ -128,7 +154,7 @@ export default function Broadcast() {
   // New content (a card or tab that opens) is picked up as it mounts.
   useEffect(() => {
     const root = section.current;
-    if (!root || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!root || reducedMotion()) return;
     const SELECTOR = [
       `.${styles.aboutPoints} > li`,
       `.${styles.aboutStats} > div`,
@@ -182,7 +208,7 @@ export default function Broadcast() {
   // plays it in reverse. Positions are read every frame, so an open card
   // above can't leave a row stuck hidden; an open row is always shown.
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const easeOut = (t: number) => 1 - (1 - t) ** 3;
     const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - (-2 * t + 2) ** 3 / 2);
     // Phones: a longer range and a short glide, so finger jumps don't stutter.
@@ -364,7 +390,7 @@ export default function Broadcast() {
   }, []);
 
   useEffect(() => {
-    reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    reduced.current = reducedMotion();
     canHover.current = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
     const f = flipper.current;
     const pos = cardPos.current;
@@ -486,12 +512,14 @@ export default function Broadcast() {
         // gently (soft ease, a plain fade, no glitch flash), so it reads as the
         // page settling instead of a cut. A click keeps the full sting.
         const soft = autoOpening.current;
-        gsap.to(wrap, {
-          height: "auto",
-          duration: soft ? 1.1 : OPEN_TIME,
-          ease: soft ? "power2.out" : EASE_OPEN,
-          overwrite: true,
-        });
+        const opening = [
+          gsap.to(wrap, {
+            height: "auto",
+            duration: soft ? 1.1 : OPEN_TIME,
+            ease: soft ? "power2.out" : EASE_OPEN,
+            overwrite: true,
+          }),
+        ];
         if (!soft) {
           // A short signal glitch as the content comes in, like a camera cut (< 300ms).
           timers[i] = window.setTimeout(() => {
@@ -501,15 +529,18 @@ export default function Broadcast() {
         }
         if (inner) {
           if (fromClosed) gsap.set(inner, { opacity: 0, y: soft ? 0 : -24 });
-          gsap.to(inner, {
-            opacity: 1,
-            y: 0,
-            duration: soft ? 0.9 : OPEN_TIME,
-            delay: fromClosed ? (soft ? 0.15 : 0.2) : 0,
-            ease: soft ? "power1.out" : EASE_OPEN,
-            overwrite: true,
-          });
+          opening.push(
+            gsap.to(inner, {
+              opacity: 1,
+              y: 0,
+              duration: soft ? 0.9 : OPEN_TIME,
+              delay: fromClosed ? (soft ? 0.15 : 0.2) : 0,
+              ease: soft ? "power1.out" : EASE_OPEN,
+              overwrite: true,
+            }),
+          );
         }
+        lagSafe(...opening);
       } else {
         // Closing runs faster than opening (fast closing: the visitor is done with it).
         // The page shrinks without a scroll event: re-check the rows' reveal every
@@ -616,8 +647,12 @@ export default function Broadcast() {
       {/* White strip separating the hero from the rest of the site. */}
       <div className={styles.marqueeWrap}>
         <Marquee />
-        {/* Language switch: under the strip, on the right, in the black. */}
-        <LangSwitch className={styles.langSwitch} />
+        {/* Under the strip, on the right, in the black: "turn off animations"
+            above the language switch. */}
+        <div className={styles.switches}>
+          <MotionSwitch className={styles.motionSwitch} />
+          <LangSwitch className={styles.langSwitch} />
+        </div>
       </div>
 
       {/* Giant section title crossing the screen with the scroll. */}

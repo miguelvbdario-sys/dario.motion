@@ -63,6 +63,13 @@ https://www.dario-motion.com (main page, English by default) and /course
 - Lite mode (`src/lib/lite.ts`): only devices measured slow (median frame) get
   still 3D objects, no CRT glare/scanlines, one carousel video. `?debug` in the
   URL shows an FPS meter.
+- "Turn off animations" switch (`src/lib/motion.ts`, above EN/PT): calm mode =
+  reduced-motion path + still head/3D; video loops always play (`loopsPaused`).
+  Components use `reducedMotion()`, CSS uses `html[data-calm]`; switching
+  remounts the page (CalmRemount). Auto-on under ~10 fps (lite.ts).
+- CRT glass is one canvas drawn once (CrtScreen drawCrt). Head frames decode in
+  `public/decode-worker.js`. `?debug&off=crt,anim,blend,3d,head,videos,smooth`.
+- Safari can't be tested here; Playwright WebKit on Windows is only a rough proxy.
 - Headless-Chrome FPS tests drop to 30 fps with any two videos playing — a test
   artifact, not the site.
 
@@ -71,5 +78,5 @@ https://www.dario-motion.com (main page, English by default) and /course
 - Link preview image proposal: `src/assets/og-hero-proposta.png` (not approved,
   not committed). He asked for a version without the CRT curve/borders and
   without the 3D pig. Current share image: `src/app/opengraph-image.tsx`.
-- Chrome on Miguel's PC still drops frames (Opera is smooth); waiting for a
-  `?debug` screenshot showing where.
+- Miguel's Chrome has hardware acceleration OFF (his "Opera" is Opera GX); told
+  him to turn it on. Waiting for his Safari (Mac) `?debug` fps after this deploy.

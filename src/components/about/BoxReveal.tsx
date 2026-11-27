@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { onScrollFrame } from "@/components/effects/scrollFx";
 import styles from "./BoxReveal.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Box reveal for ABOUT's texts ([data-box] elements, in data-box order).
@@ -34,7 +35,7 @@ export default function BoxReveal() {
     const lay = layer.current;
     const section = lay?.closest("section");
     if (!lay || !section) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const blocks = [...section.querySelectorAll<HTMLElement>("[data-box]")].sort(
       (a, b) => Number(a.dataset.box) - Number(b.dataset.box),
     );

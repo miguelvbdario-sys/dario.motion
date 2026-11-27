@@ -17,6 +17,7 @@ export const PT: Record<string, string> = {
   Works: "Trabalhos",
   "About me": "Sobre mim",
   "senior motion designer": "motion designer sênior",
+  "Turn off animations": "Desligar animações",
   "Motion Designer • Sports • 8 Years • ": "Motion Designer • Esportes • 8 Anos • ",
 
   // ---------- About ----------

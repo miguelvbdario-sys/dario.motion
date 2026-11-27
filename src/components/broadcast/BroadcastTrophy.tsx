@@ -6,6 +6,7 @@ import styles from "./Broadcast.module.css";
 import { useT } from "@/lib/i18n";
 import { useLite } from "@/lib/lite";
 import { useInView } from "@/lib/useInView";
+import { loopsPaused } from "@/lib/motion";
 /*
  * The trophy square (Paulistão About), drag to rotate.
  *
@@ -68,7 +69,7 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
   useEffect(() => {
     const v = video.current;
     if (!v) return;
-    if (active && seen && !ready && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) v.play().catch(() => {});
+    if (active && seen && !ready && !loopsPaused()) v.play().catch(() => {});
     else v.pause();
   }, [active, seen, ready]);
 

@@ -101,3 +101,14 @@
     animation: none;
   }
 }
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .tag,
+:global(html[data-calm]) .title,
+:global(html[data-calm]) .sub {
+  transition: none;
+}
+
+:global(html[data-calm]) .dot {
+  animation: none;
+}

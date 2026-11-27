@@ -135,6 +135,12 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .backdrop,
+:global(html[data-calm]) .panel {
+  animation: none;
+}
+
 /* "Contact me" in About: bone-white until picked, then inverted (hover / open). */
 .trigger {
   background: #efeeee !important;

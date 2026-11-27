@@ -78,3 +78,14 @@
     animation: none;
   }
 }
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .track {
+  animation: none;
+}
+
+:global(html[data-calm][data-intro]) .marquee,
+:global(html[data-calm][data-intro][data-loaded]) .marquee {
+  translate: none;
+  animation: none;
+}

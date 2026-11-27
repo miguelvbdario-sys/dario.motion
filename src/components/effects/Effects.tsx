@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { reducedMotion, useCalm } from "@/lib/motion";
 
 /*
  * Small site-wide interaction effects, attached by attribute/selector so the
@@ -23,9 +24,11 @@ const SCRAMBLE_MS = 650;
 const GLYPH_MS = 70;
 
 export default function Effects() {
+  /** Re-runs when "turn off animations" switches (this sits outside the page remount). */
+  const calm = useCalm();
   useEffect(() => {
     const fine = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = reducedMotion();
     if (!fine || reduced) return;
 
     // ---------- Magnetic ----------
@@ -169,7 +172,7 @@ export default function Effects() {
       document.removeEventListener("pointerout", onOut);
       mags.forEach((m) => (m.el.style.translate = ""));
     };
-  }, []);
+  }, [calm]);
 
   return null;
 }

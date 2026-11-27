@@ -3,6 +3,55 @@
 import { useEffect } from "react";
 import { isLite, startLiteWatch } from "@/lib/lite";
 
+/** Browser engine, for the meter (Safari and every iPhone browser are WebKit). */
+const ENGINE =
+  typeof navigator === "undefined"
+    ? ""
+    : /OPR\//.test(navigator.userAgent)
+      ? "opera"
+      : navigator.vendor?.startsWith("Apple")
+        ? "webkit/safari"
+        : /Firefox\//.test(navigator.userAgent)
+          ? "firefox"
+          : "chrome";
+
+/*
+ * ?debug&off=a,b,c turns parts of the site off, to find which one a browser
+ * struggles with (compare the fps with and without). Never used otherwise.
+ *   crt     CRT glass, glare and curved edges over the whole site
+ *   anim    every CSS animation (paused)
+ *   blend   every blend mode (drawn normally)
+ *   3d      the 3D emblems and trophy
+ *   head    the hero character
+ *   videos  every video (paused)
+ *   smooth  smooth scrolling (Lenis; read in SmoothScroll.tsx)
+ */
+const OFF_CSS: Record<string, string> = {
+  crt: "[data-crt] { display: none !important; }",
+  anim: "*, *::before, *::after { animation-play-state: paused !important; }",
+  blend: "* { mix-blend-mode: normal !important; }",
+  "3d": '#hero [class*="emblem"] canvas, #broadcast canvas { visibility: hidden !important; }',
+  head: "#hero [data-head] { visibility: hidden !important; }",
+};
+const OFF =
+  typeof location === "undefined"
+    ? []
+    : (new URLSearchParams(location.search).get("off") ?? "").split(",").map((s) => s.trim()).filter(Boolean);
+
+function applyOff() {
+  const css = OFF.map((k) => OFF_CSS[k] ?? "").join("\n");
+  if (css) {
+    const style = document.createElement("style");
+    style.textContent = css;
+    document.head.appendChild(style);
+  }
+  if (OFF.includes("videos")) {
+    const pause = () => document.querySelectorAll("video").forEach((v) => v.pause());
+    pause();
+    window.setInterval(pause, 300);
+  }
+}
+
 /** ?debug meter: fps over the last second, slowest frame, section in view, lite. */
 function startDebugMeter() {
   const box = document.createElement("div");
@@ -37,7 +86,8 @@ function startDebugMeter() {
     });
     const playing = [...document.querySelectorAll("video")].filter((v) => !v.paused).length;
     box.textContent = `${fps} fps  worst ${worst}ms
-${sec?.id ?? "-"}  videos ${playing}  lite ${isLite() ? "ON" : "off"}`;
+${sec?.id ?? "-"}  videos ${playing}  lite ${isLite() ? "ON" : "off"}
+${ENGINE}  dpr ${window.devicePixelRatio}  off: ${OFF.join(",") || "-"}`;
     box.style.color = fps < 45 ? "#f55" : "#0f0";
   }, 500);
   return () => {
@@ -81,7 +131,9 @@ export default function LiteWatch() {
       }
     });
     mo.observe(document.body, { childList: true, subtree: true });
-    const stopMeter = new URLSearchParams(location.search).has("debug") ? startDebugMeter() : null;
+    const debug = new URLSearchParams(location.search).has("debug");
+    if (debug) applyOff();
+    const stopMeter = debug ? startDebugMeter() : null;
     return () => {
       mo.disconnect();
       stopMeter?.();

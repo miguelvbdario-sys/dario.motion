@@ -7,6 +7,7 @@ import Marked from "@/components/effects/Marked";
 
 import { useT } from "@/lib/i18n";
 import { useInView } from "@/lib/useInView";
+import { loopsPaused } from "@/lib/motion";
 /** Intro text at the top of the tab (where to change it). */
 const INTRO =
   "Recopando replays the most memorable matches from past World Cups. The vignette is all about ==nostalgia==: a typical Brazilian bedroom from the 90s to the 00s, with the CRT TV and the PS2.";
@@ -45,7 +46,7 @@ function Compare({ decade, active }: { decade: Decade; active: boolean }) {
   useEffect(() => {
     const m = main.current;
     if (!m) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = loopsPaused();
     if (active && seen && !still) m.play().catch(() => {});
     else m.pause();
     const w = wire.current;

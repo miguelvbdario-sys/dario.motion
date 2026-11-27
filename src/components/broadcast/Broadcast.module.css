@@ -1031,6 +1031,11 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .mascotHint span {
+  animation: none;
+}
+
 .mascotVideo video {
   display: block;
   width: 100%;
@@ -1627,6 +1632,12 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .goLiveRing {
+  animation: none;
+  opacity: 0;
+}
+
 /* ---------- Phones and touch screens ---------- */
 
 @media (max-width: 767px), (hover: none) {
@@ -1782,6 +1793,13 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .filter[data-moving] .square,
+:global(html[data-calm]) .statusDot[data-status="in"],
+:global(html[data-calm]) .statusDot[data-status="out"] {
+  animation: none;
+}
+
 /* Phones/portrait tablets: the hero has its own height there (see Hero.module.css). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .section {
@@ -1881,6 +1899,11 @@
   .teamList {
     animation: none;
   }
+}
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .teamList {
+  animation: none;
 }
 
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
@@ -2756,6 +2779,11 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .panelWrap[data-glitch] > * {
+  animation: none;
+}
+
 
 
 /*
@@ -2854,6 +2882,15 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .preview,
+:global(html[data-calm]) .onAirTile,
+:global(html[data-calm]) .loopCell,
+:global(html[data-calm]) .aboutPoints > li,
+:global(html[data-calm]) .extra {
+  transition: none;
+}
+
 /* Classic cards (Paris): the whole preview is the play button. */
 .previewHit {
   position: absolute;
@@ -2876,11 +2913,23 @@
 }
 
 /* EN / PT switch under the strip, right side (above the BROADCAST title). */
-.marqueeWrap .langSwitch {
+.marqueeWrap .switches {
   position: absolute;
   top: calc(100% + var(--s) * 28);
   right: calc(var(--s) * 64);
   z-index: 20;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.switches .motionSwitch {
+  height: 40px;
+  font-size: 13px;
+}
+
+.switches .langSwitch {
   /* A little bigger on desktop. */
   width: 116px;
   height: 44px;
@@ -2889,9 +2938,24 @@
 
 /* Phones: smaller and lower, clear of the character's hands (its drag area). */
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
-  .marqueeWrap .langSwitch {
+  /* Phones: side by side on one row (stacked, the language switch fell onto
+     the "01 — Broadcast" line), clear of the character's hands. */
+  .marqueeWrap .switches {
     top: calc(100% + 58px);
     right: 16px;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .switches .motionSwitch {
+    height: 28px;
+    gap: 6px;
+    padding: 0 3px 0 10px;
+    font-size: 10px;
+  }
+
+  .switches .langSwitch {
     width: 72px;
     height: 28px;
     font-size: 10px;
@@ -2965,6 +3029,11 @@
   .outroArrow {
     animation: none;
   }
+}
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .outroArrow {
+  animation: none;
 }
 
 /* "Watch on Live >" under the screen list. */
@@ -3114,6 +3183,11 @@
   .liveDot {
     animation: none;
   }
+}
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .liveDot {
+  animation: none;
 }
 
 .liveLink:active {
@@ -3344,4 +3418,9 @@
   .stepsHint {
     animation: none;
   }
+}
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .stepsHint {
+  animation: none;
 }

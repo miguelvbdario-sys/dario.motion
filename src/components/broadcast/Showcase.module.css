@@ -244,6 +244,15 @@
   outline-offset: 2px;
 }
 
+/* Click layer over a clickable loop (the video itself ignores the pointer,
+   see globals.css: that keeps Opera's pop-out button off it). */
+.hit {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+}
+
 .zoomIcon {
   position: absolute;
   right: 8px;
@@ -335,6 +344,11 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .lightbox {
+  animation: none;
+}
+
 /* Hover zoom on the tiles, like the other media in the cards. */
 .cell,
 .vertical {
@@ -354,6 +368,12 @@
   .vertical {
     transition: none;
   }
+}
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .cell,
+:global(html[data-calm]) .vertical {
+  transition: none;
 }
 
 /* Description under all the videos + optional button (e.g. Course page). */

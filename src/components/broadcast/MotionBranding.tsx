@@ -7,6 +7,7 @@ import Marked from "@/components/effects/Marked";
 
 import { useT } from "@/lib/i18n";
 import { useInView } from "@/lib/useInView";
+import { loopsPaused } from "@/lib/motion";
 /*
  * MOTION BRANDING tab (2026 World Cup card).
  *
@@ -32,7 +33,7 @@ export default function MotionBranding({ active, compact }: { active: boolean; c
   useEffect(() => {
     const v = video.current;
     if (!v) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = loopsPaused();
     if (active && seen && !still && !full) v.play().catch(() => {});
     else v.pause();
   }, [active, seen, full]);

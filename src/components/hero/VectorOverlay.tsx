@@ -5,6 +5,7 @@ import gsap from "gsap";
 import type { FrameSequence } from "@/lib/frameSequence";
 import type { ScanlineField } from "@/lib/scanlineField";
 import { vectorBus, type ScreenRect } from "@/lib/vectorBus";
+import { reducedMotion } from "@/lib/motion";
 import styles from "./Hero.module.css";
 
 /*
@@ -54,6 +55,8 @@ export default function VectorOverlay({
   const frameLabel = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
+    // Animations off: no selection box chasing the mouse.
+    if (reducedMotion()) return;
     const section = stage.current;
     const overlay = layer.current;
     const box = frame.current;

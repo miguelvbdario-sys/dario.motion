@@ -18,16 +18,15 @@ import { FOCUS_AT } from "./focus";
 import { followScroll } from "@/lib/followScroll";
 import WordReveal from "@/components/effects/WordReveal";
 import styles from "./Broadcast.module.css";
+import showcaseStyles from "./Showcase.module.css";
 
 import { useT } from "@/lib/i18n";
 import { useInView } from "@/lib/useInView";
+import { loopsPaused, reducedMotion } from "@/lib/motion";
 const pad = (n: number) => String(n).padStart(2, "0");
 
 /** Phones: length of the slide between two screens (ms; keep in sync with the CSS). */
 const COMPACT_QUERY = "(max-width: 767px), (max-aspect-ratio: 3/4)";
-
-const reducedMotion = () =>
-  typeof window !== "undefined" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /**
  * Accordion body (phones): unfolds from 0 to its height when it mounts and
@@ -90,9 +89,8 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    // Reduced motion: loops stay on their first frame / poster.
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (active && seen && !reduced) v.play().catch(() => {});
+    // Loops play in every mode (src/lib/motion.ts, loopsPaused).
+    if (active && seen && !loopsPaused()) v.play().catch(() => {});
     else v.pause();
   }, [active, seen]);
   return (
@@ -107,8 +105,12 @@ function Loop({ src, poster, active }: { src: string; poster?: string; active: b
         preload="metadata"
         disablePictureInPicture
         aria-hidden="true"
+      />
+      {/* Click layer (the video itself ignores the pointer, see globals.css). */}
+      <span
+        className={showcaseStyles.hit}
         data-cursor="view"
-        style={{ cursor: "pointer" }}
+        aria-hidden="true"
         onClick={(e) => {
           e.stopPropagation();
           setOpen(true);
@@ -160,7 +162,7 @@ function ScreenSwipe({
   useLayoutEffect(() => {
     if (track.current) gsap.set(track.current, { x: 0 });
     busy.current = false;
-    if (title.current && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (title.current && !reducedMotion()) {
       gsap.fromTo(title.current, { opacity: 0, y: 6 }, { opacity: 1, y: 0, duration: 0.25, ease: "power2.out" });
     }
   }, [index]);
@@ -457,7 +459,7 @@ export default function BroadcastPanel({
     const was = aboutWasShown.current;
     aboutWasShown.current = aboutShown;
     if (!el || !aboutShown || was) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const items = el.querySelectorAll<HTMLElement>(
       `.${styles.aboutLead}, .${styles.aboutPoints} > li, .${styles.aboutStats} > div, .${styles.aboutChannels} > *, .${styles.aboutOutroRow}, .${styles.aboutLoops} > *`,
     );

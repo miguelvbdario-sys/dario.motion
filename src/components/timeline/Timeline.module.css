@@ -224,6 +224,13 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .timeline,
+:global(html[data-calm]) .toTop {
+  translate: none;
+  scale: none;
+}
+
 
 @media (hover: hover) and (pointer: fine) {
   .toTop:hover {

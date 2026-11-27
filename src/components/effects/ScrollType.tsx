@@ -5,6 +5,7 @@ import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "./s
 import styles from "./ScrollType.module.css";
 
 import { useT } from "@/lib/i18n";
+import { reducedMotion } from "@/lib/motion";
 /*
  * Giant section title (Tusker, site red) that crosses the screen sideways
  * while the page scrolls past it (scrub: it follows the finger / wheel, and
@@ -36,7 +37,7 @@ export default function ScrollType({
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion()) {
       el.setAttribute("data-lit", "");
       return;
     }

@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { glide, isTouchLayout, onScrollFrame, progress, SMOOTH_TOUCH } from "@/components/effects/scrollFx";
 import styles from "./AboutIntro.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Sequence right before ABOUT, tied literally to the scroll (scrolling back
@@ -47,7 +48,7 @@ export default function AboutIntro() {
     const root = track.current;
     const about = document.getElementById("about");
     if (!root || !about) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (reducedMotion()) return;
     const q = <T extends HTMLElement>(s: string) => root.querySelector<T>(s)!;
     const stage = q("[data-stage]");
     const vids = [...root.querySelectorAll<HTMLVideoElement>("video")];

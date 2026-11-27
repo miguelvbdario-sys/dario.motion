@@ -8,6 +8,7 @@ import IntroCuts, { preloadCuts } from "./IntroCuts";
 import styles from "./Loader.module.css";
 
 import { useT } from "@/lib/i18n";
+import { reducedMotion } from "@/lib/motion";
 /*
  * Loading screen: on black, the character's face, small, turning (a few frames
  * of the hero "look" render on a loop), then "Miguel Dario" and "motion
@@ -32,14 +33,18 @@ export default function Loader() {
   const t = useT();
   const root = useRef<HTMLDivElement>(null);
   const canvas = useRef<HTMLCanvasElement>(null);
-  const [gone, setGone] = useState(false);
+  // Already lifted earlier in this visit (the page content was rebuilt by the
+  // "turn off animations" switch): no loader, no jump to the top.
+  const [gone, setGone] = useState(() => typeof window !== "undefined" && !!(window as { __siteLoaded?: boolean }).__siteLoaded);
   /** The opening sting (IntroCuts) runs between the loader and the hero. */
   const [sting, setSting] = useState(false);
 
   // A reload always starts at the top (the hero), never where the last visit left off.
   useEffect(() => {
+    if (gone) return;
     if ("scrollRestoration" in history) history.scrollRestoration = "manual";
     if (!location.hash) window.scrollTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- on mount only
   }, []);
 
   useEffect(() => {
@@ -47,7 +52,7 @@ export default function Loader() {
     const cv = canvas.current;
     if (!el || !cv) return;
     const ctx = cv.getContext("2d");
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduced = reducedMotion();
     // Lenis is created by a parent effect, which runs after this one.
     const stopLenis = setTimeout(() => lenis()?.stop(), 0);
     document.documentElement.style.overflow = "hidden";
@@ -85,7 +90,8 @@ export default function Loader() {
     // window load: that waits for every video and held phones back for seconds.
     const compact = window.matchMedia("(max-width: 767px), (max-aspect-ratio: 3/4)").matches;
     const rest = new Image();
-    rest.src = `/sequence/${compact ? "hero-look-720" : "hero-look"}/LOOK_049.webp`;
+    // Same file as the preload in page.tsx (the old "hero-look" folder is gone).
+    rest.src = `/sequence/${compact ? "hero-look-720" : "hero-look-960"}/LOOK_049.webp`;
     const loaded = rest.decode().catch(() => {});
     let done = false;
     const lift = () => {

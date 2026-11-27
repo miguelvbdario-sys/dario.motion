@@ -12,6 +12,7 @@ import type { Work } from "@/content/works";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import styles from "./Course.module.css";
 import LangSwitch from "@/components/lang/LangSwitch";
+import { reducedMotion } from "@/lib/motion";
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
@@ -183,7 +184,8 @@ export default function Course() {
   useGSAP(
     () => {
       const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      // Not with reduced motion / "turn off animations" (src/lib/motion.ts).
+      if (!reducedMotion()) mm.add("all", () => {
         const items = gsap.utils.toArray<HTMLElement>("[data-rise]");
         gsap.set(items, { opacity: 0, y: 40 });
         ScrollTrigger.batch(items, {

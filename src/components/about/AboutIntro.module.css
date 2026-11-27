@@ -94,3 +94,8 @@
     display: none;
   }
 }
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .track {
+  display: none;
+}

@@ -77,6 +77,15 @@ body {
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+html[data-calm] {
+  scroll-behavior: auto;
+}
+
+html[data-calm] :where(button, a, [role="tab"], [role="option"]):active:not(:disabled) {
+  scale: none;
+}
+
 /*
  * Page change (portfolio <-> /course): a cross-document view transition. The
  * old page leaves fast (ease-in), the new one settles in (ease-out), like a
@@ -116,6 +125,12 @@ body {
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+html[data-calm]::view-transition-old(root),
+html[data-calm]::view-transition-new(root) {
+  animation-duration: 0.01s;
+}
+
 /* Skip link: hidden until focused with the keyboard. */
 .skip-link {
   position: fixed;
@@ -149,4 +164,13 @@ video:not([controls])::-webkit-media-controls-overlay-play-button,
 video:not([controls])::-webkit-media-controls-start-playback-button {
   display: none !important;
   -webkit-appearance: none;
+}
+
+/* Muted loops are decoration: the mouse passes through them to the element
+   behind. Opera draws its own "pop out" button (▶|) on any <video> under the
+   pointer and ignores disablepictureinpicture; a video that never receives
+   the pointer never gets the button. Clickable loops carry a transparent
+   .hit layer on top instead (Showcase.module.css). */
+video:not([controls]) {
+  pointer-events: none;
 }

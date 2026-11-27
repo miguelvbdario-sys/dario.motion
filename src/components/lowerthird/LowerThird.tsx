@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import styles from "./LowerThird.module.css";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * Section title drawn like a TV lower third: a tag block (optionally "live",
@@ -30,7 +31,7 @@ export default function LowerThird({
   useEffect(() => {
     const el = root.current;
     if (!el) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    if (reducedMotion()) {
       el.dataset.in = "";
       return;
     }

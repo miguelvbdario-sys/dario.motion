@@ -145,6 +145,11 @@
   }
 }
 
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .brand {
+  transition: none;
+}
+
 @media (max-width: 767px), (max-aspect-ratio: 3/4) {
   .intro {
     grid-template-columns: minmax(0, 1fr);

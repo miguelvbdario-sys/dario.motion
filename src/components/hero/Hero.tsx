@@ -15,6 +15,7 @@ import styles from "./Hero.module.css";
 
 import { useT } from "@/lib/i18n";
 import { useLite } from "@/lib/lite";
+import { reducedMotion, useCalm } from "@/lib/motion";
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 // three.js only loads in the browser, after the hero text has painted.
@@ -70,9 +71,6 @@ const REST_ZONE = { from: 0.247, to: 0.771, top: 0.157, bottom: 0.76 };
  */
 const LOOK = { last: 98, rest: 49 };
 
-// HUD grid, measured on the wireframe (1920×1080).
-const V_LINES = ["15.89%", "38.52%", "61.12%", "83.75%"];
-const H_LINES = ["18.19%", "51.81%", "85.42%"];
 /** Course: the same link as the "Course page" button in About (falls back to #about while unset). */
 const courseHref = ABOUT.buttons.find((b) => b.label === "Course page")?.href ?? "#";
 const PILLS = [
@@ -94,7 +92,6 @@ const goTo = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
 };
 
 const pad = (frame: number) => String(frame).padStart(3, "0");
-const at = (position: string) => ({ "--at": position }) as CSSProperties;
 
 /** Lite mode: the emblem's first pose as an image (no WebGL). */
 function EmblemStill({ src, label }: { src: string; label: string }) {
@@ -110,6 +107,9 @@ export default function Hero() {
   const t = useT();
   /** Weak devices (src/lib/lite.ts): the 3D emblems become still images (their first pose). */
   const lite = useLite();
+  /** "Turn off animations" (src/lib/motion.ts): still emblems too, and a still character. */
+  const calm = useCalm();
+  const still3d = lite || calm;
   const root = useRef<HTMLElement>(null);
   const headCanvas = useRef<HTMLCanvasElement>(null);
   const arrowCanvas = useRef<HTMLCanvasElement>(null);
@@ -117,18 +117,6 @@ export default function Hero() {
   const headSequence = useRef<FrameSequence | null>(null);
   const scanCanvas = useRef<HTMLCanvasElement>(null);
   const scanlines = useRef<ScanlineField | null>(null);
-
-  // Off screen, the looping CSS animations (breathing core, grain) pause.
-  useEffect(() => {
-    const stage = root.current;
-    if (!stage) return;
-    const io = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) delete stage.dataset.offscreen;
-      else stage.dataset.offscreen = "";
-    });
-    io.observe(stage);
-    return () => io.disconnect();
-  }, []);
 
   // Background scanlines: drawn on a canvas so the mouse light can bend them.
   useEffect(() => {
@@ -148,6 +136,8 @@ export default function Hero() {
     () => {
       const stage = root.current;
       if (!stage || !headCanvas.current || !arrowCanvas.current) return;
+      /** Read once: switching "turn off animations" remounts the page. */
+      const still = reducedMotion();
 
       // Phones get the 720px frames.
       // Desktop: 960px frames (same look on screen as the 1256px masters, ~4x lighter).
@@ -206,6 +196,7 @@ export default function Hero() {
 
       const onDown = (e: PointerEvent) => {
         if (e.pointerType === "mouse") return; // the mouse uses the zones, not a drag
+        if (still) return; // animations off: the character stays put
         followMouse = false;
         if (e.button !== 0 || blocked(e.target) || !overCharacter(e.clientX, e.clientY)) return;
         pendingId = e.pointerId;
@@ -256,11 +247,11 @@ export default function Hero() {
       // the other side passes through rest, so it never jumps.
       // Chosen by the pointer actually in use (not the screen size): a mouse,
       // even in a narrow window, uses the zones; a finger uses scroll + drag.
-      let followMouse = window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+      let followMouse = !still && window.matchMedia("(hover: hover) and (pointer: fine)").matches;
       /** Mouse zone: −1 left of the character, 0 over it (or away), 1 right of it. */
       let mouseX = 0;
       const onWindowMove = (e: PointerEvent) => {
-        if (e.pointerType !== "mouse") return;
+        if (e.pointerType !== "mouse" || still) return;
         followMouse = true;
         // −1 left of the character, 0 over it, 1 right of it.
         const r = headCanvas.current?.getBoundingClientRect();
@@ -322,7 +313,7 @@ export default function Hero() {
       const onGlitchClick = (e: PointerEvent) => {
         if (e.pointerType !== "mouse" || e.button !== 0) return;
         if (blocked(e.target) || !overCharacter(e.clientX, e.clientY)) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+        if (reducedMotion()) return;
         const c = headCanvas.current;
         if (!c) return;
         delete c.dataset.glitch;
@@ -338,8 +329,11 @@ export default function Hero() {
       stage.addEventListener("pointercancel", onUp);
       gsap.ticker.add(tickHead);
 
+      // Animations off (or reduced motion): no scroll scrub, no intro; the
+      // character and the arrow stay on their first frames.
+      if (still) arrow.draw(ARROW_FRAMES.first);
       const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
+      if (!still) mm.add("all", () => {
         const q = gsap.utils.selector(stage);
 
         // Scroll scrub: one playhead drives both sequences, so the arrow and
@@ -374,9 +368,6 @@ export default function Hero() {
         // Intro, played once the loading screen has lifted.
         const intro = gsap
           .timeline({ paused: true, defaults: { ease: "expo.out" } })
-          .fromTo(q("[data-vline]"), { scaleY: 0, opacity: 1 }, { scaleY: 1, duration: 1.6, stagger: 0.07 }, 0)
-          .fromTo(q("[data-hline]"), { scaleX: 0, opacity: 1 }, { scaleX: 1, duration: 1.6, stagger: 0.07 }, 0.1)
-          .fromTo(q("[data-mark]"), { opacity: 0 }, { opacity: 1, duration: 0.8, stagger: 0.025 }, 0.9)
           // Name: neon flicker, each letter switching on like a tube (CSS heroNeon).
           .fromTo(q("[data-word]"), { opacity: 0 }, { opacity: 1, duration: 0.01 }, 0.1)
           .call(() => title.current?.setAttribute("data-neon", ""), undefined, 0.1)
@@ -420,20 +411,6 @@ export default function Hero() {
           only; the old pixel trail added ~25% to every frame and was removed). */}
       <CameraReticle />
 
-      <div className={styles.grid} aria-hidden="true">
-        {V_LINES.map((x) => (
-          <span key={x} className={styles.vline} style={at(x)} data-vline />
-        ))}
-        {H_LINES.map((y) => (
-          <span key={y} className={styles.hline} style={at(y)} data-hline />
-        ))}
-        {V_LINES.flatMap((x) =>
-          H_LINES.map((y) => (
-            <span key={`${x}-${y}`} className={styles.cross} style={{ "--x": x, "--y": y } as CSSProperties} data-mark />
-          )),
-        )}
-      </div>
-
       {/* Everything below travels up together while the hero is pinned. */}
       <div className={styles.scroll}>
         <div className={styles.fade} aria-hidden="true" />
@@ -467,14 +444,14 @@ export default function Hero() {
 
 
           <div className={`${styles.emblem} ${styles.emblemLeft}`} data-reveal data-nodrag>
-            {lite ? (
+            {still3d ? (
               <EmblemStill src="/3d/emblem-left-still.webp" label="Chrome 3D pig emblem" />
             ) : (
               <Emblem id="left" src="/3d/emblem-left.glb" label="Chrome 3D pig emblem" speed={0.75} />
             )}
           </div>
           <div className={`${styles.emblem} ${styles.emblemRight}`} data-reveal data-nodrag>
-            {lite ? (
+            {still3d ? (
               <EmblemStill src="/3d/emblem-right-still.webp" label="Chrome 3D vulture emblem" />
             ) : (
               <Emblem id="right" src="/3d/emblem-right.glb" label="Chrome 3D vulture emblem" speed={-0.6} />
@@ -507,8 +484,6 @@ export default function Hero() {
           <canvas ref={arrowCanvas} className={styles.arrow} aria-hidden="true" data-reveal />
         </div>
       </div>
-
-      <div className={styles.grain} aria-hidden="true" />
 
       <VectorOverlay stage={root} title={title} headCanvas={headCanvas} headSequence={headSequence} scanlines={scanlines} />
     </section>

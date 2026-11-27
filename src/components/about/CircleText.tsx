@@ -5,6 +5,7 @@ import { onScrollFrame } from "@/components/effects/scrollFx";
 import styles from "./CircleText.module.css";
 
 import { useT } from "@/lib/i18n";
+import { reducedMotion } from "@/lib/motion";
 /*
  * Round badge on the photo's corner: a sentence written around a circle that
  * turns with the scroll (DEG_PER_PX), backwards when scrolling up.
@@ -20,7 +21,7 @@ export default function CircleText() {
 
   useEffect(() => {
     const el = ring.current;
-    if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!el || reducedMotion()) return;
     return onScrollFrame((vh, r: DOMRect) => {
       if (r.bottom < -100 || r.top > vh + 100) return;
       el.style.transform = `rotate(${(window.scrollY * DEG_PER_PX) % 360}deg)`;

@@ -86,3 +86,9 @@
     opacity: 1;
   }
 }
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .dots span {
+  animation: none;
+  opacity: 1;
+}

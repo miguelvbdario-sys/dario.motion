@@ -1,4 +1,5 @@
 import gsap from "gsap";
+import { reducedMotion } from "@/lib/motion";
 
 /*
  * followScroll(el, at, duration): glide an element to `at` (0–1) of the screen
@@ -20,7 +21,7 @@ const lenis = () => (window as unknown as { lenis?: Lenis }).lenis;
 
 let current: (() => void) | null = null;
 
-const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const reduced = () => reducedMotion();
 
 function setScroll(y: number) {
   const l = lenis();

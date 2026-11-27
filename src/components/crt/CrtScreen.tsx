@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLite } from "@/lib/lite";
 import styles from "./CrtScreen.module.css";
 
 /*
@@ -56,16 +57,193 @@ function barrelMap(width: number, height: number) {
   return { href: canvas.toDataURL("image/png"), scale };
 }
 
-/** The rim glow: copies of the screen edge stepping inwards, fading out. */
-const RIM = Array.from({ length: 12 }, (_, i) => {
-  const k = 4 + i * 2.2; // inset of this copy (viewBox units)
-  const x0 = 18 + k, x1 = 982 - k, y0 = 26 + k, y1 = 974 - k;
-  return `M${x0} ${y0} Q500 ${-10 + k} ${x1} ${y0} Q${1010 - k} 500 ${x1} ${y1} Q500 ${1010 - k} ${x0} ${y1} Q${-10 + k} 500 ${x0} ${y0}Z`;
-});
+/** The rim glow: copies of the screen edge stepping inwards, fading out (viewBox 0–1000 units). */
+const RIM_STEPS = 12;
+const RIM_INSET = (i: number) => 4 + i * 2.2;
+
+/** The glass's sizes, as CSS lengths (they follow the screen: vmin, clamped). */
+const GLASS = {
+  radius: "clamp(6px, 1vmin, 12px)",
+  edgeBlur: "clamp(18px, 3vmin, 36px)",
+  edgeSpread: "clamp(4px, 0.8vmin, 10px)",
+  vignetteBlur: "clamp(60px, 14vmin, 180px)",
+};
+
+/** Resolve the GLASS lengths to px exactly as CSS does (a hidden probe). */
+function glassSizes() {
+  const probe = document.createElement("div");
+  probe.style.cssText = `position:fixed;visibility:hidden;pointer-events:none;width:${GLASS.radius};height:${GLASS.edgeBlur};margin-left:${GLASS.edgeSpread};margin-top:${GLASS.vignetteBlur}`;
+  document.body.appendChild(probe);
+  const cs = getComputedStyle(probe);
+  const out = {
+    radius: parseFloat(cs.width),
+    edgeBlur: parseFloat(cs.height),
+    edgeSpread: parseFloat(cs.marginLeft),
+    vignetteBlur: parseFloat(cs.marginTop),
+  };
+  probe.remove();
+  return out;
+}
+
+/**
+ * The whole CRT glass drawn ONCE into a single canvas (redrawn only when the
+ * screen size changes). It used to be three full-screen layers (an SVG edge,
+ * a glare and a glass with big box-shadows and scanlines); Safari re-blended
+ * all three on every frame anything moved under them. The drawing reproduces
+ * them in their old paint order:
+ *   1. the bowed screen edge: black outside it, plus a faint white rim glow;
+ *   2. the glare: brighter upper left, darker towards the edges;
+ *   3. the glass: faint scanlines, two inset shadows (vignette and edge),
+ *      and black in the rounded corners.
+ * Lite mode (src/lib/lite.ts) leaves out the rim, glare and scanlines.
+ */
+function drawCrt(canvas: HTMLCanvasElement, lite: boolean) {
+  const rect = canvas.getBoundingClientRect();
+  const W = rect.width;
+  const H = rect.height;
+  if (W < 1 || H < 1) return;
+  const dpr = window.devicePixelRatio || 1;
+  canvas.width = Math.round(W * dpr);
+  canvas.height = Math.round(H * dpr);
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return;
+  const sx = canvas.width / W;
+  const sy = canvas.height / H;
+  ctx.setTransform(sx, 0, 0, sy, 0, 0);
+  ctx.clearRect(0, 0, W, H);
+  const X = (v: number) => (v * W) / 1000;
+  const Y = (v: number) => (v * H) / 1000;
+
+  /** The bowed screen edge, inset by k viewBox units. */
+  const edge = (k: number) => {
+    const x0 = 18 + k;
+    const x1 = 982 - k;
+    const y0 = 26 + k;
+    const y1 = 974 - k;
+    ctx.moveTo(X(x0), Y(y0));
+    ctx.quadraticCurveTo(X(500), Y(-10 + k), X(x1), Y(y0));
+    ctx.quadraticCurveTo(X(1010 - k), Y(500), X(x1), Y(y1));
+    ctx.quadraticCurveTo(X(500), Y(1010 - k), X(x0), Y(y1));
+    ctx.quadraticCurveTo(X(-10 + k), Y(500), X(x0), Y(y0));
+    ctx.closePath();
+  };
+
+  // 1. Black outside the bowed edge.
+  ctx.beginPath();
+  ctx.rect(X(-20), Y(-20), X(1040), Y(1040));
+  edge(0);
+  ctx.fillStyle = "#000";
+  ctx.fill("evenodd");
+
+  if (!lite) {
+    // Rim glow: 3px strokes, white fading down each copy's own height.
+    ctx.lineWidth = 3;
+    ctx.miterLimit = 4;
+    for (let i = 0; i < RIM_STEPS; i++) {
+      const k = RIM_INSET(i);
+      // The curve's own top and bottom (the gradient spans its bounding box).
+      const g = ctx.createLinearGradient(0, Y(8 + k), 0, Y(992 - k));
+      g.addColorStop(0, "rgba(255, 255, 255, 1)");
+      g.addColorStop(0.5, "rgba(255, 255, 255, 0.35)");
+      g.addColorStop(1, "rgba(255, 255, 255, 0.7)");
+      ctx.globalAlpha = 0.09 * (1 - i / RIM_STEPS);
+      ctx.strokeStyle = g;
+      ctx.beginPath();
+      edge(k);
+      ctx.stroke();
+    }
+    ctx.globalAlpha = 1;
+
+    // 2. Glare: the darker edges first, the bright spot on top.
+    const ellipse = (cx: number, cy: number, rx: number, ry: number, stops: [number, string][]) => {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(rx, ry);
+      const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 1);
+      for (const [at, color] of stops) g.addColorStop(at, color);
+      ctx.fillStyle = g;
+      ctx.fillRect(-cx / rx, -cy / ry, W / rx, H / ry);
+      ctx.restore();
+    };
+    ellipse(W * 0.5, H * 0.5, W * 0.7, H * 0.6, [
+      [0.55, "rgba(0, 0, 0, 0)"],
+      [1, "rgba(0, 0, 0, 0.28)"],
+    ]);
+    ellipse(W * 0.28, H * 0.18, W * 0.6, H * 0.45, [
+      [0, "rgba(255, 255, 255, 0.11)"],
+      [0.7, "rgba(255, 255, 255, 0)"],
+    ]);
+  }
+
+  // 3. The glass, inside its rounded corners.
+  const glass = glassSizes();
+  const r = glass.radius;
+  ctx.save();
+  ctx.beginPath();
+  ctx.roundRect(0, 0, W, H, r);
+  ctx.clip();
+  if (!lite) {
+    // Scanlines: 1px of 10% black every 3px, from the top.
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+    for (let y = 0; y < H; y += 3) ctx.fillRect(0, y, W, 1);
+  }
+  /** An inset box-shadow: everything outside the shrunk rounded box, blurred. */
+  const inset = (blur: number, spread: number, color: string) => {
+    // Only the shadow is wanted: the shape is drawn far off to the left and
+    // its shadow shifted back (shadow offset and blur are in canvas pixels).
+    const away = W * 3;
+    ctx.save();
+    ctx.shadowColor = color;
+    ctx.shadowBlur = blur * sx;
+    ctx.shadowOffsetX = away * sx;
+    ctx.shadowOffsetY = 0;
+    ctx.beginPath();
+    ctx.rect(-away - W, -H, W * 3, H * 3);
+    ctx.roundRect(-away + spread, spread, W - spread * 2, H - spread * 2, Math.max(0, r - spread));
+    ctx.fillStyle = "#000";
+    ctx.fill("evenodd");
+    ctx.restore();
+  };
+  // CSS paints the first listed shadow on top: the vignette goes first.
+  inset(glass.vignetteBlur, 0, "rgba(0, 0, 0, 0.55)");
+  inset(glass.edgeBlur, glass.edgeSpread, "#000");
+  ctx.restore();
+
+  // Black in the rounded corners (the old 60px outer spread).
+  ctx.beginPath();
+  ctx.rect(0, 0, W, H);
+  ctx.roundRect(0, 0, W, H, r);
+  ctx.fillStyle = "#000";
+  ctx.fill("evenodd");
+}
 
 export default function CrtScreen() {
   const [map, setMap] = useState<{ href: string; scale: number; w: number; h: number } | null>(null);
   const timer = useRef(0);
+  const glassCanvas = useRef<HTMLCanvasElement>(null);
+  const lite = useLite();
+
+  // Draw the glass now, and again whenever the screen size, its pixel
+  // density or lite mode changes. Nothing is redrawn while scrolling.
+  useEffect(() => {
+    const canvas = glassCanvas.current;
+    if (!canvas) return;
+    let frame = 0;
+    const redraw = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => drawCrt(canvas, lite));
+    };
+    drawCrt(canvas, lite);
+    const ro = new ResizeObserver(redraw);
+    ro.observe(canvas);
+    const dpr = window.matchMedia(`(resolution: ${window.devicePixelRatio}dppx)`);
+    dpr.addEventListener("change", redraw);
+    return () => {
+      cancelAnimationFrame(frame);
+      ro.disconnect();
+      dpr.removeEventListener("change", redraw);
+    };
+  }, [lite]);
 
   useEffect(() => {
     if (!CURVE) return;
@@ -111,32 +289,8 @@ export default function CrtScreen() {
       {/* Bulge off: the full-screen SVG backdrop filter cost ~2/3 of every frame
           (60 → 20 fps even on fast machines). Set CURVE = true to bring it back. */}
       {CURVE && map && <div className={styles.bulge} aria-hidden="true" />}
-      {/* Light curve: a static "pillow" screen silhouette (edges bowed out,
-          corners tucked in) and a soft glare on the glass. Drawn once by the
-          browser, no per-frame cost. Where to tweak: the path below and .glare. */}
-      <svg className={styles.shape} viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true" focusable="false">
-        <path
-          fillRule="evenodd"
-          d="M-20 -20H1020V1020H-20Z M18 26 Q500 -10 982 26 Q1010 500 982 974 Q500 1010 18 974 Q-10 500 18 26Z"
-        />
-        {/* Glass rim: a soft white-to-transparent glow just inside the bowed
-            edge (stacked strokes, static vector, no filter), so the curve
-            reads on the black sections too. Brighter at the top. */}
-        <defs>
-          <linearGradient id="crt-rim" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0" stopColor="#fff" stopOpacity="1" />
-            <stop offset="0.5" stopColor="#fff" stopOpacity="0.35" />
-            <stop offset="1" stopColor="#fff" stopOpacity="0.7" />
-          </linearGradient>
-        </defs>
-        <g className={styles.rim}>
-          {RIM.map((d, i) => (
-            <path key={i} d={d} style={{ opacity: 0.09 * (1 - i / RIM.length) }} />
-          ))}
-        </g>
-      </svg>
-      <div className={styles.glare} aria-hidden="true" />
-      <div className={styles.glass} aria-hidden="true" />
+      {/* The glass: edge, rim, glare, scanlines and shadows, drawn once (drawCrt). */}
+      <canvas ref={glassCanvas} data-crt className={styles.glass} aria-hidden="true" />
     </>
   );
 }

@@ -22,3 +22,9 @@
     transition: none;
   }
 }
+
+/* Same with "turn off animations" on (src/lib/motion.ts). */
+:global(html[data-calm]) .mark,
+:global(html[data-calm]) .mark[data-on] {
+  transition: none;
+}

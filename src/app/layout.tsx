@@ -9,6 +9,8 @@ import LiteWatch from "@/components/providers/LiteWatch";
 import Effects from "@/components/effects/Effects";
 import { SITE, SITE_URL } from "@/lib/site";
 import { LangProvider } from "@/lib/i18n";
+import CalmRemount from "@/components/providers/CalmRemount";
+import { CALM_BOOT } from "@/lib/calmBoot";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -43,6 +45,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
+      // data-calm / data-lite / data-loaded are set by script before React hydrates.
+      suppressHydrationWarning
       className={`${inter.variable} ${mono.variable} ${tusker.variable} ${wildest.variable} antialiased`}
     >
       <body>
@@ -50,7 +54,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             or Chrome restores the old scroll position first. */}
         <script
           dangerouslySetInnerHTML={{
-            __html: `try{history.scrollRestoration="manual";if(!location.hash)window.scrollTo(0,0)}catch(e){}`,
+            __html: `try{history.scrollRestoration="manual";if(!location.hash)window.scrollTo(0,0)}catch(e){}` + CALM_BOOT,
           }}
         />
         <script
@@ -63,10 +67,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </a>
         {/* The hero intro starts hidden and is revealed by script; without scripts, show it as is. */}
         <noscript>
-          <style>{`[data-reveal],[data-word],[data-head],[data-vline],[data-hline],[data-mark]{opacity:1!important}`}</style>
+          <style>{`[data-reveal],[data-word],[data-head]{opacity:1!important}`}</style>
         </noscript>
         <LangProvider>
-          <SmoothScroll>{children}</SmoothScroll>
+          <SmoothScroll>
+            <CalmRemount>{children}</CalmRemount>
+          </SmoothScroll>
         </LangProvider>
         <CrtScreen />
         <LiteWatch />

@@ -8,6 +8,7 @@ import Marked from "@/components/effects/Marked";
 import { useT } from "@/lib/i18n";
 import { useInView } from "@/lib/useInView";
 import { inlineSrc } from "@/content/videoVariants";
+import { loopsPaused } from "@/lib/motion";
 /*
  * Personal project gallery (e.g. World Cup Graphics).
  *
@@ -33,7 +34,7 @@ function Clip({ base, active }: { base: string; active: boolean }) {
     if (!v) return;
     // Metadata may already be in (cached) before React attached onLoadedMetadata.
     if (v.readyState >= 1 && v.videoWidth / v.videoHeight > 2.2) v.parentElement?.setAttribute("data-strip", "");
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = loopsPaused();
     if (active && seen && !still) v.play().catch(() => {});
     else v.pause();
   }, [active, seen]);
@@ -72,7 +73,7 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
   useEffect(() => {
     const v = ref.current;
     if (!v) return;
-    const still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const still = loopsPaused();
     if (active && seen && !still) v.play().catch(() => {});
     else v.pause();
   }, [active, seen, i]);
@@ -105,9 +106,12 @@ function Vertical({ videos, active }: { videos: string[]; active: boolean }) {
         aria-label={`Process video ${i + 1} of ${n}`}
         loop={n === 1}
         onEnded={() => step(1)}
-        // Click / tap: fullscreen, where the arrows and swipe still change video.
+      />
+      {/* Click / tap: fullscreen, where the arrows and swipe still change video. */}
+      <span
+        className={styles.hit}
         data-cursor="view"
-        style={{ cursor: "pointer" }}
+        aria-hidden="true"
         onClick={() => {
           if (swiped.current) swiped.current = false;
           else setFull(true);

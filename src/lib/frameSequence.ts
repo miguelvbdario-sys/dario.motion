@@ -10,6 +10,54 @@ type FrameSequenceOptions = {
   onReady?: () => void;
 };
 
+// ---------- Off-thread decoding (shared by every sequence) ----------
+
+type Waiting = { resolve: (b: ImageBitmap) => void; reject: (e: unknown) => void; blob: Blob };
+/** undefined = not tried yet, null = unavailable (decode on the page instead). */
+let decoder: Worker | null | undefined;
+const waiting = new Map<number, Waiting>();
+let nextId = 0;
+
+function startDecoder() {
+  try {
+    const w = new Worker("/decode-worker.js");
+    w.onmessage = (e: MessageEvent<{ id: number; bitmap?: ImageBitmap; error?: string }>) => {
+      const job = waiting.get(e.data.id);
+      if (!job) return e.data.bitmap?.close();
+      waiting.delete(e.data.id);
+      if (e.data.bitmap) job.resolve(e.data.bitmap);
+      else job.reject(new Error(e.data.error));
+    };
+    // The worker failed to load: decode on the page from now on, including
+    // the jobs it was holding.
+    w.onerror = () => {
+      decoder = null;
+      w.terminate();
+      for (const job of waiting.values()) createImageBitmap(job.blob).then(job.resolve, job.reject);
+      waiting.clear();
+    };
+    return w;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Blob → ImageBitmap in a worker. Chrome already decodes createImageBitmap
+ * off the main thread, but Safari blocks the page during part of each decode
+ * (~30 ms per 960px frame), which made scrolling the hero stutter there.
+ */
+function decodeImage(blob: Blob): Promise<ImageBitmap> {
+  if (decoder === undefined) decoder = typeof Worker === "function" ? startDecoder() : null;
+  if (!decoder) return createImageBitmap(blob);
+  const id = nextId++;
+  const w = decoder;
+  return new Promise((resolve, reject) => {
+    waiting.set(id, { resolve, reject, blob });
+    w.postMessage({ id, blob });
+  });
+}
+
 /**
  * Numbered image sequence painted on a <canvas>.
  *
@@ -21,7 +69,7 @@ type FrameSequenceOptions = {
  * Performance: the WebP frames (with alpha) are expensive to decode. Drawing a
  * plain <img> made the browser decode it on the main thread on every frame
  * change, which froze slower machines. Here each file is decoded with
- * createImageBitmap(blob), which Chrome does on a background thread, and only
+ * createImageBitmap(blob) in a worker (decodeImage above), and only
  * the decoded frames around the playhead are kept (memory stays bounded).
  */
 export class FrameSequence {
@@ -159,7 +207,7 @@ export class FrameSequence {
 
   private decode(frame: number, blob: Blob) {
     this.decoding.add(frame);
-    createImageBitmap(blob)
+    decodeImage(blob)
       .then((bmp) => {
         this.decoding.delete(frame);
         if (!this.alive) return bmp.close();

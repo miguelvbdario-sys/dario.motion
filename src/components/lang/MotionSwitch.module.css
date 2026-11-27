@@ -1,0 +1,81 @@
+/* "Turn off animations" switch (MotionSwitch.tsx), styled like the EN / PT pill. */
+
+.switch {
+  --switch-color: #e60000;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  height: 36px;
+  padding: 0 5px 0 14px;
+  border: 1px solid rgb(239 238 238 / 0.28);
+  border-radius: 999px;
+  background: #0b0000;
+  color: rgb(239 238 238 / 0.7);
+  cursor: pointer;
+  font-family: var(--font-mono, monospace);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition:
+    border-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.switch:hover,
+.switch[data-on] {
+  border-color: var(--switch-color);
+  color: #fff;
+}
+
+.switch:focus-visible {
+  outline: 2px solid #efeeee;
+  outline-offset: 3px;
+}
+
+/* The little track: grey while animations play, red once they are off. */
+.track {
+  position: relative;
+  flex: none;
+  width: 44px;
+  height: calc(100% - 8px);
+  border-radius: 999px;
+  background: rgb(239 238 238 / 0.14);
+  transition: background-color 0.2s ease;
+}
+
+.knob {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(239 238 238 / 0.75);
+  transition:
+    translate 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+    background-color 0.2s ease;
+}
+
+.switch[data-on] .track {
+  background: var(--switch-color);
+  box-shadow: 0 0 14px color-mix(in srgb, var(--switch-color) 55%, transparent);
+}
+
+.switch[data-on] .knob {
+  /* Track 44px minus the knob and its 3px margins on each side. */
+  translate: calc(44px - 100% - 6px) 0;
+  background: #fff;
+}
+
+:global(html[data-calm]) .knob,
+:global(html[data-calm]) .track {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .knob,
+  .track {
+    transition: none;
+  }
+}

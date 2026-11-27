@@ -8,6 +8,7 @@ import type { Work } from "@/content/works";
 import styles from "./WorkPlayer.module.css";
 
 import { useT } from "@/lib/i18n";
+import { reducedMotion } from "@/lib/motion";
 type WorkPlayerProps = {
   work: Work | null;
   onClose: () => void;
@@ -55,7 +56,7 @@ export default function WorkPlayer({ work, onClose, origin }: WorkPlayerProps) {
   });
 
   useEffect(() => {
-    reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    reduced.current = reducedMotion();
   }, []);
 
   useEffect(() => {
