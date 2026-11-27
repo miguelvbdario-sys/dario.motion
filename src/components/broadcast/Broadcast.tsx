@@ -690,9 +690,9 @@ export default function Broadcast() {
       if (!row) return;
       const { top, bottom } = row.getBoundingClientRect();
       // Almost leaving the screen: the row is in the top 10% (or just passing it on a fast scroll).
-      // Phones open it earlier (25%), while the row is still in front of the
+      // Phones open it earlier (20%), while the row is still in front of the
       // visitor, so the finger's momentum doesn't carry it off the screen first.
-      const at = isTouchLayout() ? 0.25 : 0.1;
+      const at = isTouchLayout() ? 0.2 : 0.1;
       if (bottom > 0 && top <= window.innerHeight * at) {
         autoOpened.current = true;
         window.removeEventListener("scroll", onScroll);
