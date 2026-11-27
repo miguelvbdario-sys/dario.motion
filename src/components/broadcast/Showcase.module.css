@@ -157,6 +157,10 @@
   grid-auto-columns: 88%;
   gap: 8px;
   overflow-x: auto;
+  /* Sideways only. With overflow-x set, the browser made it scrollable up and
+     down too (the two-loop pages have different heights), so a vertical swipe
+     over the loops scrolled this box instead of the page. */
+  overflow-y: hidden;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
   overscroll-behavior-x: contain;

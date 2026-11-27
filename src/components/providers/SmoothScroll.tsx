@@ -29,7 +29,11 @@ export default function SmoothScroll({ children }: { children: React.ReactNode }
     gsap.ticker.add(tick);
     gsap.ticker.lagSmoothing(0);
 
-    // Expose for anchor navigation (e.g. lenis.scrollTo("#works"))
+    // Start at the top on every load (Lenis keeps its own copy of the scroll
+    // position, so set it here too, not only on the window).
+    if (!location.hash) lenis.scrollTo(0, { immediate: true, force: true });
+
+        // Expose for anchor navigation (e.g. lenis.scrollTo("#works"))
     (window as unknown as { lenis?: Lenis }).lenis = lenis;
 
     return () => {

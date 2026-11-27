@@ -451,6 +451,8 @@ export default function Broadcast() {
   });
 
   // ---------- Open / close ----------
+  /** The next opening comes from the automatic Paulistão open (no glide). */
+  const autoOpening = useRef(false);
   const toggle = (project: BroadcastProject) => {
     setOpenId((current) => (current === project.id ? null : project.id));
     setMounted((m) => (m.has(project.id) ? m : new Set(m).add(project.id)));
@@ -480,15 +482,33 @@ export default function Broadcast() {
       delete wrap.dataset.glitch;
       if (isOpen) {
         const fromClosed = wrap.offsetHeight < 2;
-        gsap.to(wrap, { height: "auto", duration: OPEN_TIME, ease: EASE_OPEN, overwrite: true });
-        // A short signal glitch as the content comes in, like a camera cut (< 300ms).
-        timers[i] = window.setTimeout(() => {
-          wrap.dataset.glitch = "";
-          timers[i] = window.setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
-        }, 280);
+        // The automatic opening happens while the visitor scrolls: it unfolds
+        // gently (soft ease, a plain fade, no glitch flash), so it reads as the
+        // page settling instead of a cut. A click keeps the full sting.
+        const soft = autoOpening.current;
+        gsap.to(wrap, {
+          height: "auto",
+          duration: soft ? 1.1 : OPEN_TIME,
+          ease: soft ? "power2.out" : EASE_OPEN,
+          overwrite: true,
+        });
+        if (!soft) {
+          // A short signal glitch as the content comes in, like a camera cut (< 300ms).
+          timers[i] = window.setTimeout(() => {
+            wrap.dataset.glitch = "";
+            timers[i] = window.setTimeout(() => delete wrap.dataset.glitch, GLITCH_MS);
+          }, 280);
+        }
         if (inner) {
-          if (fromClosed) gsap.set(inner, { opacity: 0, y: -24 });
-          gsap.to(inner, { opacity: 1, y: 0, duration: OPEN_TIME, delay: fromClosed ? 0.2 : 0, ease: EASE_OPEN, overwrite: true });
+          if (fromClosed) gsap.set(inner, { opacity: 0, y: soft ? 0 : -24 });
+          gsap.to(inner, {
+            opacity: 1,
+            y: 0,
+            duration: soft ? 0.9 : OPEN_TIME,
+            delay: fromClosed ? (soft ? 0.15 : 0.2) : 0,
+            ease: soft ? "power1.out" : EASE_OPEN,
+            overwrite: true,
+          });
         }
       } else {
         // Closing runs faster than opening (fast closing: the visitor is done with it).
@@ -516,10 +536,14 @@ export default function Broadcast() {
     // animation at the same time; the glide re-reads the row's position every
     // frame, so a card collapsing above it is followed smoothly and the row
     // still lands exactly in place (no instant collapse, no jump).
-    if (openId) {
+    // The automatic opening (Paulistão at 35%) does not glide: the visitor is
+    // scrolling right then, and a scripted scroll on top of their momentum made
+    // the page flicker. The row is already near the focus line anyway.
+    if (openId && !autoOpening.current) {
       const row = rows.current[BROADCAST.findIndex((p) => p.id === openId)];
       if (row) followScroll(row, FOCUS_AT, OPEN_TIME, "bcOpen");
     }
+    autoOpening.current = false;
   }, [openId, setBars, targetFor, transition]);
 
   // Paulistão (first card) opens by itself the first time its row reaches 35%
@@ -536,6 +560,7 @@ export default function Broadcast() {
         autoOpened.current = true;
         window.removeEventListener("scroll", onScroll);
         if (!openRef.current) {
+          autoOpening.current = true;
           setMounted((m) => (m.has("paulistao") ? m : new Set(m).add("paulistao")));
           setOpenId("paulistao");
         }

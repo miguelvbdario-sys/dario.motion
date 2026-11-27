@@ -49,6 +49,12 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
   const [want3D, setWant3D] = useState(false);
   /** The 3D is on screen (the video is hidden and paused). */
   const [ready, setReady] = useState(false);
+  /**
+   * The press that asked for the 3D, followed while it loads: if the button
+   * or finger is still down when the 3D appears, that same press is handed to
+   * the 3D controls, so the very first drag already turns the trophy.
+   */
+  const press = useRef<{ id: number; x: number; y: number; type: string; down: boolean } | null>(null);
 
   // Card closed: back to the video for the next opening.
   useEffect(() => {
@@ -199,6 +205,22 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
           shown = true;
           renderer.domElement.setAttribute("data-on", "");
           setReady(true);
+          const p = press.current;
+          if (p?.down) {
+            renderer.domElement.dispatchEvent(
+              new PointerEvent("pointerdown", {
+                pointerId: p.id,
+                pointerType: p.type,
+                isPrimary: true,
+                clientX: p.x,
+                clientY: p.y,
+                button: 0,
+                buttons: 1,
+                bubbles: true,
+                cancelable: true,
+              }),
+            );
+          }
         }
       });
 
@@ -220,9 +242,40 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
     };
   }, [active, want3D, lite]);
 
-  const reach = () => {
-    if (!lite) setWant3D(true);
+  const reach = (e: React.PointerEvent) => {
+    if (lite || ready) return;
+    const p = { id: e.pointerId, x: e.clientX, y: e.clientY, type: e.pointerType, down: true };
+    press.current = p;
+    const move = (ev: PointerEvent) => {
+      if (ev.pointerId !== p.id) return;
+      p.x = ev.clientX;
+      p.y = ev.clientY;
+    };
+    const up = (ev: PointerEvent) => {
+      if (ev.pointerId !== p.id) return;
+      p.down = false;
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+    };
+    window.addEventListener("pointermove", move, { passive: true });
+    window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", up);
+    setWant3D(true);
   };
+
+  /** Mouse over the square: fetch the 3D files ahead (no WebGL yet), so a click shows it sooner. */
+  const warm = (e: React.PointerEvent) => {
+    if (lite || e.pointerType !== "mouse" || warmed.current) return;
+    warmed.current = true;
+    void import("three");
+    void import("three/examples/jsm/loaders/GLTFLoader.js");
+    void import("three/examples/jsm/loaders/DRACOLoader.js");
+    void import("three/examples/jsm/controls/OrbitControls.js");
+    void import("three/examples/jsm/environments/RoomEnvironment.js");
+    void fetch(`${DIR}trophy.glb`).catch(() => {});
+  };
+  const warmed = useRef(false);
 
   return (
     <div className={styles.trophyWrap}>
@@ -232,6 +285,7 @@ export default function BroadcastTrophy({ active }: { active: boolean }) {
         aria-label="3D trophy, drag to rotate"
         role="img"
         onPointerDown={reach}
+        onPointerEnter={warm}
       >
         {lite ? (
           // eslint-disable-next-line @next/next/no-img-element

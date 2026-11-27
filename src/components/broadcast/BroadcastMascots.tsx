@@ -66,7 +66,35 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
     setValue(v);
     setUsed(true);
     const el = video.current;
-    if (el && el.duration) seek((v / STEPS) * Math.max(0, el.duration - 0.04));
+    if (!el) return;
+    if (el.duration) seek((v / STEPS) * Math.max(0, el.duration - 0.04));
+    else wantedStep.current = v; // applied once the video knows its length
+  };
+  const wantedStep = useRef<number | null>(null);
+  const onMeta = () => {
+    const v = wantedStep.current;
+    wantedStep.current = null;
+    const el = video.current;
+    if (v !== null && el?.duration) seek((v / STEPS) * Math.max(0, el.duration - 0.04));
+  };
+  /**
+   * Phones: a muted video that has never played often has no frame decoded
+   * (and may not even have loaded, to save data), so seeking showed nothing.
+   * The first touch loads it and plays/pauses it once, which "wakes" it.
+   */
+  const primed = useRef(false);
+  const prime = () => {
+    const el = video.current;
+    if (!el || primed.current) return;
+    primed.current = true;
+    if (el.readyState < 1) el.load();
+    el.play()
+      .then(() => {
+        el.pause();
+        const v = wantedStep.current ?? value;
+        if (el.duration) seek((v / STEPS) * Math.max(0, el.duration - 0.04));
+      })
+      .catch(() => {});
   };
 
   // Pointer x → position along the slider track (the whole card is the grip).
@@ -85,6 +113,7 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
           fromPointer(e.clientX);
           return;
         }
+        prime();
         start.current = { x: e.clientX, y: e.clientY, v: value };
         // Touch on the slider: drag at once. On the video: decide by direction.
         if ((e.target as Element).closest("label")) {
@@ -136,6 +165,7 @@ function MascotRow({ slug, label }: { slug: string; label: string }) {
           disablePictureInPicture
           aria-hidden="true"
           onSeeked={onSeeked}
+          onLoadedMetadata={onMeta}
         />
         <span className={styles.mascotName}>{label}</span>
         <span className={styles.mascotHint} data-hidden={used || undefined} aria-hidden="true">

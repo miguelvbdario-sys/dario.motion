@@ -412,7 +412,10 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: #efeeee;
-  mix-blend-mode: difference;
+  /* (Was mix-blend-mode: difference. A blended label on top of a playing video
+     makes the browser re-blend it on every video frame and stops the video
+     from taking the fast path; a soft shadow reads the same.) */
+  text-shadow: 0 0 6px rgb(0 0 0 / 0.55);
 }
 
 .index {
@@ -1705,6 +1708,7 @@
     flex-wrap: nowrap;
     max-width: 100%;
     overflow-x: auto;
+    overflow-y: hidden;
   }
 
   .mediaGrid,
@@ -3230,6 +3234,7 @@
     margin: 0 -16px;
     padding: 0 16px 4px;
     overflow-x: auto;
+    overflow-y: hidden;
     overscroll-behavior-x: contain;
     scroll-snap-type: x mandatory;
     scroll-padding: 0 16px;
@@ -3285,4 +3290,58 @@
 .panelWrap,
 .accItem > :not(.accHeader) {
   overflow-anchor: none;
+}
+
+/* ---------- Phones: readability pack ---------- */
+.stepsWrap {
+  position: relative;
+}
+
+.stepsHint {
+  display: none;
+}
+
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  /* Steps row: a round arrow on the right edge says "slide for more"; it
+     nudges sideways, never covers the text (sits in the card gap side), and
+     fades out at the end of the row. */
+  .stepsHint {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    display: grid;
+    place-items: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgb(230 0 0 / 0.92);
+    color: #fff;
+    box-shadow: 0 2px 10px rgb(0 0 0 / 0.35);
+    pointer-events: none;
+    translate: 0 -50%;
+    transition: opacity 0.3s ease;
+    animation: stepsNudge 1.6s ease-in-out infinite;
+  }
+
+  .stepsWrap[data-end] .stepsHint {
+    opacity: 0;
+  }
+
+  /* The closing line: natural spacing. */
+  .aboutProcess .aboutOutro {
+    font-size: 22px;
+    line-height: 1.22;
+  }
+}
+
+@keyframes stepsNudge {
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stepsHint {
+    animation: none;
+  }
 }

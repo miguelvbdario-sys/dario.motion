@@ -8,7 +8,6 @@ import { useTr, useT } from "@/lib/i18n";
 import WorkPlayer from "@/components/works/WorkPlayer";
 import SlotNumber from "@/components/effects/SlotNumber";
 import styles from "./WorksCarousel.module.css";
-import { isLite } from "@/lib/lite";
 
 /*
  * Concave carousel: a wall of video panels that curves around the viewer,
@@ -99,7 +98,6 @@ export default function WorksCarousel() {
     if (!el || !wall || !section) return;
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const touch = window.matchMedia("(hover: none)");
     let width = 0;
     let inView = false;
     let lastActive = -1;
@@ -206,10 +204,9 @@ export default function WorksCarousel() {
           caption.style.opacity = String(show);
         }
 
-        // Desktop plays the centre panel and its two neighbours (the outer pair
-        // holds still: five videos decoding at once halved the frame rate);
-        // phones and lite mode (weak devices) only the centre one.
-        const shouldPlay = !hidden && !reducedMotion && (touch.matches || isLite() ? i === centre : Math.abs(rel) < 1.5);
+        // One video at a time: the hovered (zoomed) panel while the mouse is on
+        // one, otherwise the centre panel. The others hold their frame.
+        const shouldPlay = !hidden && !reducedMotion && (m.hovered >= 0 ? i === m.hovered : i === centre);
         if (shouldPlay !== isPlaying[i]) {
           isPlaying[i] = shouldPlay;
           panel.toggleAttribute("data-still", !shouldPlay);

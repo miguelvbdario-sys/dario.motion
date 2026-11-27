@@ -307,3 +307,20 @@
 .moveHint[data-side="left"] {
   transform: translate(33px, -50%);
 }
+
+/* Phones: a small hint (it was sized for desktop). */
+@media (max-width: 767px), (max-aspect-ratio: 3/4) {
+  .moveHint {
+    padding: 5px 8px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .moveHint[data-side="right"] {
+    transform: translate(calc(-100% - 28px), -50%);
+  }
+
+  .moveHint[data-side="left"] {
+    transform: translate(28px, -50%);
+  }
+}

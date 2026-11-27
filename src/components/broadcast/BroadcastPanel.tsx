@@ -685,7 +685,20 @@ export default function BroadcastPanel({
 
   /** "All assets": the whole package list, scrolling inside the 16:9 stage. */
   const assetsList = (
-                  <div className={styles.assetsList} data-lenis-prevent>
+                  <div
+                    className={styles.assetsList}
+                    data-lenis-prevent
+                    // Phones: keep the list one pixel away from its ends when a
+                    // touch starts, so the finger always scrolls the LIST (at
+                    // an end, the browser would hand the gesture to the page).
+                    onTouchStart={(e) => {
+                      const el = e.currentTarget;
+                      const max = el.scrollHeight - el.clientHeight;
+                      if (max <= 0) return;
+                      if (el.scrollTop <= 0) el.scrollTop = 1;
+                      else if (el.scrollTop >= max) el.scrollTop = max - 1;
+                    }}
+                  >
                     <p className={styles.assetsTitle}>
                       All assets <span aria-hidden="true">&gt;</span>
                       <span className={styles.assetsCount}>[{PAULISTAO_ASSET_COUNT}]</span>

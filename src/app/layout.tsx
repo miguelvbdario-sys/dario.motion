@@ -46,6 +46,13 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${inter.variable} ${mono.variable} ${tusker.variable} ${wildest.variable} antialiased`}
     >
       <body>
+        {/* A reload always starts at the top (the hero): run before anything paints,
+            or Chrome restores the old scroll position first. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{history.scrollRestoration="manual";if(!location.hash)window.scrollTo(0,0)}catch(e){}`,
+          }}
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(PERSON_LD).replace(/</g, "\\u003c") }}
