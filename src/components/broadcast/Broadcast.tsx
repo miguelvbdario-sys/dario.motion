@@ -364,10 +364,15 @@ export default function Broadcast() {
       });
     };
     fit();
+    // fonts.ready can resolve before the title font has even been requested;
+    // refit whenever any font finishes loading too, so the title is sized for
+    // the real font right away (not only on the next resize).
     document.fonts?.ready.then(fit);
+    document.fonts?.addEventListener?.("loadingdone", fit);
     mq.addEventListener("change", fit);
     window.addEventListener("resize", fit);
     return () => {
+      document.fonts?.removeEventListener?.("loadingdone", fit);
       mq.removeEventListener("change", fit);
       window.removeEventListener("resize", fit);
     };
@@ -685,7 +690,10 @@ export default function Broadcast() {
       if (!row) return;
       const { top, bottom } = row.getBoundingClientRect();
       // Almost leaving the screen: the row is in the top 10% (or just passing it on a fast scroll).
-      if (bottom > 0 && top <= window.innerHeight * 0.1) {
+      // Phones open it earlier (25%), while the row is still in front of the
+      // visitor, so the finger's momentum doesn't carry it off the screen first.
+      const at = isTouchLayout() ? 0.25 : 0.1;
+      if (bottom > 0 && top <= window.innerHeight * at) {
         autoOpened.current = true;
         window.removeEventListener("scroll", onScroll);
         if (!openRef.current) {
