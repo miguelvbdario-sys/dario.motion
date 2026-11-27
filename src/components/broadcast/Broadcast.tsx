@@ -583,7 +583,7 @@ export default function Broadcast() {
     autoOpening.current = false;
   }, [openId, setBars, targetFor, transition]);
 
-  // Paulistão (first card) opens by itself the first time its row reaches 35%
+  // Paulistão (first card) opens by itself the first time its row reaches 10%
   // of the screen from the top. Only once per visit; the others need a click.
   const autoOpened = useRef(false);
   useEffect(() => {
@@ -592,8 +592,9 @@ export default function Broadcast() {
       const i = BROADCAST.findIndex((p) => p.id === "paulistao");
       const row = rows.current[i];
       if (!row) return;
-      const top = row.getBoundingClientRect().top;
-      if (top > 0 && top <= window.innerHeight * 0.35) {
+      const { top, bottom } = row.getBoundingClientRect();
+      // Almost leaving the screen: the row is in the top 10% (or just passing it on a fast scroll).
+      if (bottom > 0 && top <= window.innerHeight * 0.1) {
         autoOpened.current = true;
         window.removeEventListener("scroll", onScroll);
         if (!openRef.current) {
